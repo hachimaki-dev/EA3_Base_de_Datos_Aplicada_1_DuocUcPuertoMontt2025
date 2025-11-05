@@ -1,0 +1,22 @@
+--Eliminamos todas las tablas
+DROP TABLE MARCAS CASCADE CONSTRAINT;
+
+-- Primero vamos a crear tablas con prioridad 0
+CREATE TABLE MARCAS(
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL
+);
+
+--INSERTAR DATOS
+INSERT INTO MARCAS(id, nombre) VALUES(1, 'Sony');
+COMMIT;
+
+INSERT INTO MARCAS(id) VALUES(2);
+COMMIT;
+
+CREATE TABLE FAMILIAS(
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL
+);
+INSERT INTO FAMILIAS(id, nombre) VALUES(1, 'Electrónico');
+COMMIT;
