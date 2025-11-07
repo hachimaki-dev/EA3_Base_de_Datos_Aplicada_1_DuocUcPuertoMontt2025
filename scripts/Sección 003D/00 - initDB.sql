@@ -1,5 +1,6 @@
 DROP TABLE MARCAS CASCADE CONSTRAINT;
 DROP TABLE FAMILIA CASCADE CONSTRAINT;
+DROP TABLE PRODUCTOS CASCADE CONSTRAINT;
 -- Esto es un comentario
 
 CREATE TABLE MARCAS(
@@ -7,23 +8,154 @@ CREATE TABLE MARCAS(
     nombre VARCHAR2(50) NOT NULL
 );
 
---Vamos a insertar una marc
-INSERT INTO MARCAS(id, nombre) VALUES (1, 'SONY');
-COMMIT;
-
-INSERT INTO MARCAS(id, nombre) VALUES(2, 'LG');
-COMMIT;
-
-
 CREATE TABLE FAMILIA(
     ID NUMBER PRIMARY KEY,
     NOMBRE VARCHAR2(50) NOT NULL
 );
 
+CREATE TABLE PRODUCTOS(
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(100) NOT NULL,
+    id_marca NUMBER REFERENCES MARCAS(id)
+);
+
+CREATE TABLE ALMACEN(
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL
+);
+
+CREATE TABLE CLIENTES(
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(100) NOT NULL
+);
+
+
+CREATE TABLE PAIS(
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL
+);
+
+CREATE TABLE ESTADO_ENVIO(
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL
+);
+
+CREATE TABLE METODO_PAGO(
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL
+);
+
+
+CREATE TABLE PROVEEDOR_ENVIO(
+    id NUMBER PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL,
+    telefono VARCHAR2(20) NOT NULL
+);
+
+
+
+
+-- 1 Marcas             ✔
+-- 2 Familias           ✔
+-- Almacen              ✔
+-- Clientes             ✔
+-- Pais                 ✔
+-- Estado_envio         ✔  
+-- Proveedor envio      ✔
+-- Metodo de Pago       ✔
+-- 
+
+--Vamos a insertar una marcas
+INSERT INTO MARCAS(id, nombre) VALUES (1, 'SONY');
+INSERT INTO MARCAS(id, nombre) VALUES(2, 'LG');
+INSERT INTO MARCAS(id, nombre) VALUES (3, 'RAZER');
+
+COMMIT;
+
+
+--Vamos a insertar las Familias
 INSERT INTO FAMILIA(ID, NOMBRE) VALUES (1,'ELECTRONICOS');
 COMMIT;
 
-SELECT * FROM FAMILIA;
+--Insertemos PRODCUTOS
+INSERT INTO PRODUCTOS(id, nombre, id_marca) VALUES (1, 'Monitor Gamer', 1);
+INSERT INTO PRODUCTOS(id, nombre, id_marca) VALUES (2, 'TV 32', 1);
+INSERT INTO PRODUCTOS(id, nombre, id_marca) VALUES (3, 'Monitor Curvo', 2);
+INSERT INTO PRODUCTOS(id, nombre, id_marca) VALUES (4, 'Mouse Razer', 3);
+COMMIT;
+
+
+--Insetamos datos de almacen:
+INSERT INTO ALMACEN VALUES (1, 'Central Puerto Montt');
+INSERT INTO ALMACEN VALUES (2, 'Sucursal Osorno');
+INSERT INTO ALMACEN VALUES (3, 'Sucursal Valdivia');
+INSERT INTO ALMACEN VALUES (4, 'Sucursal Castro');
+INSERT INTO ALMACEN VALUES (5, 'Sucursal Ancud');
+INSERT INTO ALMACEN VALUES (6, 'Bodega Norte');
+INSERT INTO ALMACEN VALUES (7, 'Bodega Sur');
+INSERT INTO ALMACEN VALUES (8, 'Depósito Central');
+INSERT INTO ALMACEN VALUES (9, 'Centro de Distribución Llanquihue');
+INSERT INTO ALMACEN VALUES (10, 'Almacén de Repuestos');
+COMMIT;
+
+--INSERTAMOS DATOS DE CLIENTES
+INSERT INTO CLIENTES VALUES (1, 'Carlos Orellana');
+INSERT INTO CLIENTES VALUES (2, 'María González');
+INSERT INTO CLIENTES VALUES (3, 'Pedro Muñoz');
+INSERT INTO CLIENTES VALUES (4, 'Javiera Soto');
+INSERT INTO CLIENTES VALUES (5, 'Andrés Pérez');
+INSERT INTO CLIENTES VALUES (6, 'Fernanda Díaz');
+INSERT INTO CLIENTES VALUES (7, 'Ricardo Salazar');
+INSERT INTO CLIENTES VALUES (8, 'Paula Rojas');
+INSERT INTO CLIENTES VALUES (9, 'Cristóbal Reyes');
+INSERT INTO CLIENTES VALUES (10, 'Camila Torres');
+COMMIT;
+
+--insetamos datos de paises:
+INSERT INTO PAIS VALUES (1, 'Chile');
+INSERT INTO PAIS VALUES (2, 'Argentina');
+INSERT INTO PAIS VALUES (3, 'Perú');
+INSERT INTO PAIS VALUES (4, 'Brasil');
+INSERT INTO PAIS VALUES (5, 'Colombia');
+INSERT INTO PAIS VALUES (6, 'México');
+INSERT INTO PAIS VALUES (7, 'Estados Unidos');
+INSERT INTO PAIS VALUES (8, 'España');
+INSERT INTO PAIS VALUES (9, 'Alemania');
+INSERT INTO PAIS VALUES (10, 'Canadá');
+COMMIT;
+
+
+--Insetamos datos de ESTADO_ENVIO
+INSERT INTO ESTADO_ENVIO VALUES (1, 'Pendiente');
+INSERT INTO ESTADO_ENVIO VALUES (2, 'Procesando');
+INSERT INTO ESTADO_ENVIO VALUES (3, 'En tránsito');
+INSERT INTO ESTADO_ENVIO VALUES (4, 'Entregado');
+INSERT INTO ESTADO_ENVIO VALUES (5, 'Cancelado');
+INSERT INTO ESTADO_ENVIO VALUES (6, 'Devuelto');
+INSERT INTO ESTADO_ENVIO VALUES (7, 'Listo para retiro');
+INSERT INTO ESTADO_ENVIO VALUES (8, 'Demorado');
+INSERT INTO ESTADO_ENVIO VALUES (9, 'Reprogramado');
+INSERT INTO ESTADO_ENVIO VALUES (10, 'Extraviado');
+
+
+--Insertamos datos de metodo de pago:
+INSERT INTO METODO_PAGO VALUES (1, 'Tarjeta de Crédito');
+INSERT INTO METODO_PAGO VALUES (2, 'Tarjeta de Débito');
+INSERT INTO METODO_PAGO VALUES (3, 'Transferencia Bancaria');
+INSERT INTO METODO_PAGO VALUES (4, 'Pago en Efectivo');
+INSERT INTO METODO_PAGO VALUES (5, 'PayPal');
+COMMIT;
+
+--INSERTAMOS PROVEEDOR DE ENVIO:
+INSERT INTO PROVEEDOR_ENVIO VALUES (1, 'Chilexpress', '+56 600 200 0102');
+INSERT INTO PROVEEDOR_ENVIO VALUES (2, 'Starken', '+56 600 200 7100');
+INSERT INTO PROVEEDOR_ENVIO VALUES (3, 'Correos de Chile', '+56 600 950 2020');
+INSERT INTO PROVEEDOR_ENVIO VALUES (4, 'Blue Express', '+56 600 600 5599');
+INSERT INTO PROVEEDOR_ENVIO VALUES (5, 'DHL Express', '+56 2 2953 2600');
+COMMIT;
+
+
+
 
 
 
