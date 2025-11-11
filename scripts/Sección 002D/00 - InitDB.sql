@@ -135,3 +135,13 @@ INSERT INTO CLIENTES (id, nombre, rut, telefono) VALUES (5, 'Patricia Muñoz', '
 COMMIT;
 
 -- Ahora generemos las tablas que tienen depencias
+
+
+INSERT INTO PRODUCTOS(nombre, id_marca) VALUES('Play 5', 3);
+INSERT INTO PRODUCTOS(nombre, id_marca) VALUES('Mac m1', 2);
+INSERT INTO PRODUCTOS(nombre, id_marca) VALUES('Mac M2', 2);
+INSERT INTO PRODUCTOS(nombre, id_marca) VALUES('Play 1', 3);
+INSERT INTO PRODUCTOS(nombre, id_marca) VALUES('Play 2', 3);
+INSERT INTO PRODUCTOS(nombre, id_marca) VALUES('Play 3', 3);
+INSERT INTO PRODUCTOS(nombre, id_marca) VALUES('Play 4', 3);
+COMMIT;
