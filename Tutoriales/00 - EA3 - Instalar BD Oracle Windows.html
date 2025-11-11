@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Instalador Oracle 23c - Docker (Power Black Girl Hacking)</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* === VARIABLES DE TEMA === */
+:root{
+  --bg-dark:#0b0b0d;
+  --panel-dark:#111316;
+  --muted-dark:#a4adb5;
+  --accent:#ff57b9;
+  --accent-2:#9be8ff;
+  --white:#fff;
+
+  --bg-light:#fbfbfc;
+  --panel-light:#ffffff;
+  --muted-light:#555;
+  --text-light:#0b0b0d;
+
+  --radius:14px;
+}
+
+:root[data-theme="dark"]{
+  --bg:var(--bg-dark);
+  --panel:var(--panel-dark);
+  --muted:var(--muted-dark);
+  --text:var(--white);
+  --code-bg:#081018;
+  --code-text:#e6eef6;
+}
+:root[data-theme="light"]{
+  --bg:var(--bg-light);
+  --panel:var(--panel-light);
+  --muted:var(--muted-light);
+  --text:var(--text-light);
+  --code-bg:#f3f6fb;
+  --code-text:#0b1220;
+}
+
+/* === TIPOGRAFÍA Y BASE === */
+html{
+  font-family:"Nunito Sans",system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  font-size:clamp(16px,1.1vw + 1rem,20px);
+  line-height:1.7;
+  color:var(--text);
+  background:var(--bg);
+}
+*{box-sizing:border-box;transition:all .25s ease-out;}
+:focus-visible{outline:3px solid var(--accent);outline-offset:4px;}
+
+body{margin:0;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* === LAYOUT GENERAL === */
+.container{
+  display:grid;
+  grid-template-columns:340px 1fr;
+  height:100vh;
+  overflow:hidden;
+}
+
+.aside{
+  background:var(--panel);
+  padding:16px;
+  overflow-y:auto;
+  border-right:1px solid rgba(255,255,255,0.05);
+}
+
+.panel{
+  background:var(--panel);
+  padding:2rem;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:left;
+  position:relative;
+}
+
+/* === ELEMENTOS === */
+.header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;}
+.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#111;}
+.title{font-size:1.1rem;font-weight:800;}
+.subtitle{font-size:.8rem;color:var(--muted);margin-top:4px;}
+
+/* === STEPS === */
+.step-item{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;margin-bottom:8px;cursor:pointer;}
+.step-item.active{background:linear-gradient(90deg,rgba(255,87,185,0.15),rgba(155,232,255,0.08));}
+.step-index{width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+background:rgba(255,255,255,0.1);border-radius:8px;font-weight:700;}
+.step-title{font-size:.9rem;font-weight:700;}
+.step-desc{font-size:.75rem;color:var(--muted);}
+
+/* === CONTENIDO PRINCIPAL === */
+.h1{font-size:1.5rem;font-weight:800;margin:0 0 0.5rem 0;}
+.hint{font-size:.9rem;color:var(--muted);margin-bottom:1rem;}
+.content{max-height:55vh;overflow-y:auto;padding:0 1rem;width:100%;opacity:1;transition:opacity .25s ease;}
+
+.card{background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent);
+border:1px solid rgba(255,255,255,0.05);border-radius:14px;padding:1.5rem;margin-bottom:1rem;}
+.big-step-title{font-size:1.2rem;font-weight:800;margin-bottom:.5rem;}
+.big-step-sub{color:var(--muted);font-size:.85rem;margin-bottom:.5rem;}
+.code{background:var(--code-bg);color:var(--code-text);padding:1rem;border-radius:10px;
+font-family:ui-monospace,monospace;font-size:.9rem;white-space:pre-wrap;overflow-x:auto;}
+.btn{padding:10px 16px;border-radius:10px;border:2px solid rgba(255,255,255,0.1);
+cursor:pointer;font-weight:700;font-size:.9rem;color:var(--text);background:transparent;}
+.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#081018;border:none;}
+.navbar{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;width:100%;}
+
+/* === RESPONSIVE === */
+@media (max-width:900px){
+  .container{grid-template-columns:1fr;}
+  .aside{display:none;}
+}
+
+/* === TOAST === */
+#toast{position:fixed;bottom:20px;right:20px;padding:12px 18px;
+background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#081018;
+font-weight:700;border-radius:10px;box-shadow:0 8px 25px rgba(0,0,0,0.4);opacity:0;transition:opacity .3s;}
+</style>
+</head>
+
+<body>
+<div class="header">
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="logo">PB</div>
+    <div>
+      <div class="title">Instalador Oracle 23c — Docker</div>
+      <div class="subtitle">Power Black Girl Hacking UI · Modo claro / oscuro · Accesible</div>
+    </div>
+  </div>
+  <button id="themeToggle" class="btn">Modo</button>
+</div>
+
+<div class="container">
+  <aside class="aside" id="sidebar"></aside>
+
+  <main class="panel" id="main">
+    <div class="h1" id="mainTitle">Cargando…</div>
+    <div class="hint" id="mainHint"></div>
+    <div class="content" id="content"></div>
+    <div class="navbar">
+      <button id="backBtn" class="btn">← Anterior</button>
+      <button id="nextBtn" class="btn primary">Siguiente →</button>
+    </div>
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<template id="tpl-step">
+  <section class="card" data-step>
+    <h2 class="big-step-title"></h2>
+    <div class="big-step-sub"></div>
+    <div class="card-body"></div>
+  </section>
+</template>
+
+<script>
+const STEPS=[
+  {title:'Introducción',hint:'Qué hace este instalador y cómo usarlo',
+   body:`<p>Guía interactiva paso a paso para instalar Oracle 23c en Docker.</p>`},
+  {title:'Verificar WSL',hint:'Comprobar instalación',body:`<pre class="code" data-cmd>wsl --status</pre>`},
+  {title:'Instalar Docker',hint:'Descargar e instalar Docker Desktop',body:`<pre class="code" data-cmd>docker --version</pre>`},
+  {title:'Descargar imagen Oracle',hint:'Ejecutar docker pull',body:`<pre class="code" data-cmd>docker pull gvenzl/oracle-free:latest</pre>`},
+  {title:'Ejecutar contenedor',hint:'docker run',body:`<pre class="code" data-cmd>docker run -d --name oracle23c -p 1521:1521 -p 5500:5500 -e ORACLE_PASSWORD=MiPassword123 gvenzl/oracle-free:latest</pre>`},
+  {title:'Conectar y probar',hint:'Datos de conexión',body:`<pre class="code" data-cmd>Host: localhost
+Port: 1521
+Service: FREEPDB1
+User: SYSTEM
+Password: (tu clave)</pre>`},
+  {title:'Listo',hint:'Resumen',body:`<ul><li>Docker + Oracle funcionando</li><li>Conexión lista</li></ul>`}
+];
+let idx=parseInt(localStorage.getItem('pb_step')||0);
+const tpl=document.getElementById('tpl-step');
+const sidebar=document.getElementById('sidebar');
+const content=document.getElementById('content');
+const mainTitle=document.getElementById('mainTitle');
+const mainHint=document.getElementById('mainHint');
+const toast=document.getElementById('toast');
+
+function flash(msg){toast.textContent=msg;toast.style.opacity=1;setTimeout(()=>toast.style.opacity=0,1800);}
+function copyCmd(cmd){navigator.clipboard.writeText(cmd).then(()=>flash('✓ Copiado')).catch(()=>flash('Error al copiar'));}
+
+function renderSidebar(){
+  sidebar.innerHTML='';
+  STEPS.forEach((s,i)=>{
+    const el=document.createElement('div');
+    el.className='step-item'+(i===idx?' active':'');
+    el.innerHTML=`<div class="step-index">${i+1}</div><div><div class="step-title">${s.title}</div><div class="step-desc">${s.hint}</div></div>`;
+    el.onclick=()=>{idx=i;saveStep();render();}
+    sidebar.appendChild(el);
+  });
+}
+
+function render(){
+  const s=STEPS[idx];
+  mainTitle.textContent=s.title;
+  mainHint.textContent=s.hint;
+  const frag=tpl.content.cloneNode(true);
+  const section=frag.querySelector('[data-step]');
+  section.querySelector('.big-step-title').textContent=s.title;
+  section.querySelector('.card-body').innerHTML=s.body;
+  content.style.opacity=0;
+  setTimeout(()=>{content.replaceChildren(frag);content.style.opacity=1;},200);
+  localStorage.setItem('pb_step',idx);
+  content.querySelectorAll('pre[data-cmd]').forEach(pre=>{
+    pre.onclick=()=>copyCmd(pre.textContent.trim());
+  });
+  renderSidebar();
+}
+
+function next(){if(idx<STEPS.length-1){idx++;saveStep();render();}}
+function prev(){if(idx>0){idx--;saveStep();render();}}
+function saveStep(){localStorage.setItem('pb_step',idx);}
+
+document.getElementById('nextBtn').onclick=next;
+document.getElementById('backBtn').onclick=prev;
+window.onkeydown=e=>{if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev();}
+
+/* tema */
+const root=document.documentElement;
+const themeToggle=document.getElementById('themeToggle');
+function setTheme(t){root.setAttribute('data-theme',t);localStorage.setItem('pb_theme',t);
+themeToggle.textContent=t==='dark'?'Modo: Oscuro':'Modo: Claro';}
+themeToggle.onclick=()=>setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');
+setTheme(localStorage.getItem('pb_theme')||'dark');
+
+/* init */
+renderSidebar();render();
+</script>
+</body>
+</html>
