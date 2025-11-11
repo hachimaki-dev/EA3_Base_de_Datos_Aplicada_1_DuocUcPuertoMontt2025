@@ -1,22 +1,125 @@
 --Eliminamos todas las tablas
 DROP TABLE MARCAS CASCADE CONSTRAINT;
+DROP TABLE FAMILIAS CASCADE CONSTRAINT;
+DROP TABLE PAIS CASCADE CONSTRAINT;
+DROP TABLE PROVEEDOR_ENVIO CASCADE CONSTRAINT;
+DROP TABLE ALMACENES CASCADE CONSTRAINT;
+DROP TABLE CLIENTES CASCADE CONSTRAINT;
+DROP TABLE METODO_PAGO CASCADE CONSTRAINT;
+DROP TABLE ESTADO_ENVIO CASCADE CONSTRAINT;
 
 -- Primero vamos a crear tablas con prioridad 0
 CREATE TABLE MARCAS(
-    id NUMBER PRIMARY KEY,
-    nombre VARCHAR2(50) NOT NULL
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL UNIQUE,
+    descripcion VARCHAR(200)
 );
-
---INSERTAR DATOS
-INSERT INTO MARCAS(id, nombre) VALUES(1, 'Sony');
-COMMIT;
-
-INSERT INTO MARCAS(id) VALUES(2);
-COMMIT;
 
 CREATE TABLE FAMILIAS(
-    id NUMBER PRIMARY KEY,
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR2(50) NOT NULL
 );
-INSERT INTO FAMILIAS(id, nombre) VALUES(1, 'Electrónico');
+
+
+CREATE TABLE PAIS(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(30) NOT NULL UNIQUE
+);
+
+CREATE TABLE PROVEEDOR_ENVIO(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(30) NOT NULL UNIQUE,
+    telefono VARCHAR2(12) NOT NULL
+);
+
+CREATE TABLE ALMACENES(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(30) NOT NULL
+);
+
+CREATE TABLE CLIENTES(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(30) NOT NULL,
+    rut VARCHAR2(12) NOT NULL UNIQUE,
+    telefono VARCHAR2(12) NOT NULL
+);
+
+
+CREATE TABLE METODO_PAGO(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(30) NOT NULL UNIQUE
+);
+
+CREATE TABLE ESTADO_ENVIO(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(30) NOT NULL UNIQUE
+);
+
+
+--Los Insert
+
+-- INSERTS PARA MARCAS
+INSERT INTO MARCAS (nombre, descripcion) VALUES ('Samsung', 'Tecnología y electrónica de consumo');
+INSERT INTO MARCAS (nombre, descripcion) VALUES ('Apple', 'Dispositivos y soluciones tecnológicas premium');
+INSERT INTO MARCAS (nombre, descripcion) VALUES ('Sony', 'Electrónica, entretenimiento y gaming');
+INSERT INTO MARCAS (nombre, descripcion) VALUES ('LG', 'Electrodomésticos y tecnología del hogar');
+INSERT INTO MARCAS (nombre, descripcion) VALUES ('Nike', 'Ropa deportiva y calzado');
+INSERT INTO MARCAS (nombre, descripcion) VALUES ('Adidas', 'Equipamiento deportivo y lifestyle');
+
+-- INSERTS PARA FAMILIAS
+INSERT INTO FAMILIAS (nombre) VALUES ('Electrónica');
+INSERT INTO FAMILIAS (nombre) VALUES ('Electrodomésticos');
+INSERT INTO FAMILIAS (nombre) VALUES ('Ropa y Calzado');
+INSERT INTO FAMILIAS (nombre) VALUES ('Deportes');
+INSERT INTO FAMILIAS (nombre) VALUES ('Hogar y Muebles');
+INSERT INTO FAMILIAS (nombre) VALUES ('Tecnología');
+
+-- INSERTS PARA PAIS
+INSERT INTO PAIS (nombre) VALUES ('Chile');
+INSERT INTO PAIS (nombre) VALUES ('Argentina');
+INSERT INTO PAIS (nombre) VALUES ('Brasil');
+INSERT INTO PAIS (nombre) VALUES ('Perú');
+INSERT INTO PAIS (nombre) VALUES ('Colombia');
+INSERT INTO PAIS (nombre) VALUES ('Estados Unidos');
+
+-- INSERTS PARA PROVEEDOR_ENVIO
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Chilexpress', '600-600-6000');
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Starken', '600-200-0102');
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Correos Chile', '600-950-2020');
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Blue Express', '600-360-3600');
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('DHL Express', '800-345-345');
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('FedEx Chile', '800-363-339');
+
+-- INSERTS PARA ALMACENES
+INSERT INTO ALMACENES (nombre) VALUES ('Almacén Central Santiago');
+INSERT INTO ALMACENES (nombre) VALUES ('Almacén Valparaíso');
+INSERT INTO ALMACENES (nombre) VALUES ('Almacén Concepción');
+INSERT INTO ALMACENES (nombre) VALUES ('Almacén La Serena');
+INSERT INTO ALMACENES (nombre) VALUES ('Almacén Temuco');
+INSERT INTO ALMACENES (nombre) VALUES ('Almacén Puerto Montt');
+
+-- INSERTS PARA CLIENTES
+INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('Juan Pérez González', '12345678-9', '912345678');
+INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('María García López', '23456789-0', '923456789');
+INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('Carlos Rodríguez Silva', '34567890-1', '934567890');
+INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('Ana Martínez Torres', '45678901-2', '945678901');
+INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('Pedro Fernández Ruiz', '56789012-3', '956789012');
+INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('Laura Sánchez Morales', '67890123-4', '967890123');
+
+-- INSERTS PARA METODO_PAGO
+INSERT INTO METODO_PAGO (nombre) VALUES ('Tarjeta de Crédito');
+INSERT INTO METODO_PAGO (nombre) VALUES ('Tarjeta de Débito');
+INSERT INTO METODO_PAGO (nombre) VALUES ('Transferencia Bancaria');
+INSERT INTO METODO_PAGO (nombre) VALUES ('Efectivo');
+INSERT INTO METODO_PAGO (nombre) VALUES ('PayPal');
+INSERT INTO METODO_PAGO (nombre) VALUES ('Mercado Pago');
+
+-- INSERTS PARA ESTADO_ENVIO
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Pendiente');
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('En Preparación');
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('En Tránsito');
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('En Reparto');
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Entregado');
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Cancelado');
+
 COMMIT;
