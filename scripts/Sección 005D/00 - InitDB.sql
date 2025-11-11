@@ -56,6 +56,14 @@ CREATE TABLE ESTADO_ENVIO(
 );
 
 
+--CREAR TODAS LAS TABLAS QUE TIENEN DEPENDENCIA 1 es a N
+
+CREATE TABLE PRODUCTOS(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(200) NOT NULL,
+    id_marca NUMBER NOT NULL REFERENCES MARCAS(id)
+);
+
 --Los Insert
 
 -- INSERTS PARA MARCAS
@@ -121,5 +129,21 @@ INSERT INTO ESTADO_ENVIO (nombre) VALUES ('En Tránsito');
 INSERT INTO ESTADO_ENVIO (nombre) VALUES ('En Reparto');
 INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Entregado');
 INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Cancelado');
+
+COMMIT;
+
+
+--Inserts de las tablas con dependencias
+-- INSERTS PARA PRODUCTOS
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Galaxy S24 Ultra 256GB', 1);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('iPhone 15 Pro Max 512GB', 2);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('PlayStation 5 Slim Digital Edition', 3);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Refrigerador Side by Side 600L', 4);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Zapatillas Air Max 270 Running', 5);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Smart TV OLED 65 pulgadas 4K', 4);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('MacBook Pro 14 M3 16GB RAM', 2);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Audífonos WH-1000XM5 Noise Cancelling', 3);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Galaxy Watch 6 Classic 47mm', 1);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Polera Deportiva Ultraboost Training', 6);
 
 COMMIT;
