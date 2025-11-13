@@ -1,161 +1,179 @@
 DROP TABLE MARCAS CASCADE CONSTRAINT;
 DROP TABLE FAMILIA CASCADE CONSTRAINT;
+DROP TABLE ALMACEN CASCADE CONSTRAINT;
+DROP TABLE CLIENTES CASCADE CONSTRAINT;
+DROP TABLE PAIS CASCADE CONSTRAINT;
+DROP TABLE ESTADO_ENVIO CASCADE CONSTRAINT;
+DROP TABLE METODO_PAGO CASCADE CONSTRAINT;
+DROP TABLE PROVEEDOR_ENVIO CASCADE CONSTRAINT;
 DROP TABLE PRODUCTOS CASCADE CONSTRAINT;
+DROP TABLE STOCK_ALMACEN CASCADE CONSTRAINT;
+
 -- Esto es un comentario
 
 CREATE TABLE MARCAS(
-    id NUMBER PRIMARY KEY, 
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY, 
     nombre VARCHAR2(50) NOT NULL
 );
 
 CREATE TABLE FAMILIA(
-    ID NUMBER PRIMARY KEY,
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     NOMBRE VARCHAR2(50) NOT NULL
 );
 
-CREATE TABLE PRODUCTOS(
-    id NUMBER PRIMARY KEY,
-    nombre VARCHAR2(100) NOT NULL,
-    id_marca NUMBER REFERENCES MARCAS(id)
-);
+
 
 CREATE TABLE ALMACEN(
-    id NUMBER PRIMARY KEY,
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR2(50) NOT NULL
 );
 
 CREATE TABLE CLIENTES(
-    id NUMBER PRIMARY KEY,
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR2(100) NOT NULL
 );
 
 
 CREATE TABLE PAIS(
-    id NUMBER PRIMARY KEY,
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR2(50) NOT NULL
 );
 
 CREATE TABLE ESTADO_ENVIO(
-    id NUMBER PRIMARY KEY,
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR2(50) NOT NULL
 );
 
 CREATE TABLE METODO_PAGO(
-    id NUMBER PRIMARY KEY,
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR2(50) NOT NULL
 );
 
 
 CREATE TABLE PROVEEDOR_ENVIO(
-    id NUMBER PRIMARY KEY,
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nombre VARCHAR2(50) NOT NULL,
     telefono VARCHAR2(20) NOT NULL
 );
 
+-- CREAR TABLAS CON DEPENDECIAS 1 N
+
+CREATE TABLE PRODUCTOS(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(100) NOT NULL,
+    id_marca NUMBER REFERENCES MARCAS(id)
+);
+
+CREATE TABLE STOCK_ALMACEN(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    stock NUMBER(7) NOT NULL,
+    fecha_rebasstecimiento TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+    stock_minimo NUMBER(3) NOT NULL,
+    id_almacen NUMBER REFERENCES ALMACEN(id),
+    id_producto NUMBER REFERENCES PRODUCTOS(id)
+);
+
+-- Tablas sin dependencias
+
+-- MARCAS
+INSERT INTO MARCAS (nombre) VALUES ('Samsung');
+INSERT INTO MARCAS (nombre) VALUES ('Apple');
+INSERT INTO MARCAS (nombre) VALUES ('Sony');
+INSERT INTO MARCAS (nombre) VALUES ('LG');
+INSERT INTO MARCAS (nombre) VALUES ('Huawei');
+
+-- FAMILIA
+INSERT INTO FAMILIA (nombre) VALUES ('Electrónica');
+INSERT INTO FAMILIA (nombre) VALUES ('Electrodomésticos');
+INSERT INTO FAMILIA (nombre) VALUES ('Computación');
+INSERT INTO FAMILIA (nombre) VALUES ('Telefonía');
+INSERT INTO FAMILIA (nombre) VALUES ('Videojuegos');
+
+-- ALMACEN
+INSERT INTO ALMACEN (nombre) VALUES ('Central Santiago');
+INSERT INTO ALMACEN (nombre) VALUES ('Bodega Norte');
+INSERT INTO ALMACEN (nombre) VALUES ('Sucursal Viña del Mar');
+INSERT INTO ALMACEN (nombre) VALUES ('Sucursal Concepción');
+INSERT INTO ALMACEN (nombre) VALUES ('Depósito Temuco');
+
+-- CLIENTES
+INSERT INTO CLIENTES (nombre) VALUES ('Juan Pérez');
+INSERT INTO CLIENTES (nombre) VALUES ('María González');
+INSERT INTO CLIENTES (nombre) VALUES ('Carlos Rivas');
+INSERT INTO CLIENTES (nombre) VALUES ('Ana Soto');
+INSERT INTO CLIENTES (nombre) VALUES ('Pedro Morales');
+
+-- PAIS
+INSERT INTO PAIS (nombre) VALUES ('Chile');
+INSERT INTO PAIS (nombre) VALUES ('Argentina');
+INSERT INTO PAIS (nombre) VALUES ('Perú');
+INSERT INTO PAIS (nombre) VALUES ('Brasil');
+INSERT INTO PAIS (nombre) VALUES ('México');
+
+-- ESTADO_ENVIO
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Pendiente');
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('En tránsito');
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Entregado');
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Devuelto');
+INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Cancelado');
+
+-- METODO_PAGO
+INSERT INTO METODO_PAGO (nombre) VALUES ('Tarjeta de crédito');
+INSERT INTO METODO_PAGO (nombre) VALUES ('Transferencia bancaria');
+INSERT INTO METODO_PAGO (nombre) VALUES ('Efectivo');
+INSERT INTO METODO_PAGO (nombre) VALUES ('PayPal');
+INSERT INTO METODO_PAGO (nombre) VALUES ('Criptomoneda');
+
+-- PROVEEDOR_ENVIO
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Correos de Chile', '+56 2 600 950 2020');
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Chilexpress', '+56 2 600 200 0102');
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Starken', '+56 2 600 200 0111');
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Bluexpress', '+56 2 2345 6789');
+INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('DHL', '+56 2 2599 8888');
 
 
+-- Inderts de las tablas con dependecia
+-- PRODUCTOS (depende de MARCAS)
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Smartphone Galaxy S23', 1);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('iPhone 15', 2);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Televisor Bravia 55"', 3);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Refrigerador InstaView', 4);
+INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Tablet MatePad Pro', 5);
 
--- 1 Marcas             ✔
--- 2 Familias           ✔
--- Almacen              ✔
--- Clientes             ✔
--- Pais                 ✔
--- Estado_envio         ✔  
--- Proveedor envio      ✔
--- Metodo de Pago       ✔
--- 
+-- STOCK_ALMACEN (depende de ALMACEN y PRODUCTOS)
+INSERT INTO STOCK_ALMACEN (stock, stock_minimo, id_almacen, id_producto)
+VALUES (120, 10, 1, 1);
 
---Vamos a insertar una marcas
-INSERT INTO MARCAS(id, nombre) VALUES (1, 'SONY');
-INSERT INTO MARCAS(id, nombre) VALUES(2, 'LG');
-INSERT INTO MARCAS(id, nombre) VALUES (3, 'RAZER');
+INSERT INTO STOCK_ALMACEN (stock, stock_minimo, id_almacen, id_producto)
+VALUES (85, 5, 2, 2);
+
+INSERT INTO STOCK_ALMACEN (stock, stock_minimo, id_almacen, id_producto)
+VALUES (45, 3, 3, 3);
+
+INSERT INTO STOCK_ALMACEN (stock, stock_minimo, id_almacen, id_producto)
+VALUES (60, 4, 4, 4);
+
+INSERT INTO STOCK_ALMACEN (stock, stock_minimo, id_almacen, id_producto)
+VALUES (30, 2, 5, 5);
 
 COMMIT;
 
 
---Vamos a insertar las Familias
-INSERT INTO FAMILIA(ID, NOMBRE) VALUES (1,'ELECTRONICOS');
-COMMIT;
 
---Insertemos PRODCUTOS
-INSERT INTO PRODUCTOS(id, nombre, id_marca) VALUES (1, 'Monitor Gamer', 1);
-INSERT INTO PRODUCTOS(id, nombre, id_marca) VALUES (2, 'TV 32', 1);
-INSERT INTO PRODUCTOS(id, nombre, id_marca) VALUES (3, 'Monitor Curvo', 2);
-INSERT INTO PRODUCTOS(id, nombre, id_marca) VALUES (4, 'Mouse Razer', 3);
-COMMIT;
+--Diferencia entre esto
+SELECT * FROM STOCK_ALMACEN;
 
 
---Insetamos datos de almacen:
-INSERT INTO ALMACEN VALUES (1, 'Central Puerto Montt');
-INSERT INTO ALMACEN VALUES (2, 'Sucursal Osorno');
-INSERT INTO ALMACEN VALUES (3, 'Sucursal Valdivia');
-INSERT INTO ALMACEN VALUES (4, 'Sucursal Castro');
-INSERT INTO ALMACEN VALUES (5, 'Sucursal Ancud');
-INSERT INTO ALMACEN VALUES (6, 'Bodega Norte');
-INSERT INTO ALMACEN VALUES (7, 'Bodega Sur');
-INSERT INTO ALMACEN VALUES (8, 'Depósito Central');
-INSERT INTO ALMACEN VALUES (9, 'Centro de Distribución Llanquihue');
-INSERT INTO ALMACEN VALUES (10, 'Almacén de Repuestos');
-COMMIT;
-
---INSERTAMOS DATOS DE CLIENTES
-INSERT INTO CLIENTES VALUES (1, 'Carlos Orellana');
-INSERT INTO CLIENTES VALUES (2, 'María González');
-INSERT INTO CLIENTES VALUES (3, 'Pedro Muñoz');
-INSERT INTO CLIENTES VALUES (4, 'Javiera Soto');
-INSERT INTO CLIENTES VALUES (5, 'Andrés Pérez');
-INSERT INTO CLIENTES VALUES (6, 'Fernanda Díaz');
-INSERT INTO CLIENTES VALUES (7, 'Ricardo Salazar');
-INSERT INTO CLIENTES VALUES (8, 'Paula Rojas');
-INSERT INTO CLIENTES VALUES (9, 'Cristóbal Reyes');
-INSERT INTO CLIENTES VALUES (10, 'Camila Torres');
-COMMIT;
-
---insetamos datos de paises:
-INSERT INTO PAIS VALUES (1, 'Chile');
-INSERT INTO PAIS VALUES (2, 'Argentina');
-INSERT INTO PAIS VALUES (3, 'Perú');
-INSERT INTO PAIS VALUES (4, 'Brasil');
-INSERT INTO PAIS VALUES (5, 'Colombia');
-INSERT INTO PAIS VALUES (6, 'México');
-INSERT INTO PAIS VALUES (7, 'Estados Unidos');
-INSERT INTO PAIS VALUES (8, 'España');
-INSERT INTO PAIS VALUES (9, 'Alemania');
-INSERT INTO PAIS VALUES (10, 'Canadá');
-COMMIT;
-
-
---Insetamos datos de ESTADO_ENVIO
-INSERT INTO ESTADO_ENVIO VALUES (1, 'Pendiente');
-INSERT INTO ESTADO_ENVIO VALUES (2, 'Procesando');
-INSERT INTO ESTADO_ENVIO VALUES (3, 'En tránsito');
-INSERT INTO ESTADO_ENVIO VALUES (4, 'Entregado');
-INSERT INTO ESTADO_ENVIO VALUES (5, 'Cancelado');
-INSERT INTO ESTADO_ENVIO VALUES (6, 'Devuelto');
-INSERT INTO ESTADO_ENVIO VALUES (7, 'Listo para retiro');
-INSERT INTO ESTADO_ENVIO VALUES (8, 'Demorado');
-INSERT INTO ESTADO_ENVIO VALUES (9, 'Reprogramado');
-INSERT INTO ESTADO_ENVIO VALUES (10, 'Extraviado');
-
-
---Insertamos datos de metodo de pago:
-INSERT INTO METODO_PAGO VALUES (1, 'Tarjeta de Crédito');
-INSERT INTO METODO_PAGO VALUES (2, 'Tarjeta de Débito');
-INSERT INTO METODO_PAGO VALUES (3, 'Transferencia Bancaria');
-INSERT INTO METODO_PAGO VALUES (4, 'Pago en Efectivo');
-INSERT INTO METODO_PAGO VALUES (5, 'PayPal');
-COMMIT;
-
---INSERTAMOS PROVEEDOR DE ENVIO:
-INSERT INTO PROVEEDOR_ENVIO VALUES (1, 'Chilexpress', '+56 600 200 0102');
-INSERT INTO PROVEEDOR_ENVIO VALUES (2, 'Starken', '+56 600 200 7100');
-INSERT INTO PROVEEDOR_ENVIO VALUES (3, 'Correos de Chile', '+56 600 950 2020');
-INSERT INTO PROVEEDOR_ENVIO VALUES (4, 'Blue Express', '+56 600 600 5599');
-INSERT INTO PROVEEDOR_ENVIO VALUES (5, 'DHL Express', '+56 2 2953 2600');
-COMMIT;
-
-
-
-
-
-
+--Y esto
+SELECT 
+    sa.id AS id_stock,
+    a.nombre AS nombre_almacen,
+    p.nombre AS nombre_producto,
+    sa.stock,
+    sa.stock_minimo,
+    sa.fecha_rebasstecimiento
+FROM STOCK_ALMACEN sa
+JOIN ALMACEN a 
+    ON sa.id_almacen = a.id
+JOIN PRODUCTOS p 
+    ON sa.id_producto = p.id;
