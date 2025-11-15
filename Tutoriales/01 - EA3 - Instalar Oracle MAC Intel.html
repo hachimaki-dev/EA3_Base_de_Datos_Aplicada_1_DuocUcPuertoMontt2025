@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instalación Oracle 23c en Docker - macOS Monterey</title>
+<style>
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --bg: #ffffff;
+  --surface: #f8fafc;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --text-secondary: #64748b;
+  --success: #059669;
+  --warning: #d97706;
+  --code-bg: #f1f5f9;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 2rem 1rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.main {
+  padding: 3rem 4rem;
+  max-width: 900px;
+}
+
+.header {
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border);
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.step-nav {
+  list-style: none;
+}
+
+.step-item {
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+}
+
+.step-item:hover {
+  background: #e2e8f0;
+}
+
+.step-item.active {
+  background: var(--primary);
+  color: white;
+  border-left-color: var(--primary-dark);
+}
+
+.step-number {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: var(--border);
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.step-item.active .step-number {
+  background: rgba(255,255,255,0.3);
+}
+
+.content-section {
+  display: none;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.content-section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--text);
+}
+
+.section-intro {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+  font-size: 1.05rem;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 0.9rem;
+  overflow-x: auto;
+  position: relative;
+  margin: 1rem 0;
+  cursor: pointer;
+}
+
+.code-block:hover {
+  border-color: var(--primary);
+}
+
+.code-block::after {
+  content: 'Click para copiar';
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--primary);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.code-block:hover::after {
+  opacity: 1;
+}
+
+.alert {
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+  border-left: 4px solid;
+}
+
+.alert-warning {
+  background: #fef3c7;
+  border-color: var(--warning);
+  color: #92400e;
+}
+
+.alert-info {
+  background: #dbeafe;
+  border-color: var(--primary);
+  color: #1e40af;
+}
+
+.alert-success {
+  background: #d1fae5;
+  border-color: var(--success);
+  color: #065f46;
+}
+
+.btn-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+.nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+ul, ol {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--success);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s;
+  pointer-events: none;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.spec-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.spec-item {
+  background: white;
+  padding: 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.spec-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+}
+
+.spec-value {
+  font-weight: 600;
+  color: var(--text);
+}
+
+@media (max-width: 1024px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    display: none;
+  }
+  .main {
+    padding: 2rem 1.5rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <aside class="sidebar">
+    <h3 style="margin-bottom: 1.5rem; font-size: 1.125rem;">Pasos de Instalación</h3>
+    <ul class="step-nav" id="stepNav"></ul>
+  </aside>
+
+  <main class="main">
+    <div class="header">
+      <h1>Instalación de Oracle 23c Free en Docker</h1>
+      <p class="subtitle">Guía para macOS Monterey - MacBook Air 2017 (Intel i5)</p>
+    </div>
+
+    <div id="content"></div>
+
+    <div class="nav-buttons">
+      <button class="btn-nav btn-secondary" id="prevBtn">← Anterior</button>
+      <button class="btn-nav btn-primary" id="nextBtn">Siguiente →</button>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STEPS = [
+  {
+    title: 'Introducción',
+    content: `
+      <h2 class="section-title">Bienvenido a la Guía de Instalación</h2>
+      <p class="section-intro">Esta guía te llevará paso a paso por la instalación de Oracle Database 23c Free en tu MacBook Air 2017 usando Docker.</p>
+      
+      <div class="card">
+        <h3 class="card-title">Especificaciones de tu Sistema</h3>
+        <div class="spec-grid">
+          <div class="spec-item">
+            <div class="spec-label">Modelo</div>
+            <div class="spec-value">MacBook Air 2017</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Procesador</div>
+            <div class="spec-value">Intel i5 vPro</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">RAM</div>
+            <div class="spec-value">8 GB</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Sistema Operativo</div>
+            <div class="spec-value">macOS Monterey</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info">
+        <strong>Nota importante:</strong> Con 8GB de RAM, Oracle funcionará correctamente pero debes evitar tener muchas aplicaciones abiertas simultáneamente. Se recomienda cerrar aplicaciones no esenciales durante el uso de la base de datos.
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">¿Qué aprenderás?</h3>
+        <ul>
+          <li>Instalar Homebrew (gestor de paquetes de macOS)</li>
+          <li>Instalar y configurar Docker Desktop</li>
+          <li>Descargar la imagen de Oracle 23c Free</li>
+          <li>Crear y ejecutar el contenedor de Oracle</li>
+          <li>Conectar con SQL Developer</li>
+          <li>Comandos útiles para gestionar el contenedor</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Requisitos Previos</h3>
+        <ul>
+          <li>Conexión a Internet estable (descarga ~2-3 GB)</li>
+          <li>Al menos 15 GB de espacio libre en disco</li>
+          <li>Privilegios de administrador en tu Mac</li>
+          <li>Tiempo estimado: 30-45 minutos</li>
+        </ul>
+      </div>
+    `
+  },
+  {
+    title: 'Instalar Homebrew',
+    content: `
+      <h2 class="section-title">Paso 1: Instalar Homebrew</h2>
+      <p class="section-intro">Homebrew es el gestor de paquetes más popular para macOS. Nos permitirá instalar Docker fácilmente.</p>
+      
+      <div class="card">
+        <h3 class="card-title">¿Qué es Homebrew?</h3>
+        <p>Homebrew simplifica la instalación de software en macOS mediante comandos de terminal. Es equivalente a apt en Linux o chocolatey en Windows.</p>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Verificar si Homebrew está instalado</h3>
+        <p>Primero, verifica si ya tienes Homebrew instalado. Abre <strong>Terminal</strong> (⌘ + Espacio, escribe "Terminal") y ejecuta:</p>
+        <pre class="code-block" onclick="copyCode(this)">brew --version</pre>
+        <p style="margin-top: 1rem;">Si ves un número de versión (ej: Homebrew 4.x.x), <strong>puedes saltar al siguiente paso</strong>. Si ves "command not found", continúa con la instalación.</p>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Instalar Homebrew</h3>
+        <p>Copia y pega este comando en Terminal y presiona Enter:</p>
+        <pre class="code-block" onclick="copyCode(this)">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</pre>
+        
+        <div class="alert alert-info" style="margin-top: 1rem;">
+          <strong>Durante la instalación:</strong>
+          <ul style="margin-top: 0.5rem;">
+            <li>Te pedirá tu contraseña de macOS (no se mostrará mientras escribes)</li>
+            <li>Puede tardar 5-10 minutos</li>
+            <li>Presiona ENTER cuando te lo solicite</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Configurar Homebrew en tu PATH</h3>
+        <p>Después de la instalación, ejecuta estos comandos para que Homebrew funcione correctamente:</p>
+        <pre class="code-block" onclick="copyCode(this)">echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellenv)"</pre>
+        
+        <p style="margin-top: 1rem;">Verifica que funcionó:</p>
+        <pre class="code-block" onclick="copyCode(this)">brew --version</pre>
+      </div>
+
+      <div class="alert alert-success">
+        <strong>✓ Homebrew instalado correctamente</strong> cuando veas el número de versión.
+      </div>
+    `
+  },
+  {
+    title: 'Instalar Docker Desktop',
+    content: `
+      <h2 class="section-title">Paso 2: Instalar Docker Desktop</h2>
+      <p class="section-intro">Docker nos permitirá ejecutar Oracle Database en un contenedor aislado y fácil de gestionar.</p>
+      
+      <div class="card">
+        <h3 class="card-title">Instalar Docker con Homebrew</h3>
+        <p>Usa Homebrew para instalar Docker Desktop:</p>
+        <pre class="code-block" onclick="copyCode(this)">brew install --cask docker</pre>
+        
+        <div class="alert alert-info" style="margin-top: 1rem;">
+          <strong>Tiempo de instalación:</strong> 5-10 minutos dependiendo de tu conexión a Internet. La descarga es aproximadamente 600 MB.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Iniciar Docker Desktop</h3>
+        <p>Una vez instalado, necesitas abrir Docker Desktop manualmente:</p>
+        <ol>
+          <li>Presiona <strong>⌘ + Espacio</strong> para abrir Spotlight</li>
+          <li>Escribe <strong>"Docker"</strong> y presiona Enter</li>
+          <li>Acepta los términos de servicio si aparecen</li>
+          <li>Espera a que Docker inicie (verás un ícono de ballena en la barra superior)</li>
+        </ol>
+
+        <div class="alert alert-warning" style="margin-top: 1rem;">
+          <strong>Primera ejecución:</strong> Docker Desktop puede tardar 2-3 minutos en iniciar la primera vez. Espera hasta que el ícono de la ballena deje de animarse.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Verificar Instalación</h3>
+        <p>En Terminal, ejecuta:</p>
+        <pre class="code-block" onclick="copyCode(this)">docker --version</pre>
+        <p style="margin-top: 1rem;">Deberías ver algo como: <code>Docker version 24.x.x</code></p>
+        
+        <p style="margin-top: 1rem;">Verifica que Docker está corriendo:</p>
+        <pre class="code-block" onclick="copyCode(this)">docker ps</pre>
+        <p style="margin-top: 1rem;">Si ves una tabla vacía (sin errores), Docker está funcionando correctamente.</p>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Configurar Recursos de Docker</h3>
+        <p>Con 8GB de RAM, es importante optimizar los recursos:</p>
+        <ol>
+          <li>Abre Docker Desktop</li>
+          <li>Ve a <strong>Settings</strong> (ícono de engranaje)</li>
+          <li>Selecciona <strong>Resources</strong></li>
+          <li>Configura:
+            <ul style="margin-top: 0.5rem;">
+              <li><strong>CPUs:</strong> 2</li>
+              <li><strong>Memory:</strong> 4 GB (máximo recomendado)</li>
+              <li><strong>Swap:</strong> 1 GB</li>
+            </ul>
+          </li>
+          <li>Haz clic en <strong>Apply & Restart</strong></li>
+        </ol>
+        
+        <div class="alert alert-info" style="margin-top: 1rem;">
+          Esta configuración deja 4GB de RAM para macOS y otras aplicaciones, permitiendo que el sistema funcione sin problemas.
+        </div>
+      </div>
+
+      <div class="alert alert-success">
+        <strong>✓ Docker Desktop instalado y configurado</strong>
+      </div>
+    `
+  },
+  {
+    title: 'Descargar Imagen Oracle',
+    content: `
+      <h2 class="section-title">Paso 3: Descargar Imagen de Oracle 23c</h2>
+      <p class="section-intro">Descargaremos la imagen oficial de Oracle Database 23c Free desde Docker Hub.</p>
+      
+      <div class="card">
+        <h3 class="card-title">Sobre Oracle 23c Free</h3>
+        <p>Oracle Database 23c Free es la versión gratuita de Oracle, ideal para desarrollo y aprendizaje. Incluye todas las características principales sin limitaciones de funcionalidad.</p>
+        <ul style="margin-top: 0.5rem;">
+          <li>Tamaño de descarga: ~2.5 GB</li>
+          <li>Tiempo estimado: 10-20 minutos</li>
+          <li>Versión: Latest (23c)</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Descargar la Imagen</h3>
+        <p>En Terminal, ejecuta el siguiente comando:</p>
+        <pre class="code-block" onclick="copyCode(this)">docker pull gvenzl/oracle-free:latest</pre>
+        
+        <div class="alert alert-info" style="margin-top: 1rem;">
+          <strong>Durante la descarga verás:</strong>
+          <ul style="margin-top: 0.5rem;">
+            <li>Múltiples capas descargándose en paralelo</li>
+            <li>Barras de progreso para cada capa</li>
+            <li>El proceso puede pausarse momentáneamente (es normal)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Verificar la Descarga</h3>
+        <p>Una vez completada la descarga, verifica que la imagen está disponible:</p>
+        <pre class="code-block" onclick="copyCode(this)">docker images</pre>
+        
+        <p style="margin-top: 1rem;">Deberías ver una tabla con la imagen <code>gvenzl/oracle-free</code> y su tamaño aproximado de 2.5 GB.</p>
+      </div>
+
+      <div class="alert alert-warning">
+        <strong>Consejo:</strong> No cierres Docker Desktop ni la Terminal durante la descarga. Si se interrumpe, puedes ejecutar el mismo comando nuevamente y Docker continuará desde donde se quedó.
+      </div>
+
+      <div class="alert alert-success">
+        <strong>✓ Imagen de Oracle 23c descargada correctamente</strong>
+      </div>
+    `
+  },
+  {
+    title: 'Crear Contenedor',
+    content: `
+      <h2 class="section-title">Paso 4: Crear y Ejecutar Contenedor de Oracle</h2>
+      <p class="section-intro">Ahora crearemos un contenedor que ejecutará Oracle Database con la configuración optimizada para tu Mac.</p>
+      
+      <div class="card">
+        <h3 class="card-title">Comando de Creación</h3>
+        <p>Ejecuta este comando completo en Terminal (todo en una línea):</p>
+        <pre class="code-block" onclick="copyCode(this)">docker run -d --name oracle23c -p 1521:1521 -p 5500:5500 -e ORACLE_PASSWORD=Oracle123 gvenzl/oracle-free:latest</pre>
+        
+        <div class="alert alert-info" style="margin-top: 1rem;">
+          <strong>Explicación del comando:</strong>
+          <ul style="margin-top: 0.5rem;">
+            <li><code>-d</code>: Ejecuta en segundo plano</li>
+            <li><code>--name oracle23c</code>: Nombre del contenedor</li>
+            <li><code>-p 1521:1521</code>: Puerto para conexiones SQL</li>
+            <li><code>-p 5500:5500</code>: Puerto para Enterprise Manager</li>
+            <li><code>-e ORACLE_PASSWORD=Oracle123</code>: Contraseña del usuario SYSTEM</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Tiempo de Inicio</h3>
+        <p>El contenedor tardará entre 2-5 minutos en estar completamente listo. Durante este tiempo, Oracle está iniciando sus servicios.</p>
+        
+        <p style="margin-top: 1rem;">Puedes verificar el progreso con:</p>
+        <pre class="code-block" onclick="copyCode(this)">docker logs -f oracle23c</pre>
+        
+        <div class="alert alert-success" style="margin-top: 1rem;">
+          <strong>Oracle está listo cuando veas:</strong> <code>DATABASE IS READY TO USE!</code>
+          <br>Presiona <strong>Ctrl + C</strong> para salir de los logs.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Verificar Estado del Contenedor</h3>
+        <p>Comprueba que el contenedor está corriendo:</p>
+        <pre class="code-block" onclick="copyCode(this)">docker ps</pre>
+        
+        <p style="margin-top: 1rem;">Deberías ver una línea con <code>oracle23c</code> y su estado como <code>Up</code>.</p>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Credenciales de Conexión</h3>
+        <div class="spec-grid">
+          <div class="spec-item">
+            <div class="spec-label">Host</div>
+            <div class="spec-value">localhost</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Puerto</div>
+            <div class="spec-value">1521</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Service Name</div>
+            <div class="spec-value">FREEPDB1</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Usuario</div>
+            <div class="spec-value">SYSTEM</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Contraseña</div>
+            <div class="spec-value">Oracle123</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">SID (alternativo)</div>
+            <div class="spec-value">FREE</div>
+          </div>
+        </div>
+        
+        <div class="alert alert-warning" style="margin-top: 1rem;">
+          <strong>Seguridad:</strong> En un entorno de producción, usa una contraseña más segura. Para desarrollo local, Oracle123 es suficiente.
+        </div>
+      </div>
+
+      <div class="alert alert-success">
+        <strong>✓ Contenedor de Oracle creado y en ejecución</strong>
+      </div>
+    `
+  },
+  {
+    title: 'Instalar SQL Developer',
+    content: `
+      <h2 class="section-title">Paso 5: Instalar Oracle SQL Developer</h2>
+      <p class="section-intro">SQL Developer es la herramienta oficial de Oracle para gestionar bases de datos. La instalaremos para conectarnos a nuestro contenedor.</p>
+      
+      <div class="card">
+        <h3 class="card-title">Opción 1: Instalar con Homebrew (Recomendado)</h3>
+        <p>La forma más sencilla es usar Homebrew:</p>
+        <pre class="code-block" onclick="copyCode(this)">brew install --cask oracle-sql-developer</pre>
+        
+        <div class="alert alert-info" style="margin-top: 1rem;">
+          Esta versión incluye Java integrado, no necesitas instalar Java por separado.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Opción 2: Descarga Manual</h3>
+        <p>Si prefieres descargar manualmente:</p>
+        <ol>
+          <li>Visita: <a href="https://www.oracle.com/database/sqldeveloper/technologies/download/" target="_blank">oracle.com/database/sqldeveloper</a></li>
+          <li>Descarga <strong>"macOS with JDK included"</strong></li>
+          <li>Descomprime el archivo .zip</li>
+          <li>Arrastra SQL Developer a tu carpeta Aplicaciones</li>
+          <li>Al abrir por primera vez, haz clic derecho → Abrir (para bypass de seguridad)</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Primera Ejecución</h3>
+        <p>Al abrir SQL Developer por primera vez:</p>
+        <ol>
+          <li>Si aparece un aviso de seguridad, haz clic en <strong>"Abrir"</strong></li>
+          <li>Puede pedirte migrar configuraciones (puedes omitir)</li>
+          <li>Espera a que termine de cargar (30-60 segundos)</li>
+        </ol>
+      </div>
+
+      <div class="alert alert-success">
+        <strong>✓ SQL Developer instalado</strong> - Continúa al siguiente paso para configurar la conexión.
+      </div>
+    `
+  },
+  {
+    title: 'Conectar SQL Developer',
+    content: `
+      <h2 class="section-title">Paso 6: Conectar SQL Developer a Oracle</h2>
+      <p class="section-intro">Configuraremos una nueva conexión en SQL Developer para acceder a nuestra base de datos Oracle.</p>
+      
+      <div class="card">
+        <h3 class="card-title">Crear Nueva Conexión</h3>
+        <ol>
+          <li>Abre <strong>Oracle SQL Developer</strong></li>
+          <li>En la esquina superior izquierda, haz clic en el botón verde <strong>"+"</strong> (Nueva Conexión)</li>
+          <li>O ve a menú: <strong>File → New → Database Connection</strong></li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Configuración de Conexión</h3>
+        <p>Completa los siguientes campos en el formulario:</p>
+        
+        <div style="background: white; padding: 1rem; border-radius: 6px; margin: 1rem 0;">
+          <p><strong>Name:</strong> <code>Oracle 23c Local</code> (o el nombre que prefieras)</p>
+          <p><strong>Username:</strong> <code>SYSTEM</code></p>
+          <p><strong>Password:</strong> <code>Oracle123</code></p>
+          <p style="margin-top: 0.5rem;"><input type="checkbox"> ☑ Save Password (marca esta casilla)</p>
+          
+          <hr style="margin: 1rem 0; border: none; border-top: 1px solid var(--border);">
+          
+          <p><strong>Connection Type:</strong> <code>Basic</code></p>
+          <p><strong>Hostname:</strong> <code>localhost</code></p>
+          <p><strong>Port:</strong> <code>1521</code></p>
+          <p><strong>Service name:</strong> (selecciona esta opción)</p>
+          <p style="margin-left: 2rem;"><code>FREEPDB1</code></p>
+        </div>
+        
+        <div class="alert alert-warning">
+          <strong>Importante:</strong> Asegúrate de seleccionar <strong>"Service name"</strong> en lugar de "SID". El valor debe ser <code>FREEPDB1</code> (todo en mayúsculas).
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Probar Conexión</h3>
+        <ol>
+          <li>Haz clic en el botón <strong>"Test"</strong> en la parte inferior del formulario</li>
+          <li>Deberías ver: <strong>"Status: Success"</strong> en la esquina inferior izquierda</li>
+          <li>Si es exitoso, haz clic en <strong>"Save"</strong> (o "Connect" para conectar inmediatamente)</li>
+        </ol>
+        
+        <div class="alert alert-success" style="margin-top: 1rem;">
+          <strong>✓ Conexión exitosa:</strong> Verás tu conexión en el panel izquierdo de SQL Developer.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Solución de Problemas</h3>
+        <p><strong>Si aparece "Status: Failure":</strong></p>
+        <ul>
+          <li><strong>Listener refused the connection:</strong> Oracle aún no ha terminado de iniciar. Espera 2-3 minutos más y vuelve a probar.</li>
+          <li><strong>IO Error:</strong> Verifica que Docker Desktop esté corriendo y el contenedor activo con <code>docker ps</code></li>
+          <li><strong>Invalid username/password:</strong> Verifica que la contraseña sea exactamente <code>Oracle123</code></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Ejecutar Consulta de Prueba</h3>
+        <p>Una vez conectado, prueba con esta consulta:</p>
+        <pre class="code-block" onclick="copyCode(this)">SELECT banner FROM v$version;</pre>
+        
+        <p style="margin-top: 1rem;">Deberías ver información sobre Oracle Database 23c Free.</p>
+      </div>
+
+      <div class="alert alert-success">
+        <strong>✓ SQL Developer conectado exitosamente a Oracle 23c</strong>
+      </div>
+    `
+  },
+  {
+    title: 'Comandos Útiles',
+    content: `
+      <h2 class="section-title">Paso 7: Comandos Útiles para Gestión</h2>
+      <p class="section-intro">Comandos esenciales de Docker para gestionar tu contenedor de Oracle en el día a día.</p>
+      
+      <div class="card">
+        <h3 class="card-title">Estado del Contenedor</h3>
+        <p><strong>Ver contenedores en ejecución:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker ps</pre>
+        
+        <p style="margin-top: 1rem;"><strong>Ver todos los contenedores (incluso detenidos):</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker ps -a</pre>
+        
+        <p style="margin-top: 1rem;"><strong>Ver logs en tiempo real:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker logs -f oracle23c</pre>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Presiona Ctrl + C para salir</p>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Iniciar y Detener</h3>
+        <p><strong>Detener el contenedor:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker stop oracle23c</pre>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Útil cuando no necesites la base de datos y quieras liberar recursos</p>
+        
+        <p style="margin-top: 1rem;"><strong>Iniciar el contenedor:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker start oracle23c</pre>
+        
+        <p style="margin-top: 1rem;"><strong>Reiniciar el contenedor:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker restart oracle23c</pre>
+        
+        <div class="alert alert-info" style="margin-top: 1rem;">
+          <strong>Ahorro de recursos:</strong> Cuando termines de trabajar, detén el contenedor con <code>docker stop oracle23c</code>. Esto liberará los 4GB de RAM asignados a Docker.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Acceder al Contenedor</h3>
+        <p><strong>Abrir terminal dentro del contenedor:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker exec -it oracle23c bash</pre>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Escribe <code>exit</code> para salir</p>
+        
+        <p style="margin-top: 1rem;"><strong>Conectar a SQL*Plus directamente:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker exec -it oracle23c sqlplus system/Oracle123@FREEPDB1</pre>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Información del Sistema</h3>
+        <p><strong>Ver uso de recursos del contenedor:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker stats oracle23c</pre>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Muestra uso de CPU, RAM y red en tiempo real. Presiona Ctrl + C para salir</p>
+        
+        <p style="margin-top: 1rem;"><strong>Inspeccionar configuración del contenedor:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker inspect oracle23c</pre>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Limpieza y Mantenimiento</h3>
+        <p><strong>Eliminar el contenedor (conserva la imagen):</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker stop oracle23c
+docker rm oracle23c</pre>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Útil si quieres empezar de cero con un contenedor nuevo</p>
+        
+        <p style="margin-top: 1rem;"><strong>Eliminar la imagen de Oracle:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker rmi gvenzl/oracle-free:latest</pre>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Solo si necesitas desinstalar completamente Oracle</p>
+        
+        <div class="alert alert-warning" style="margin-top: 1rem;">
+          <strong>Advertencia:</strong> Al eliminar el contenedor, perderás todos los datos de la base de datos. Si necesitas persistencia, consulta la documentación sobre volúmenes de Docker.
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Auto-inicio con el Sistema</h3>
+        <p>Si quieres que Oracle inicie automáticamente con tu Mac, añade la política de reinicio:</p>
+        <pre class="code-block" onclick="copyCode(this)">docker update --restart unless-stopped oracle23c</pre>
+        <p style="margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">El contenedor iniciará automáticamente cuando abras Docker Desktop</p>
+      </div>
+    `
+  },
+  {
+    title: 'Resumen Final',
+    content: `
+      <h2 class="section-title">¡Instalación Completada!</h2>
+      <p class="section-intro">Has instalado exitosamente Oracle Database 23c Free en tu MacBook Air 2017 usando Docker.</p>
+      
+      <div class="card">
+        <h3 class="card-title">Resumen de lo Instalado</h3>
+        <div class="spec-grid">
+          <div class="spec-item">
+            <div class="spec-label">Gestor de Paquetes</div>
+            <div class="spec-value">✓ Homebrew</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Plataforma de Contenedores</div>
+            <div class="spec-value">✓ Docker Desktop</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Base de Datos</div>
+            <div class="spec-value">✓ Oracle 23c Free</div>
+          </div>
+          <div class="spec-item">
+            <div class="spec-label">Cliente SQL</div>
+            <div class="spec-value">✓ SQL Developer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Datos de Conexión</h3>
+        <pre class="code-block" onclick="copyCode(this)">Host: localhost
+Port: 1521
+Service: FREEPDB1
+Usuario: SYSTEM
+Contraseña: Oracle123</pre>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Comandos Más Usados</h3>
+        <p><strong>Iniciar Oracle:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker start oracle23c</pre>
+        
+        <p style="margin-top: 1rem;"><strong>Detener Oracle:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker stop oracle23c</pre>
+        
+        <p style="margin-top: 1rem;"><strong>Ver estado:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker ps</pre>
+        
+        <p style="margin-top: 1rem;"><strong>Ver logs:</strong></p>
+        <pre class="code-block" onclick="copyCode(this)">docker logs oracle23c</pre>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Recomendaciones de Uso</h3>
+        <ul>
+          <li><strong>Gestión de recursos:</strong> Detén el contenedor cuando no lo uses para liberar los 4GB de RAM</li>
+          <li><strong>Backup:</strong> Considera hacer backups regulares de tu base de datos si trabajas en proyectos importantes</li>
+          <li><strong>Actualizaciones:</strong> Mantén Docker Desktop actualizado para mejor rendimiento</li>
+          <li><strong>Documentación:</strong> Oracle 23c incluye nuevas características - revisa la documentación oficial</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Próximos Pasos</h3>
+        <ol>
+          <li>Explora SQL Developer y familiarízate con la interfaz</li>
+          <li>Crea tu primer usuario y esquema de base de datos</li>
+          <li>Practica consultas SQL básicas</li>
+          <li>Aprende sobre PL/SQL en Oracle 23c</li>
+          <li>Experimenta con las nuevas características de Oracle 23c</li>
+        </ol>
+      </div>
+
+      <div class="alert alert-success">
+        <strong>✓ Sistema completo y funcional</strong>
+        <br>Tu entorno de desarrollo Oracle está listo para usar. ¡Éxito en tus proyectos!
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Recursos Adicionales</h3>
+        <ul>
+          <li><a href="https://docs.oracle.com/en/database/oracle/oracle-database/23/" target="_blank">Documentación Oracle 23c</a></li>
+          <li><a href="https://docs.docker.com/desktop/install/mac-install/" target="_blank">Documentación Docker Desktop</a></li>
+          <li><a href="https://www.oracle.com/database/sqldeveloper/" target="_blank">Guías SQL Developer</a></li>
+          <li><a href="https://github.com/gvenzl/oci-oracle-free" target="_blank">Repositorio imagen Docker</a></li>
+        </ul>
+      </div>
+    `
+  }
+];
+
+let currentStep = 0;
+
+function showToast(message) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function copyCode(element) {
+  const text = element.textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✓ Código copiado al portapapeles');
+  }).catch(() => {
+    showToast('✗ Error al copiar');
+  });
+}
+
+function renderStep() {
+  const content = document.getElementById('content');
+  content.innerHTML = STEPS[currentStep].content;
+  
+  // Update navigation
+  document.getElementById('prevBtn').disabled = currentStep === 0;
+  document.getElementById('nextBtn').textContent = 
+    currentStep === STEPS.length - 1 ? 'Finalizar ✓' : 'Siguiente →';
+  
+  // Update sidebar
+  renderSidebar();
+  
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderSidebar() {
+  const nav = document.getElementById('stepNav');
+  nav.innerHTML = '';
+  
+  STEPS.forEach((step, index) => {
+    const li = document.createElement('li');
+    li.className = 'step-item' + (index === currentStep ? ' active' : '');
+    li.innerHTML = `<span class="step-number">${index + 1}</span>${step.title}`;
+    li.onclick = () => {
+      currentStep = index;
+      renderStep();
+    };
+    nav.appendChild(li);
+  });
+}
+
+function nextStep() {
+  if (currentStep < STEPS.length - 1) {
+    currentStep++;
+    renderStep();
+  }
+}
+
+function prevStep() {
+  if (currentStep > 0) {
+    currentStep--;
+    renderStep();
+  }
+}
+
+document.getElementById('nextBtn').addEventListener('click', nextStep);
+document.getElementById('prevBtn').addEventListener('click', prevStep);
+
+// Keyboard navigation
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight' && currentStep < STEPS.length - 1) {
+    nextStep();
+  } else if (e.key === 'ArrowLeft' && currentStep > 0) {
+    prevStep();
+  }
+});
+
+// Initialize
+renderStep();
+</script>
+</body>
+</html>
