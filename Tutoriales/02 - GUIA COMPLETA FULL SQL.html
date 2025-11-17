@@ -1,0 +1,2678 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía SQL de Bolsillo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-light: #f1f5f9;
+            --text-gray: #94a3b8;
+            --border: #334155;
+            --code-bg: #0d1117;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-image: url('./assets/banner.jpg');
+            padding: 40px 20px;
+            text-align: center;
+            border-bottom: 4px solid var(--secondary);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            margin: 30px auto;
+            max-width: 600px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text-light);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-gray);
+        }
+
+        .section {
+            background: var(--bg-card);
+            margin: 20px 0;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .section:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--bg-card) 0%, #1a2332 100%);
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .section-header:hover {
+            background: linear-gradient(135deg, #1a2332 0%, var(--bg-card) 100%);
+        }
+
+        .section-header h2 {
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header i {
+            color: var(--primary);
+        }
+
+        .section-content {
+            padding: 25px;
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            position: relative;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            color: #58a6ff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .copy-btn.copied {
+            background: var(--secondary);
+        }
+
+        .note {
+            background: rgba(37, 99, 235, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .note.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border-left-color: var(--warning);
+        }
+
+        .note.tip {
+            background: rgba(16, 185, 129, 0.1);
+            border-left-color: var(--secondary);
+        }
+
+        .note strong {
+            color: var(--primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .note.warning strong {
+            color: var(--warning);
+        }
+
+        .note.tip strong {
+            color: var(--secondary);
+        }
+
+        .example {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid var(--secondary);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .example-title {
+            color: var(--secondary);
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid var(--border);
+        }
+
+        th {
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .card h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 40px;
+            border-top: 2px solid var(--border);
+            color: var(--text-gray);
+        }
+
+        .keyword {
+            color: #ff79c6;
+            font-weight: bold;
+        }
+
+        .string {
+            color: #f1fa8c;
+        }
+
+        .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .function {
+            color: #50fa7b;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .section-header h2 {
+                font-size: 1.2em;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        #scrollToTop {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        #scrollToTop:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+        }
+
+        #toggleAll:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        /* Progress Bar */
+        #progressBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            z-index: 9999;
+            transition: width 0.1s ease;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.5);
+        }
+
+        /* Table of Contents */
+        #tocContainer {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            max-width: 250px;
+            max-height: 70vh;
+            overflow-y: auto;
+            z-index: 999;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        #tocContainer.hidden {
+            left: -280px;
+        }
+
+        #tocToggle {
+            position: fixed;
+            left: 20px;
+            top: 100px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        #tocToggle:hover {
+            background: var(--primary-dark);
+            padding-left: 20px;
+        }
+
+        #tocContainer h3 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 1em;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .toc-item {
+            padding: 6px 8px;
+            margin: 4px 0;
+            cursor: pointer;
+            border-radius: 6px;
+            font-size: 0.85em;
+            transition: all 0.2s;
+            color: var(--text-gray);
+        }
+
+        .toc-item:hover {
+            background: rgba(37, 99, 235, 0.2);
+            color: var(--text-light);
+            padding-left: 12px;
+        }
+
+        .toc-item.active {
+            background: rgba(37, 99, 235, 0.3);
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        /* Share button in section headers */
+        .share-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-gray);
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .share-btn:hover {
+            background: rgba(37, 99, 235, 0.2);
+            color: var(--primary);
+        }
+
+        .share-btn.copied {
+            color: var(--secondary);
+        }
+
+        /* Print styles */
+        @media print {
+            #progressBar, #tocContainer, #tocToggle, #scrollToTop, 
+            #toggleAll, .search-box, header, footer, .share-btn, .copy-btn {
+                display: none !important;
+            }
+
+            body {
+                background: white;
+                color: black;
+            }
+
+            .section {
+                page-break-inside: avoid;
+                border: 1px solid #ccc;
+                margin: 10px 0;
+            }
+
+            .section-content {
+                display: block !important;
+            }
+
+            .code-block {
+                background: #f5f5f5;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+            }
+
+            .code-block pre {
+                color: #333;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            #tocContainer {
+                display: none;
+            }
+            
+            #tocToggle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .section-header h2 {
+                font-size: 1.2em;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="progressBar"></div>
+
+    <button id="tocToggle" title="Tabla de Contenidos">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div id="tocContainer" class="hidden">
+        <h3><i class="fas fa-list"></i> Contenidos</h3>
+        <div id="tocList"></div>
+    </div>
+
+    <header>
+        <h1><i class="fas fa-database"></i> Guía SQL de Bolsillo</h1>
+        <p>Referencia completa para Oracle SQL y compatibilidad con MySQL/PostgreSQL</p>
+    </header>
+
+    <div class="container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Buscar comando o concepto... (ej: SELECT, JOIN, INSERT) • Ctrl+K">
+            <i class="fas fa-search"></i>
+            <div id="searchResults" style="display: none; margin-top: 10px; text-align: center; color: var(--text-gray); font-size: 14px;">
+                <i class="fas fa-info-circle"></i> <span id="resultCount"></span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin: 20px 0;">
+            <button id="toggleAll" style="background: var(--primary); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-expand-alt"></i> Expandir Todo
+            </button>
+        </div>
+
+        <!-- SECCIÓN 0: FUNDAMENTOS -->
+        <div class="section" id="fundamentos" data-keywords="fundamentos conceptos basicos introduccion select consulta visualizacion">
+            <div class="section-header">
+                <h2><i class="fas fa-book-open"></i> Fundamentos de Consultas SQL</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('fundamentos')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>¿Qué es una Consulta SQL?</h3>
+                <p>Una consulta SQL es una instrucción que le pedimos a la base de datos para obtener, modificar o gestionar información. La consulta más fundamental es <strong>SELECT</strong>, que nos permite visualizar datos.</p>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-lightbulb"></i> Concepto Clave</strong>
+                    Piensa en una tabla como una hoja de Excel: tiene columnas (campos) y filas (registros). SQL nos permite preguntar cosas como "muéstrame todos los clientes" o "dime qué productos tiene Samsung".
+                </div>
+
+                <h3>1. La Consulta Básica: SELECT</h3>
+                <p>La estructura más simple para ver datos es:</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> columna1, columna2
+<span class="keyword">FROM</span> nombre_tabla;</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-flask"></i> Ejemplo Genérico</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Ver nombres y edades de una tabla de empleados</span>
+<span class="keyword">SELECT</span> nombre, edad
+<span class="keyword">FROM</span> empleados;</pre>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-database"></i> Ejemplo con Nuestras Tablas</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Ver todos los nombres de clientes</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> CLIENTES;</pre>
+                    </div>
+                </div>
+
+                <h3>2. Seleccionar Todas las Columnas</h3>
+                <p>El asterisco (*) es un comodín que significa "todas las columnas":</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> MARCAS;</pre>
+                </div>
+
+                <div class="note warning">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Advertencia</strong>
+                    Usar SELECT * en tablas grandes puede ser lento. En producción, especifica solo las columnas que necesitas.
+                </div>
+
+                <h3>3. Operaciones Aritméticas en Consultas</h3>
+                <p>Puedes hacer cálculos directamente en tus consultas:</p>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3><i class="fas fa-plus"></i> Suma (+)</h3>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT</span> stock + 10
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-minus"></i> Resta (-)</h3>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT</span> stock - stock_minimo
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-times"></i> Multiplicación (*)</h3>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT</span> precio * cantidad
+<span class="keyword">FROM</span> pedidos;</pre>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-divide"></i> División (/)</h3>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT</span> stock / 2
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-calculator"></i> Ejemplo Práctico</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Calcular cuánto stock disponible hay (stock - stock_minimo)</span>
+<span class="keyword">SELECT</span> stock - stock_minimo
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                    </div>
+                </div>
+
+                <h3>4. Alias de Columnas (AS)</h3>
+                <p>Los alias permiten renombrar columnas temporalmente para hacer los resultados más legibles:</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> columna <span class="keyword">AS</span> <span class="string">"Nombre Personalizado"</span>
+<span class="keyword">FROM</span> tabla;</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-tag"></i> Ejemplos de Alias</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Sin comillas (palabras simples)</span>
+<span class="keyword">SELECT</span> nombre <span class="keyword">AS</span> marca
+<span class="keyword">FROM</span> MARCAS;
+
+<span class="comment">-- Con comillas (espacios o caracteres especiales)</span>
+<span class="keyword">SELECT</span> 
+    stock - stock_minimo <span class="keyword">AS</span> <span class="string">"Stock Disponible"</span>,
+    stock <span class="keyword">AS</span> <span class="string">"Inventario Total"</span>
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                    </div>
+                </div>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-info-circle"></i> Oracle vs MySQL/PostgreSQL</strong>
+                    En Oracle usa comillas dobles ("alias"). En MySQL puedes usar comillas simples o dobles. PostgreSQL también acepta ambas pero prefiere dobles para identificadores.
+                </div>
+
+                <h3>5. Concatenación de Valores</h3>
+                <p>Puedes unir texto de diferentes columnas:</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Operador de concatenación en Oracle</span>
+<span class="keyword">SELECT</span> nombre || <span class="string">' - '</span> || telefono <span class="keyword">AS</span> <span class="string">"Proveedor Info"</span>
+<span class="keyword">FROM</span> PROVEEDOR_ENVIO;</pre>
+                </div>
+
+                <div class="note warning">
+                    <strong><i class="fas fa-exchange-alt"></i> Diferencias entre Motores</strong>
+                    <ul>
+                        <li><strong>Oracle:</strong> usa || (doble pipe)</li>
+                        <li><strong>MySQL:</strong> usa CONCAT(col1, col2) o ||</li>
+                        <li><strong>PostgreSQL:</strong> usa || (igual que Oracle)</li>
+                    </ul>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-link"></i> Concatenación Avanzada</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Crear una descripción completa de producto</span>
+<span class="keyword">SELECT</span> 
+    <span class="string">'Producto: '</span> || nombre || <span class="string">' (ID: '</span> || id || <span class="string">')'</span> <span class="keyword">AS</span> <span class="string">"Descripción"</span>
+<span class="keyword">FROM</span> PRODUCTOS;</pre>
+                    </div>
+                </div>
+
+                <h3>6. Eliminar Valores Duplicados (DISTINCT)</h3>
+                <p>DISTINCT elimina filas repetidas en los resultados:</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT DISTINCT</span> columna
+<span class="keyword">FROM</span> tabla;</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-filter"></i> Ejemplos DISTINCT</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Ver qué marcas tienen productos (sin repetir)</span>
+<span class="keyword">SELECT DISTINCT</span> id_marca
+<span class="keyword">FROM</span> PRODUCTOS;
+
+<span class="comment">-- Ver nombres únicos de almacenes</span>
+<span class="keyword">SELECT DISTINCT</span> nombre
+<span class="keyword">FROM</span> ALMACEN;</pre>
+                    </div>
+                </div>
+
+                <h3>7. Ordenamiento de Resultados (ORDER BY)</h3>
+                <p>ORDER BY ordena los resultados de forma ascendente (ASC) o descendente (DESC):</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> columna
+<span class="keyword">FROM</span> tabla
+<span class="keyword">ORDER BY</span> columna <span class="keyword">ASC</span>;  <span class="comment">-- Ascendente (por defecto)</span>
+
+<span class="keyword">SELECT</span> columna
+<span class="keyword">FROM</span> tabla
+<span class="keyword">ORDER BY</span> columna <span class="keyword">DESC</span>; <span class="comment">-- Descendente</span></pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-sort"></i> Ejemplos de Ordenamiento</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Clientes ordenados alfabéticamente</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> CLIENTES
+<span class="keyword">ORDER BY</span> nombre <span class="keyword">ASC</span>;
+
+<span class="comment">-- Stock ordenado de mayor a menor</span>
+<span class="keyword">SELECT</span> stock, id_producto
+<span class="keyword">FROM</span> STOCK_ALMACEN
+<span class="keyword">ORDER BY</span> stock <span class="keyword">DESC</span>;
+
+<span class="comment">-- Ordenar por múltiples columnas</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> STOCK_ALMACEN
+<span class="keyword">ORDER BY</span> id_almacen <span class="keyword">ASC</span>, stock <span class="keyword">DESC</span>;</pre>
+                    </div>
+                </div>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-graduation-cap"></i> Buenas Prácticas</strong>
+                    <ul>
+                        <li>Usa alias descriptivos para mejorar la legibilidad</li>
+                        <li>Especifica ASC o DESC explícitamente aunque ASC sea el defecto</li>
+                        <li>Evita SELECT * en producción, lista las columnas necesarias</li>
+                        <li>Usa DISTINCT solo cuando sea necesario (puede ser costoso)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 1: SELECT -->
+        <div class="section" id="select" data-keywords="select consulta where filtro condicion">
+            <div class="section-header">
+                <h2><i class="fas fa-search"></i> SELECT - Consultas Avanzadas</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('select')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>Cláusula WHERE - Filtrar Datos</h3>
+                <p>WHERE permite filtrar registros según condiciones específicas:</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> PRODUCTOS
+<span class="keyword">WHERE</span> id_marca = <span class="string">1</span>;</pre>
+                </div>
+
+                <h3>Operadores de Comparación</h3>
+                <table>
+                    <tr>
+                        <th>Operador</th>
+                        <th>Descripción</th>
+                        <th>Ejemplo</th>
+                    </tr>
+                    <tr>
+                        <td>=</td>
+                        <td>Igual a</td>
+                        <td>WHERE id = 5</td>
+                    </tr>
+                    <tr>
+                        <td>!=, <></td>
+                        <td>Diferente de</td>
+                        <td>WHERE id <> 5</td>
+                    </tr>
+                    <tr>
+                        <td>></td>
+                        <td>Mayor que</td>
+                        <td>WHERE stock > 100</td>
+                    </tr>
+                    <tr>
+                        <td><</td>
+                        <td>Menor que</td>
+                        <td>WHERE stock < 50</td>
+                    </tr>
+                    <tr>
+                        <td>>=</td>
+                        <td>Mayor o igual</td>
+                        <td>WHERE stock >= 100</td>
+                    </tr>
+                    <tr>
+                        <td><=</td>
+                        <td>Menor o igual</td>
+                        <td>WHERE stock <= 50</td>
+                    </tr>
+                    <tr>
+                        <td>BETWEEN</td>
+                        <td>Entre dos valores</td>
+                        <td>WHERE stock BETWEEN 10 AND 100</td>
+                    </tr>
+                    <tr>
+                        <td>IN</td>
+                        <td>En una lista de valores</td>
+                        <td>WHERE id IN (1,2,3)</td>
+                    </tr>
+                    <tr>
+                        <td>LIKE</td>
+                        <td>Coincidencia de patrón</td>
+                        <td>WHERE nombre LIKE 'Sam%'</td>
+                    </tr>
+                    <tr>
+                        <td>IS NULL</td>
+                        <td>Valor nulo</td>
+                        <td>WHERE campo IS NULL</td>
+                    </tr>
+                </table>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-code"></i> Ejemplos Prácticos WHERE</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Productos de marca Samsung (id = 1)</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> PRODUCTOS
+<span class="keyword">WHERE</span> id_marca = <span class="string">1</span>;
+
+<span class="comment">-- Stock bajo (menor al mínimo)</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> STOCK_ALMACEN
+<span class="keyword">WHERE</span> stock < stock_minimo;
+
+<span class="comment">-- Buscar marcas que empiezan con 'S'</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> MARCAS
+<span class="keyword">WHERE</span> nombre <span class="keyword">LIKE</span> <span class="string">'S%'</span>;
+
+<span class="comment">-- Stock entre 30 y 100</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> STOCK_ALMACEN
+<span class="keyword">WHERE</span> stock <span class="keyword">BETWEEN</span> <span class="string">30</span> <span class="keyword">AND</span> <span class="string">100</span>;</pre>
+                    </div>
+                </div>
+
+                <h3>Operadores Lógicos</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h3><i class="fas fa-link"></i> AND</h3>
+                        <p>Ambas condiciones deben ser verdaderas</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">WHERE</span> stock > <span class="string">50</span> 
+  <span class="keyword">AND</span> id_almacen = <span class="string">1</span></pre>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-code-branch"></i> OR</h3>
+                        <p>Al menos una condición debe ser verdadera</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">WHERE</span> id_marca = <span class="string">1</span> 
+   <span class="keyword">OR</span> id_marca = <span class="string">2</span></pre>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-ban"></i> NOT</h3>
+                        <p>Invierte el resultado de una condición</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">WHERE NOT</span> id_marca = <span class="string">1</span></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>LIMIT / FETCH - Limitar Resultados</h3>
+                <div class="note warning">
+                    <strong><i class="fas fa-database"></i> Diferencias entre Motores</strong>
+                    <ul>
+                        <li><strong>Oracle 12c+:</strong> FETCH FIRST n ROWS ONLY</li>
+                        <li><strong>MySQL/PostgreSQL:</strong> LIMIT n</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Oracle</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> PRODUCTOS
+<span class="keyword">FETCH FIRST</span> <span class="string">5</span> <span class="keyword">ROWS ONLY</span>;
+
+<span class="comment">-- MySQL/PostgreSQL</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> PRODUCTOS
+<span class="keyword">LIMIT</span> <span class="string">5</span>;</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: INSERT -->
+        <div class="section" id="insert" data-keywords="insert insertar agregar crear registro">
+            <div class="section-header">
+                <h2><i class="fas fa-plus-circle"></i> INSERT - Insertar Datos</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('insert')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>Sintaxis Básica</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">INSERT INTO</span> nombre_tabla (columna1, columna2, columna3)
+<span class="keyword">VALUES</span> (valor1, valor2, valor3);</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-flask"></i> Ejemplo Básico</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Insertar una nueva marca</span>
+<span class="keyword">INSERT INTO</span> MARCAS (nombre)
+<span class="keyword">VALUES</span> (<span class="string">'Xiaomi'</span>);
+
+<span class="comment">-- Insertar un nuevo cliente</span>
+<span class="keyword">INSERT INTO</span> CLIENTES (nombre)
+<span class="keyword">VALUES</span> (<span class="string">'Roberto Silva'</span>);</pre>
+                    </div>
+                </div>
+
+                <h3>Insertar Múltiples Registros</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Insertar varias marcas a la vez</span>
+<span class="keyword">INSERT INTO</span> MARCAS (nombre)
+<span class="keyword">VALUES</span> (<span class="string">'Lenovo'</span>);
+
+<span class="keyword">INSERT INTO</span> MARCAS (nombre)
+<span class="keyword">VALUES</span> (<span class="string">'Dell'</span>);
+
+<span class="keyword">INSERT INTO</span> MARCAS (nombre)
+<span class="keyword">VALUES</span> (<span class="string">'HP'</span>);</pre>
+                </div>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-lightbulb"></i> Inserción Múltiple Moderna</strong>
+                    En Oracle 23c, MySQL y PostgreSQL puedes insertar múltiples filas en una sola sentencia:
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- MySQL/PostgreSQL/Oracle 23c+</span>
+<span class="keyword">INSERT INTO</span> MARCAS (nombre)
+<span class="keyword">VALUES</span> 
+    (<span class="string">'Lenovo'</span>),
+    (<span class="string">'Dell'</span>),
+    (<span class="string">'HP'</span>);</pre>
+                </div>
+
+                <h3>Insertar con Todas las Columnas</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Si proporcionas valores para TODAS las columnas, puedes omitir sus nombres</span>
+<span class="keyword">INSERT INTO</span> PROVEEDOR_ENVIO
+<span class="keyword">VALUES</span> (6, <span class="string">'FedEx'</span>, <span class="string">'+56 2 2800 3300'</span>);</pre>
+                </div>
+
+                <div class="note warning">
+                    <strong><i class="fas fa-exclamation-triangle"></i> Advertencia</strong>
+                    Con tablas que tienen ID auto-generados (IDENTITY), no incluyas el ID en el INSERT. Oracle lo generará automáticamente.
+                </div>
+
+                <h3>Insertar con Subconsulta</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Copiar datos de una tabla a otra</span>
+<span class="keyword">INSERT INTO</span> tabla_destino (columna1, columna2)
+<span class="keyword">SELECT</span> columna1, columna2
+<span class="keyword">FROM</span> tabla_origen
+<span class="keyword">WHERE</span> condicion;</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-database"></i> Ejemplo con Nuestras Tablas</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Insertar un producto nuevo</span>
+<span class="keyword">INSERT INTO</span> PRODUCTOS (nombre, id_marca)
+<span class="keyword">VALUES</span> (<span class="string">'Notebook Pavilion'</span>, <span class="string">8</span>);
+
+<span class="comment">-- Insertar stock para el nuevo producto</span>
+<span class="keyword">INSERT INTO</span> STOCK_ALMACEN (stock, stock_minimo, id_almacen, id_producto)
+<span class="keyword">VALUES</span> (<span class="string">75</span>, <span class="string">5</span>, <span class="string">1</span>, <span class="string">6</span>);</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: UPDATE -->
+        <div class="section" id="update" data-keywords="update actualizar modificar cambiar">
+            <div class="section-header">
+                <h2><i class="fas fa-edit"></i> UPDATE - Actualizar Datos</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('update')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>Sintaxis Básica</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">UPDATE</span> nombre_tabla
+<span class="keyword">SET</span> columna1 = valor1, columna2 = valor2
+<span class="keyword">WHERE</span> condicion;</pre>
+                </div>
+
+                <div class="note warning">
+                    <strong><i class="fas fa-exclamation-circle"></i> ¡CRÍTICO!</strong>
+                    SIEMPRE usa WHERE en UPDATE. Sin WHERE, actualizarás TODOS los registros de la tabla.
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-pencil-alt"></i> Ejemplos de UPDATE</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Actualizar el nombre de una marca específica</span>
+<span class="keyword">UPDATE</span> MARCAS
+<span class="keyword">SET</span> nombre = <span class="string">'Samsung Electronics'</span>
+<span class="keyword">WHERE</span> id = <span class="string">1</span>;
+
+<span class="comment">-- Actualizar stock de un producto en un almacén</span>
+<span class="keyword">UPDATE</span> STOCK_ALMACEN
+<span class="keyword">SET</span> stock = <span class="string">150</span>
+<span class="keyword">WHERE</span> id_producto = <span class="string">1</span> <span class="keyword">AND</span> id_almacen = <span class="string">1</span>;
+
+<span class="comment">-- Incrementar el stock en 20 unidades</span>
+<span class="keyword">UPDATE</span> STOCK_ALMACEN
+<span class="keyword">SET</span> stock = stock + <span class="string">20</span>
+<span class="keyword">WHERE</span> id = <span class="string">1</span>;</pre>
+                    </div>
+                </div>
+
+                <h3>Actualizar Múltiples Columnas</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Actualizar stock y stock_minimo simultáneamente</span>
+<span class="keyword">UPDATE</span> STOCK_ALMACEN
+<span class="keyword">SET</span> 
+    stock = <span class="string">100</span>,
+    stock_minimo = <span class="string">15</span>,
+    fecha_rebasstecimiento = <span class="keyword">SYSTIMESTAMP</span>
+<span class="keyword">WHERE</span> id = <span class="string">3</span>;</pre>
+                </div>
+
+                <h3>UPDATE con Subconsulta</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Actualizar usando valores de otra tabla</span>
+<span class="keyword">UPDATE</span> PRODUCTOS
+<span class="keyword">SET</span> nombre = (<span class="keyword">SELECT</span> nombre <span class="keyword">FROM</span> MARCAS <span class="keyword">WHERE</span> id = <span class="string">1</span>) || <span class="string">' Product'</span>
+<span class="keyword">WHERE</span> id_marca = <span class="string">1</span>;</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-tools"></i> Casos de Uso Comunes</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Corregir un teléfono de proveedor</span>
+<span class="keyword">UPDATE</span> PROVEEDOR_ENVIO
+<span class="keyword">SET</span> telefono = <span class="string">'+56 2 2600 6000'</span>
+<span class="keyword">WHERE</span> nombre = <span class="string">'Chilexpress'</span>;
+
+<span class="comment">-- Reducir stock por venta (decrementar)</span>
+<span class="keyword">UPDATE</span> STOCK_ALMACEN
+<span class="keyword">SET</span> stock = stock - <span class="string">5</span>
+<span class="keyword">WHERE</span> id_producto = <span class="string">2</span> <span class="keyword">AND</span> id_almacen = <span class="string">2</span>;
+
+<span class="comment">-- Actualizar múltiples registros con misma condición</span>
+<span class="keyword">UPDATE</span> STOCK_ALMACEN
+<span class="keyword">SET</span> stock_minimo = <span class="string">20</span>
+<span class="keyword">WHERE</span> id_almacen = <span class="string">1</span>;</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 4: DELETE -->
+        <div class="section" id="delete" data-keywords="delete eliminar borrar quitar">
+            <div class="section-header">
+                <h2><i class="fas fa-trash-alt"></i> DELETE - Eliminar Datos</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('delete')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>Sintaxis Básica</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">DELETE FROM</span> nombre_tabla
+<span class="keyword">WHERE</span> condicion;</pre>
+                </div>
+
+                <div class="note warning">
+                    <strong><i class="fas fa-exclamation-triangle"></i> ¡PELIGRO!</strong>
+                    DELETE sin WHERE eliminará TODOS los registros de la tabla. Siempre verifica tu condición antes de ejecutar.
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-trash"></i> Ejemplos de DELETE</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Eliminar una marca específica por ID</span>
+<span class="keyword">DELETE FROM</span> MARCAS
+<span class="keyword">WHERE</span> id = <span class="string">10</span>;
+
+<span class="comment">-- Eliminar un cliente por nombre</span>
+<span class="keyword">DELETE FROM</span> CLIENTES
+<span class="keyword">WHERE</span> nombre = <span class="string">'Juan Pérez'</span>;
+
+<span class="comment">-- Eliminar stock con inventario cero</span>
+<span class="keyword">DELETE FROM</span> STOCK_ALMACEN
+<span class="keyword">WHERE</span> stock = <span class="string">0</span>;</pre>
+                    </div>
+                </div>
+
+                <h3>DELETE con Múltiples Condiciones</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Eliminar stock bajo de almacén específico</span>
+<span class="keyword">DELETE FROM</span> STOCK_ALMACEN
+<span class="keyword">WHERE</span> stock < <span class="string">10</span> <span class="keyword">AND</span> id_almacen = <span class="string">3</span>;</pre>
+                </div>
+
+                <h3>DELETE con Subconsulta</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Eliminar productos de una marca específica</span>
+<span class="keyword">DELETE FROM</span> PRODUCTOS
+<span class="keyword">WHERE</span> id_marca = (
+    <span class="keyword">SELECT</span> id 
+    <span class="keyword">FROM</span> MARCAS 
+    <span class="keyword">WHERE</span> nombre = <span class="string">'Huawei'</span>
+);</pre>
+                </div>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-shield-alt"></i> Buenas Prácticas</strong>
+                    <ol>
+                        <li>Antes de DELETE, ejecuta un SELECT con la misma WHERE para verificar qué se eliminará</li>
+                        <li>Considera usar transacciones (BEGIN/COMMIT/ROLLBACK)</li>
+                        <li>Ten cuidado con restricciones de integridad referencial (CASCADE CONSTRAINT)</li>
+                    </ol>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-check-circle"></i> Verificación Antes de Eliminar</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- PASO 1: Verificar qué se eliminará</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> STOCK_ALMACEN
+<span class="keyword">WHERE</span> stock < <span class="string">5</span>;
+
+<span class="comment">-- PASO 2: Si está correcto, entonces eliminar</span>
+<span class="keyword">DELETE FROM</span> STOCK_ALMACEN
+<span class="keyword">WHERE</span> stock < <span class="string">5</span>;</pre>
+                    </div>
+                </div>
+
+                <h3>TRUNCATE vs DELETE</h3>
+                <table>
+                    <tr>
+                        <th>Característica</th>
+                        <th>DELETE</th>
+                        <th>TRUNCATE</th>
+                    </tr>
+                    <tr>
+                        <td>Velocidad</td>
+                        <td>Más lento</td>
+                        <td>Muy rápido</td>
+                    </tr>
+                    <tr>
+                        <td>Condiciones WHERE</td>
+                        <td>✓ Soporta</td>
+                        <td>✗ No soporta</td>
+                    </tr>
+                    <tr>
+                        <td>Rollback</td>
+                        <td>✓ Posible</td>
+                        <td>✗ No posible</td>
+                    </tr>
+                    <tr>
+                        <td>Reinicia IDENTITY</td>
+                        <td>✗ No</td>
+                        <td>✓ Sí</td>
+                    </tr>
+                    <tr>
+                        <td>Uso típico</td>
+                        <td>Eliminar registros específicos</td>
+                        <td>Vaciar tabla completa</td>
+                    </tr>
+                </table>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Vaciar tabla completa (rápido, sin rollback)</span>
+<span class="keyword">TRUNCATE TABLE</span> nombre_tabla;</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 5: JOINS -->
+        <div class="section" id="joins" data-keywords="join inner left right full union relacionar combinar">
+            <div class="section-header">
+                <h2><i class="fas fa-link"></i> JOINS - Relacionar Tablas</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('joins')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>¿Qué es un JOIN?</h3>
+                <p>Un JOIN combina filas de dos o más tablas basándose en una relación entre ellas (normalmente llaves foráneas).</p>
+
+                <h3>INNER JOIN</h3>
+                <p>Devuelve solo las filas que tienen coincidencias en AMBAS tablas.</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> tabla1.columna, tabla2.columna
+<span class="keyword">FROM</span> tabla1
+<span class="keyword">INNER JOIN</span> tabla2
+    <span class="keyword">ON</span> tabla1.id = tabla2.id_foranea;</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-database"></i> Ejemplo: Productos con sus Marcas</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Ver productos con el nombre de su marca</span>
+<span class="keyword">SELECT</span> 
+    p.nombre <span class="keyword">AS</span> <span class="string">"Producto"</span>,
+    m.nombre <span class="keyword">AS</span> <span class="string">"Marca"</span>
+<span class="keyword">FROM</span> PRODUCTOS p
+<span class="keyword">INNER JOIN</span> MARCAS m
+    <span class="keyword">ON</span> p.id_marca = m.id;</pre>
+                    </div>
+                </div>
+
+                <h3>LEFT JOIN (LEFT OUTER JOIN)</h3>
+                <p>Devuelve TODAS las filas de la tabla izquierda, y las coincidencias de la derecha. Si no hay coincidencia, devuelve NULL.</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> tabla1.columna, tabla2.columna
+<span class="keyword">FROM</span> tabla1
+<span class="keyword">LEFT JOIN</span> tabla2
+    <span class="keyword">ON</span> tabla1.id = tabla2.id_foranea;</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-list"></i> Ejemplo: Todas las Marcas (con o sin productos)</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Ver todas las marcas, incluso las que no tienen productos</span>
+<span class="keyword">SELECT</span> 
+    m.nombre <span class="keyword">AS</span> <span class="string">"Marca"</span>,
+    p.nombre <span class="keyword">AS</span> <span class="string">"Producto"</span>
+<span class="keyword">FROM</span> MARCAS m
+<span class="keyword">LEFT JOIN</span> PRODUCTOS p
+    <span class="keyword">ON</span> m.id = p.id_marca;</pre>
+                    </div>
+                </div>
+
+                <h3>RIGHT JOIN (RIGHT OUTER JOIN)</h3>
+                <p>Devuelve TODAS las filas de la tabla derecha, y las coincidencias de la izquierda.</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> tabla1.columna, tabla2.columna
+<span class="keyword">FROM</span> tabla1
+<span class="keyword">RIGHT JOIN</span> tabla2
+    <span class="keyword">ON</span> tabla1.id = tabla2.id_foranea;</pre>
+                </div>
+
+                <h3>FULL OUTER JOIN</h3>
+                <p>Devuelve todas las filas cuando hay coincidencia en cualquiera de las tablas.</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> tabla1.columna, tabla2.columna
+<span class="keyword">FROM</span> tabla1
+<span class="keyword">FULL OUTER JOIN</span> tabla2
+    <span class="keyword">ON</span> tabla1.id = tabla2.id_foranea;</pre>
+                </div>
+
+                <div class="note warning">
+                    <strong><i class="fas fa-info-circle"></i> MySQL no soporta FULL OUTER JOIN</strong>
+                    En MySQL, debes usar UNION entre LEFT y RIGHT JOIN para simularlo.
+                </div>
+
+                <h3>Múltiples JOINs</h3>
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-project-diagram"></i> Ejemplo del Script Original</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Stock con nombres de almacén y producto</span>
+<span class="keyword">SELECT</span> 
+    sa.id <span class="keyword">AS</span> id_stock,
+    a.nombre <span class="keyword">AS</span> nombre_almacen,
+    p.nombre <span class="keyword">AS</span> nombre_producto,
+    sa.stock,
+    sa.stock_minimo,
+    sa.fecha_rebasstecimiento
+<span class="keyword">FROM</span> STOCK_ALMACEN sa
+<span class="keyword">JOIN</span> ALMACEN a 
+    <span class="keyword">ON</span> sa.id_almacen = a.id
+<span class="keyword">JOIN</span> PRODUCTOS p 
+    <span class="keyword">ON</span> sa.id_producto = p.id;</pre>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-cubes"></i> JOIN Complejo: 4 Tablas</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Stock completo con almacén, producto y marca</span>
+<span class="keyword">SELECT</span> 
+    a.nombre <span class="keyword">AS</span> <span class="string">"Almacén"</span>,
+    p.nombre <span class="keyword">AS</span> <span class="string">"Producto"</span>,
+    m.nombre <span class="keyword">AS</span> <span class="string">"Marca"</span>,
+    sa.stock <span class="keyword">AS</span> <span class="string">"Stock Actual"</span>,
+    sa.stock_minimo <span class="keyword">AS</span> <span class="string">"Stock Mínimo"</span>
+<span class="keyword">FROM</span> STOCK_ALMACEN sa
+<span class="keyword">JOIN</span> ALMACEN a <span class="keyword">ON</span> sa.id_almacen = a.id
+<span class="keyword">JOIN</span> PRODUCTOS p <span class="keyword">ON</span> sa.id_producto = p.id
+<span class="keyword">JOIN</span> MARCAS m <span class="keyword">ON</span> p.id_marca = m.id;</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 6: FUNCIONES AGREGADAS -->
+        <div class="section" id="funciones-agregadas" data-keywords="funciones agregadas count sum avg max min group by having">
+            <div class="section-header">
+                <h2><i class="fas fa-calculator"></i> Funciones Agregadas</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('funciones-agregadas')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>Funciones Principales</h3>
+                
+                <div class="grid">
+                    <div class="card">
+                        <h3><i class="fas fa-hashtag"></i> COUNT()</h3>
+                        <p>Cuenta el número de filas</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT COUNT</span>(*)
+<span class="keyword">FROM</span> PRODUCTOS;</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-plus"></i> SUM()</h3>
+                        <p>Suma valores numéricos</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT SUM</span>(stock)
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-chart-line"></i> AVG()</h3>
+                        <p>Calcula el promedio</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT AVG</span>(stock)
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-arrow-up"></i> MAX()</h3>
+                        <p>Valor máximo</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT MAX</span>(stock)
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <h3><i class="fas fa-arrow-down"></i> MIN()</h3>
+                        <p>Valor mínimo</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT MIN</span>(stock)
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-chart-bar"></i> Ejemplos Prácticos</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Contar cuántos productos hay</span>
+<span class="keyword">SELECT COUNT</span>(*) <span class="keyword">AS</span> <span class="string">"Total Productos"</span>
+<span class="keyword">FROM</span> PRODUCTOS;
+
+<span class="comment">-- Stock total en todos los almacenes</span>
+<span class="keyword">SELECT SUM</span>(stock) <span class="keyword">AS</span> <span class="string">"Stock Total"</span>
+<span class="keyword">FROM</span> STOCK_ALMACEN;
+
+<span class="comment">-- Promedio de stock</span>
+<span class="keyword">SELECT AVG</span>(stock) <span class="keyword">AS</span> <span class="string">"Promedio Stock"</span>
+<span class="keyword">FROM</span> STOCK_ALMACEN;
+
+<span class="comment">-- Stock máximo y mínimo</span>
+<span class="keyword">SELECT</span> 
+    <span class="keyword">MAX</span>(stock) <span class="keyword">AS</span> <span class="string">"Stock Máximo"</span>,
+    <span class="keyword">MIN</span>(stock) <span class="keyword">AS</span> <span class="string">"Stock Mínimo"</span>
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                    </div>
+                </div>
+
+                <h3>GROUP BY - Agrupar Resultados</h3>
+                <p>GROUP BY agrupa filas que tienen valores iguales en columnas específicas. Se usa con funciones agregadas.</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> columna_agrupacion, <span class="keyword">COUNT</span>(*)
+<span class="keyword">FROM</span> tabla
+<span class="keyword">GROUP BY</span> columna_agrupacion;</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-layer-group"></i> Ejemplos GROUP BY</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Contar productos por marca</span>
+<span class="keyword">SELECT</span> 
+    id_marca,
+    <span class="keyword">COUNT</span>(*) <span class="keyword">AS</span> <span class="string">"Cantidad Productos"</span>
+<span class="keyword">FROM</span> PRODUCTOS
+<span class="keyword">GROUP BY</span> id_marca;
+
+<span class="comment">-- Stock total por almacén</span>
+<span class="keyword">SELECT</span> 
+    id_almacen,
+    <span class="keyword">SUM</span>(stock) <span class="keyword">AS</span> <span class="string">"Stock Total"</span>
+<span class="keyword">FROM</span> STOCK_ALMACEN
+<span class="keyword">GROUP BY</span> id_almacen;
+
+<span class="comment">-- Promedio de stock por almacén con nombre</span>
+<span class="keyword">SELECT</span> 
+    a.nombre <span class="keyword">AS</span> <span class="string">"Almacén"</span>,
+    <span class="keyword">AVG</span>(sa.stock) <span class="keyword">AS</span> <span class="string">"Promedio Stock"</span>,
+    <span class="keyword">COUNT</span>(*) <span class="keyword">AS</span> <span class="string">"Productos"</span>
+<span class="keyword">FROM</span> STOCK_ALMACEN sa
+<span class="keyword">JOIN</span> ALMACEN a <span class="keyword">ON</span> sa.id_almacen = a.id
+<span class="keyword">GROUP BY</span> a.nombre;</pre>
+                    </div>
+                </div>
+
+                <h3>HAVING - Filtrar Grupos</h3>
+                <p>HAVING es como WHERE, pero para grupos (se usa después de GROUP BY).</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> columna, <span class="keyword">COUNT</span>(*)
+<span class="keyword">FROM</span> tabla
+<span class="keyword">GROUP BY</span> columna
+<span class="keyword">HAVING</span> <span class="keyword">COUNT</span>(*) > 5;</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-filter"></i> Ejemplos HAVING</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Almacenes con stock total mayor a 100</span>
+<span class="keyword">SELECT</span> 
+    id_almacen,
+    <span class="keyword">SUM</span>(stock) <span class="keyword">AS</span> <span class="string">"Stock Total"</span>
+<span class="keyword">FROM</span> STOCK_ALMACEN
+<span class="keyword">GROUP BY</span> id_almacen
+<span class="keyword">HAVING SUM</span>(stock) > <span class="string">100</span>;
+
+<span class="comment">-- Marcas con más de 2 productos</span>
+<span class="keyword">SELECT</span> 
+    m.nombre <span class="keyword">AS</span> <span class="string">"Marca"</span>,
+    <span class="keyword">COUNT</span>(*) <span class="keyword">AS</span> <span class="string">"Total Productos"</span>
+<span class="keyword">FROM</span> PRODUCTOS p
+<span class="keyword">JOIN</span> MARCAS m <span class="keyword">ON</span> p.id_marca = m.id
+<span class="keyword">GROUP BY</span> m.nombre
+<span class="keyword">HAVING COUNT</span>(*) > <span class="string">2</span>;</pre>
+                    </div>
+                </div>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-info-circle"></i> WHERE vs HAVING</strong>
+                    <ul>
+                        <li><strong>WHERE:</strong> Filtra filas ANTES de agrupar</li>
+                        <li><strong>HAVING:</strong> Filtra grupos DESPUÉS de agrupar</li>
+                    </ul>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-code"></i> Ejemplo Completo: WHERE + GROUP BY + HAVING</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Almacenes con promedio de stock > 50, solo productos con stock > 20</span>
+<span class="keyword">SELECT</span> 
+    a.nombre <span class="keyword">AS</span> <span class="string">"Almacén"</span>,
+    <span class="keyword">AVG</span>(sa.stock) <span class="keyword">AS</span> <span class="string">"Promedio"</span>,
+    <span class="keyword">COUNT</span>(*) <span class="keyword">AS</span> <span class="string">"Productos"</span>
+<span class="keyword">FROM</span> STOCK_ALMACEN sa
+<span class="keyword">JOIN</span> ALMACEN a <span class="keyword">ON</span> sa.id_almacen = a.id
+<span class="keyword">WHERE</span> sa.stock > <span class="string">20</span>
+<span class="keyword">GROUP BY</span> a.nombre
+<span class="keyword">HAVING AVG</span>(sa.stock) > <span class="string">50</span>;</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 7: SUBCONSULTAS -->
+        <div class="section" id="subconsultas" data-keywords="subconsulta subquery anidada nested">
+            <div class="section-header">
+                <h2><i class="fas fa-layer-group"></i> Subconsultas (Subqueries)</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('subconsultas')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>¿Qué es una Subconsulta?</h3>
+                <p>Una subconsulta es una consulta dentro de otra consulta. Se ejecuta primero y su resultado se usa en la consulta principal.</p>
+
+                <h3>Subconsulta en WHERE</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> columna
+<span class="keyword">FROM</span> tabla1
+<span class="keyword">WHERE</span> columna = (
+    <span class="keyword">SELECT</span> columna
+    <span class="keyword">FROM</span> tabla2
+    <span class="keyword">WHERE</span> condicion
+);</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-search"></i> Ejemplos Básicos</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Productos de la marca Samsung</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> PRODUCTOS
+<span class="keyword">WHERE</span> id_marca = (
+    <span class="keyword">SELECT</span> id
+    <span class="keyword">FROM</span> MARCAS
+    <span class="keyword">WHERE</span> nombre = <span class="string">'Samsung'</span>
+);
+
+<span class="comment">-- Stock con cantidad mayor al promedio</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> STOCK_ALMACEN
+<span class="keyword">WHERE</span> stock > (
+    <span class="keyword">SELECT AVG</span>(stock)
+    <span class="keyword">FROM</span> STOCK_ALMACEN
+);</pre>
+                    </div>
+                </div>
+
+                <h3>Subconsulta con IN</h3>
+                <p>Cuando la subconsulta devuelve múltiples valores, usa IN:</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Productos de marcas Samsung o Apple</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> PRODUCTOS
+<span class="keyword">WHERE</span> id_marca <span class="keyword">IN</span> (
+    <span class="keyword">SELECT</span> id
+    <span class="keyword">FROM</span> MARCAS
+    <span class="keyword">WHERE</span> nombre <span class="keyword">IN</span> (<span class="string">'Samsung'</span>, <span class="string">'Apple'</span>)
+);</pre>
+                </div>
+
+                <h3>Subconsulta en SELECT</h3>
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-columns"></i> Subconsulta como Columna</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Mostrar nombre de marca junto al producto</span>
+<span class="keyword">SELECT</span> 
+    nombre,
+    (
+        <span class="keyword">SELECT</span> nombre 
+        <span class="keyword">FROM</span> MARCAS 
+        <span class="keyword">WHERE</span> id = PRODUCTOS.id_marca
+    ) <span class="keyword">AS</span> <span class="string">"Marca"</span>
+<span class="keyword">FROM</span> PRODUCTOS;</pre>
+                    </div>
+                </div>
+
+                <h3>Subconsulta en FROM</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Usar resultado de subconsulta como tabla temporal</span>
+<span class="keyword">SELECT</span> promedio_stock
+<span class="keyword">FROM</span> (
+    <span class="keyword">SELECT AVG</span>(stock) <span class="keyword">AS</span> promedio_stock
+    <span class="keyword">FROM</span> STOCK_ALMACEN
+);</pre>
+                </div>
+
+                <h3>EXISTS y NOT EXISTS</h3>
+                <p>Verifica si una subconsulta devuelve algún resultado:</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Marcas que tienen productos</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> MARCAS m
+<span class="keyword">WHERE EXISTS</span> (
+    <span class="keyword">SELECT</span> 1
+    <span class="keyword">FROM</span> PRODUCTOS p
+    <span class="keyword">WHERE</span> p.id_marca = m.id
+);
+
+<span class="comment">-- Marcas sin productos</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> MARCAS m
+<span class="keyword">WHERE NOT EXISTS</span> (
+    <span class="keyword">SELECT</span> 1
+    <span class="keyword">FROM</span> PRODUCTOS p
+    <span class="keyword">WHERE</span> p.id_marca = m.id
+);</pre>
+                </div>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-lightbulb"></i> Consejo de Performance</strong>
+                    EXISTS suele ser más eficiente que IN para subconsultas grandes, especialmente en Oracle.
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 8: FUNCIONES DE CADENA -->
+        <div class="section" id="funciones-texto" data-keywords="funciones texto cadena string upper lower concat substr">
+            <div class="section-header">
+                <h2><i class="fas fa-font"></i> Funciones de Texto</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('funciones-texto')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>Funciones Principales</h3>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3><i class="fas fa-text-height"></i> UPPER()</h3>
+                        <p>Convierte a mayúsculas</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT UPPER</span>(nombre)
+<span class="keyword">FROM</span> CLIENTES;</pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-text-height"></i> LOWER()</h3>
+                        <p>Convierte a minúsculas</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT LOWER</span>(nombre)
+<span class="keyword">FROM</span> CLIENTES;</pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-ruler-horizontal"></i> LENGTH()</h3>
+                        <p>Longitud del texto</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT LENGTH</span>(nombre)
+<span class="keyword">FROM</span> MARCAS;</pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-cut"></i> SUBSTR()</h3>
+                        <p>Extrae parte del texto</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">SELECT SUBSTR</span>(nombre, 1, 3)
+<span class="keyword">FROM</span> MARCAS;</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-code"></i> Ejemplos Prácticos</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Buscar sin importar mayúsculas/minúsculas</span>
+<span class="keyword">SELECT</span> nombre
+<span class="keyword">FROM</span> CLIENTES
+<span class="keyword">WHERE UPPER</span>(nombre) <span class="keyword">LIKE</span> <span class="string">'%JUAN%'</span>;
+
+<span class="comment">-- Primeros 3 caracteres de cada marca</span>
+<span class="keyword">SELECT</span> 
+    nombre,
+    <span class="keyword">SUBSTR</span>(nombre, <span class="string">1</span>, <span class="string">3</span>) <span class="keyword">AS</span> <span class="string">"Código"</span>
+<span class="keyword">FROM</span> MARCAS;
+
+<span class="comment">-- Eliminar espacios en blanco</span>
+<span class="keyword">SELECT TRIM</span>(nombre)
+<span class="keyword">FROM</span> CLIENTES;</pre>
+                    </div>
+                </div>
+
+                <h3>CONCAT - Concatenación</h3>
+                <div class="note warning">
+                    <strong><i class="fas fa-exchange-alt"></i> Diferencias entre Motores</strong>
+                    <ul>
+                        <li><strong>Oracle:</strong> || o CONCAT()</li>
+                        <li><strong>MySQL:</strong> CONCAT() preferido</li>
+                        <li><strong>PostgreSQL:</strong> || preferido</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Oracle (ambos funcionan)</span>
+<span class="keyword">SELECT</span> nombre || <span class="string">' - '</span> || telefono <span class="keyword">FROM</span> PROVEEDOR_ENVIO;
+<span class="keyword">SELECT CONCAT</span>(nombre, telefono) <span class="keyword">FROM</span> PROVEEDOR_ENVIO;
+
+<span class="comment">-- MySQL (CONCAT con múltiples argumentos)</span>
+<span class="keyword">SELECT CONCAT</span>(nombre, <span class="string">' - '</span>, telefono) <span class="keyword">FROM</span> PROVEEDOR_ENVIO;</pre>
+                </div>
+
+                <h3>REPLACE - Reemplazar Texto</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Reemplazar texto en nombres</span>
+<span class="keyword">SELECT REPLACE</span>(nombre, <span class="string">'Samsung'</span>, <span class="string">'SAMSUNG'</span>)
+<span class="keyword">FROM</span> MARCAS;</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 9: FUNCIONES DE FECHA -->
+        <div class="section" id="funciones-fecha" data-keywords="funciones fecha time timestamp sysdate now">
+            <div class="section-header">
+                <h2><i class="fas fa-calendar-alt"></i> Funciones de Fecha y Hora</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('funciones-fecha')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>Obtener Fecha/Hora Actual</h3>
+
+                <div class="note warning">
+                    <strong><i class="fas fa-database"></i> Diferencias entre Motores</strong>
+                    <ul>
+                        <li><strong>Oracle:</strong> SYSDATE, SYSTIMESTAMP</li>
+                        <li><strong>MySQL:</strong> NOW(), CURDATE(), CURTIME()</li>
+                        <li><strong>PostgreSQL:</strong> NOW(), CURRENT_DATE, CURRENT_TIME</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Oracle</span>
+<span class="keyword">SELECT</span> SYSDATE <span class="keyword">FROM</span> DUAL;
+<span class="keyword">SELECT</span> SYSTIMESTAMP <span class="keyword">FROM</span> DUAL;
+
+<span class="comment">-- MySQL</span>
+<span class="keyword">SELECT</span> NOW();
+<span class="keyword">SELECT</span> CURDATE(); <span class="comment">-- Solo fecha</span>
+
+<span class="comment">-- PostgreSQL</span>
+<span class="keyword">SELECT</span> NOW();
+<span class="keyword">SELECT</span> CURRENT_DATE;</pre>
+                </div>
+
+                <h3>Extraer Partes de una Fecha</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Oracle</span>
+<span class="keyword">SELECT</span> 
+    <span class="keyword">EXTRACT</span>(YEAR <span class="keyword">FROM</span> fecha_pedido) <span class="keyword">AS</span> anio,
+    <span class="keyword">EXTRACT</span>(MONTH <span class="keyword">FROM</span> fecha_pedido) <span class="keyword">AS</span> mes
+<span class="keyword">FROM</span> PEDIDOS;
+
+<span class="comment">-- MySQL</span>
+<span class="keyword">SELECT</span> 
+    <span class="keyword">YEAR</span>(fecha_pedido) <span class="keyword">AS</span> anio,
+    <span class="keyword">MONTH</span>(fecha_pedido) <span class="keyword">AS</span> mes,
+    <span class="keyword">DAY</span>(fecha_pedido) <span class="keyword">AS</span> dia
+<span class="keyword">FROM</span> PEDIDOS;</pre>
+                </div>
+
+                <h3>Operaciones con Fechas</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Oracle: Sumar/restar días</span>
+<span class="keyword">SELECT</span> SYSDATE + <span class="string">7</span> <span class="keyword">FROM</span> DUAL;  <span class="comment">-- 7 días después</span>
+<span class="keyword">SELECT</span> SYSDATE - <span class="string">7</span> <span class="keyword">FROM</span> DUAL;  <span class="comment">-- 7 días antes</span>
+
+<span class="comment">-- MySQL: DATE_ADD y DATE_SUB</span>
+<span class="keyword">SELECT DATE_ADD</span>(NOW(), <span class="keyword">INTERVAL</span> <span class="string">7</span> DAY);
+<span class="keyword">SELECT DATE_SUB</span>(NOW(), <span class="keyword">INTERVAL</span> <span class="string">1</span> MONTH);</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-calendar-check"></i> Ejemplos Prácticos</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Pedidos del último mes (Oracle)</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> PEDIDOS
+<span class="keyword">WHERE</span> fecha_pedido >= SYSDATE - <span class="string">30</span>;
+
+<span class="comment">-- Stock reabastecido en los últimos 7 días</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> STOCK_ALMACEN
+<span class="keyword">WHERE</span> fecha_rebasstecimiento >= SYSTIMESTAMP - <span class="keyword">INTERVAL</span> <span class="string">'7'</span> DAY;</pre>
+                    </div>
+                </div>
+
+                <h3>Formatear Fechas</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Oracle: TO_CHAR</span>
+<span class="keyword">SELECT TO_CHAR</span>(SYSDATE, <span class="string">'DD/MM/YYYY'</span>) <span class="keyword">FROM</span> DUAL;
+<span class="keyword">SELECT TO_CHAR</span>(SYSTIMESTAMP, <span class="string">'DD-MON-YYYY HH24:MI:SS'</span>) <span class="keyword">FROM</span> DUAL;
+
+<span class="comment">-- MySQL: DATE_FORMAT</span>
+<span class="keyword">SELECT DATE_FORMAT</span>(NOW(), <span class="string">'%d/%m/%Y'</span>);</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 10: TRANSACCIONES -->
+        <div class="section" id="transacciones" data-keywords="transacciones commit rollback savepoint transaction">
+            <div class="section-header">
+                <h2><i class="fas fa-exchange-alt"></i> Transacciones</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('transacciones')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>¿Qué es una Transacción?</h3>
+                <p>Una transacción es un conjunto de operaciones SQL que se ejecutan como una unidad. O se completan todas, o ninguna (atomicidad).</p>
+
+                <h3>Comandos Principales</h3>
+                <div class="grid">
+                    <div class="card">
+                        <h3><i class="fas fa-save"></i> COMMIT</h3>
+                        <p>Guarda permanentemente los cambios</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">COMMIT</span>;</pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-undo"></i> ROLLBACK</h3>
+                        <p>Deshace los cambios no confirmados</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">ROLLBACK</span>;</pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-bookmark"></i> SAVEPOINT</h3>
+                        <p>Crea un punto de guardado</p>
+                        <div class="code-block">
+                            <pre><span class="keyword">SAVEPOINT</span> nombre;</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-project-diagram"></i> Ejemplo Completo de Transacción</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Transferir stock entre almacenes</span>
+<span class="keyword">BEGIN</span>
+    <span class="comment">-- Reducir stock del almacén origen</span>
+    <span class="keyword">UPDATE</span> STOCK_ALMACEN
+    <span class="keyword">SET</span> stock = stock - <span class="string">10</span>
+    <span class="keyword">WHERE</span> id_almacen = <span class="string">1</span> <span class="keyword">AND</span> id_producto = <span class="string">1</span>;
+    
+    <span class="comment">-- Aumentar stock del almacén destino</span>
+    <span class="keyword">UPDATE</span> STOCK_ALMACEN
+    <span class="keyword">SET</span> stock = stock + <span class="string">10</span>
+    <span class="keyword">WHERE</span> id_almacen = <span class="string">2</span> <span class="keyword">AND</span> id_producto = <span class="string">1</span>;
+    
+    <span class="comment">-- Si todo está bien, confirmar</span>
+    <span class="keyword">COMMIT</span>;
+<span class="keyword">EXCEPTION</span>
+    <span class="keyword">WHEN OTHERS THEN</span>
+        <span class="comment">-- Si hay error, deshacer</span>
+        <span class="keyword">ROLLBACK</span>;
+<span class="keyword">END</span>;</pre>
+                    </div>
+                </div>
+
+                <h3>Uso de SAVEPOINT</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Crear múltiples puntos de guardado</span>
+<span class="keyword">UPDATE</span> STOCK_ALMACEN <span class="keyword">SET</span> stock = <span class="string">100</span> <span class="keyword">WHERE</span> id = <span class="string">1</span>;
+<span class="keyword">SAVEPOINT</span> punto1;
+
+<span class="keyword">UPDATE</span> STOCK_ALMACEN <span class="keyword">SET</span> stock = <span class="string">200</span> <span class="keyword">WHERE</span> id = <span class="string">2</span>;
+<span class="keyword">SAVEPOINT</span> punto2;
+
+<span class="keyword">UPDATE</span> STOCK_ALMACEN <span class="keyword">SET</span> stock = <span class="string">300</span> <span class="keyword">WHERE</span> id = <span class="string">3</span>;
+
+<span class="comment">-- Deshacer solo hasta punto2 (mantiene cambios hasta punto1)</span>
+<span class="keyword">ROLLBACK TO</span> punto2;
+
+<span class="comment">-- Confirmar cambios restantes</span>
+<span class="keyword">COMMIT</span>;</pre>
+                </div>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-shield-alt"></i> Buenas Prácticas</strong>
+                    <ul>
+                        <li>Usa transacciones para operaciones críticas que afectan múltiples tablas</li>
+                        <li>Siempre usa COMMIT o ROLLBACK explícitamente</li>
+                        <li>Mantén las transacciones lo más cortas posible</li>
+                        <li>En Oracle, DDL (CREATE, DROP) hace COMMIT automático</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 11: VISTAS -->
+        <div class="section" id="vistas" data-keywords="vistas view create vista virtual">
+            <div class="section-header">
+                <h2><i class="fas fa-eye"></i> Vistas (Views)</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('vistas')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>¿Qué es una Vista?</h3>
+                <p>Una vista es una consulta guardada que se comporta como una tabla virtual. No almacena datos, solo la definición de la consulta.</p>
+
+                <h3>Crear una Vista</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">CREATE VIEW</span> nombre_vista <span class="keyword">AS</span>
+<span class="keyword">SELECT</span> columnas
+<span class="keyword">FROM</span> tablas
+<span class="keyword">WHERE</span> condiciones;</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-table"></i> Ejemplos de Vistas</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Vista: Productos con sus marcas</span>
+<span class="keyword">CREATE VIEW</span> vista_productos_marcas <span class="keyword">AS</span>
+<span class="keyword">SELECT</span> 
+    p.id,
+    p.nombre <span class="keyword">AS</span> producto,
+    m.nombre <span class="keyword">AS</span> marca
+<span class="keyword">FROM</span> PRODUCTOS p
+<span class="keyword">JOIN</span> MARCAS m <span class="keyword">ON</span> p.id_marca = m.id;
+
+<span class="comment">-- Vista: Stock completo con información detallada</span>
+<span class="keyword">CREATE VIEW</span> vista_stock_completo <span class="keyword">AS</span>
+<span class="keyword">SELECT</span> 
+    a.nombre <span class="keyword">AS</span> almacen,
+    p.nombre <span class="keyword">AS</span> producto,
+    m.nombre <span class="keyword">AS</span> marca,
+    sa.stock,
+    sa.stock_minimo,
+    sa.stock - sa.stock_minimo <span class="keyword">AS</span> disponible
+<span class="keyword">FROM</span> STOCK_ALMACEN sa
+<span class="keyword">JOIN</span> ALMACEN a <span class="keyword">ON</span> sa.id_almacen = a.id
+<span class="keyword">JOIN</span> PRODUCTOS p <span class="keyword">ON</span> sa.id_producto = p.id
+<span class="keyword">JOIN</span> MARCAS m <span class="keyword">ON</span> p.id_marca = m.id;</pre>
+                    </div>
+                </div>
+
+                <h3>Usar una Vista</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Consultar una vista como si fuera una tabla</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> vista_productos_marcas;
+
+<span class="comment">-- Filtrar en una vista</span>
+<span class="keyword">SELECT</span> *
+<span class="keyword">FROM</span> vista_stock_completo
+<span class="keyword">WHERE</span> disponible < <span class="string">10</span>;</pre>
+                </div>
+
+                <h3>Modificar y Eliminar Vistas</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Reemplazar una vista existente</span>
+<span class="keyword">CREATE OR REPLACE VIEW</span> vista_productos_marcas <span class="keyword">AS</span>
+<span class="keyword">SELECT</span> p.nombre, m.nombre <span class="keyword">AS</span> marca
+<span class="keyword">FROM</span> PRODUCTOS p
+<span class="keyword">JOIN</span> MARCAS m <span class="keyword">ON</span> p.id_marca = m.id;
+
+<span class="comment">-- Eliminar una vista</span>
+<span class="keyword">DROP VIEW</span> vista_productos_marcas;</pre>
+                </div>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-lightbulb"></i> Ventajas de las Vistas</strong>
+                    <ul>
+                        <li>Simplifica consultas complejas</li>
+                        <li>Mejora la seguridad (oculta columnas sensibles)</li>
+                        <li>Proporciona una capa de abstracción</li>
+                        <li>Facilita el mantenimiento del código</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 12: ÍNDICES -->
+        <div class="section" id="indices" data-keywords="indices index indexar performance optimizacion">
+            <div class="section-header">
+                <h2><i class="fas fa-tachometer-alt"></i> Índices</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('indices')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>¿Qué es un Índice?</h3>
+                <p>Un índice es una estructura de datos que mejora la velocidad de búsqueda en una tabla, similar a un índice en un libro.</p>
+
+                <h3>Crear un Índice</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">CREATE INDEX</span> nombre_indice
+<span class="keyword">ON</span> tabla (columna);</pre>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-bolt"></i> Ejemplos de Índices</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Índice simple en nombre de cliente</span>
+<span class="keyword">CREATE INDEX</span> idx_clientes_nombre
+<span class="keyword">ON</span> CLIENTES (nombre);
+
+<span class="comment">-- Índice en llave foránea</span>
+<span class="keyword">CREATE INDEX</span> idx_productos_marca
+<span class="keyword">ON</span> PRODUCTOS (id_marca);
+
+<span class="comment">-- Índice compuesto (múltiples columnas)</span>
+<span class="keyword">CREATE INDEX</span> idx_stock_almacen_producto
+<span class="keyword">ON</span> STOCK_ALMACEN (id_almacen, id_producto);</pre>
+                    </div>
+                </div>
+
+                <h3>Índice Único</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Garantiza valores únicos</span>
+<span class="keyword">CREATE UNIQUE INDEX</span> idx_marcas_nombre_unico
+<span class="keyword">ON</span> MARCAS (nombre);</pre>
+                </div>
+
+                <h3>Eliminar un Índice</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">DROP INDEX</span> nombre_indice;</pre>
+                </div>
+
+                <div class="note warning">
+                    <strong><i class="fas fa-balance-scale"></i> Consideraciones</strong>
+                    <ul>
+                        <li><strong>Ventajas:</strong> Acelera SELECT, WHERE, JOIN, ORDER BY</li>
+                        <li><strong>Desventajas:</strong> Ralentiza INSERT, UPDATE, DELETE</li>
+                        <li>Usa índices en columnas frecuentemente consultadas</li>
+                        <li>No crees índices innecesarios (consumen espacio)</li>
+                    </ul>
+                </div>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-check-circle"></i> Cuándo Crear Índices</strong>
+                    <ul>
+                        <li>Columnas usadas frecuentemente en WHERE</li>
+                        <li>Columnas en JOIN (especialmente llaves foráneas)</li>
+                        <li>Columnas en ORDER BY</li>
+                        <li>Tablas grandes con búsquedas frecuentes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 13: RESTRICCIONES -->
+        <div class="section" id="restricciones" data-keywords="restricciones constraint primary key foreign unique check not null">
+            <div class="section-header">
+                <h2><i class="fas fa-lock"></i> Restricciones (Constraints)</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('restricciones')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>Tipos de Restricciones</h3>
+
+                <div class="grid">
+                    <div class="card">
+                        <h3><i class="fas fa-key"></i> PRIMARY KEY</h3>
+                        <p>Identifica únicamente cada registro</p>
+                        <div class="code-block">
+                            <pre>id <span class="keyword">PRIMARY KEY</span></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-link"></i> FOREIGN KEY</h3>
+                        <p>Relaciona con otra tabla</p>
+                        <div class="code-block">
+                            <pre>id_marca <span class="keyword">REFERENCES</span> 
+MARCAS(id)</pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-ban"></i> NOT NULL</h3>
+                        <p>Campo obligatorio</p>
+                        <div class="code-block">
+                            <pre>nombre <span class="keyword">NOT NULL</span></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-fingerprint"></i> UNIQUE</h3>
+                        <p>Valores únicos</p>
+                        <div class="code-block">
+                            <pre>email <span class="keyword">UNIQUE</span></pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-check"></i> CHECK</h3>
+                        <p>Valida condición</p>
+                        <div class="code-block">
+                            <pre>stock <span class="keyword">CHECK</span>(stock >= 0)</pre>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3><i class="fas fa-code"></i> DEFAULT</h3>
+                        <p>Valor por defecto</p>
+                        <div class="code-block">
+                            <pre>estado <span class="keyword">DEFAULT</span> 'Activo'</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="example">
+                    <div class="example-title"><i class="fas fa-tools"></i> Ejemplos de Restricciones</div>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                        <pre><span class="comment">-- Tabla con múltiples restricciones</span>
+<span class="keyword">CREATE TABLE</span> empleados (
+    id <span class="keyword">NUMBER PRIMARY KEY</span>,
+    nombre <span class="keyword">VARCHAR2</span>(100) <span class="keyword">NOT NULL</span>,
+    email <span class="keyword">VARCHAR2</span>(100) <span class="keyword">UNIQUE NOT NULL</span>,
+    salario <span class="keyword">NUMBER CHECK</span>(salario > 0),
+    edad <span class="keyword">NUMBER CHECK</span>(edad >= 18),
+    activo <span class="keyword">CHAR</span>(1) <span class="keyword">DEFAULT</span> 'S'
+);
+
+<span class="comment">-- Agregar restricción a tabla existente</span>
+<span class="keyword">ALTER TABLE</span> PRODUCTOS
+<span class="keyword">ADD CONSTRAINT</span> chk_producto_nombre 
+<span class="keyword">CHECK</span> (<span class="keyword">LENGTH</span>(nombre) > 3);
+
+<span class="comment">-- Llave foránea con nombre</span>
+<span class="keyword">ALTER TABLE</span> PRODUCTOS
+<span class="keyword">ADD CONSTRAINT</span> fk_productos_marca
+<span class="keyword">FOREIGN KEY</span> (id_marca) 
+<span class="keyword">REFERENCES</span> MARCAS(id);</pre>
+                    </div>
+                </div>
+
+                <h3>Eliminar Restricciones</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">ALTER TABLE</span> tabla
+<span class="keyword">DROP CONSTRAINT</span> nombre_restriccion;</pre>
+                </div>
+
+                <h3>CASCADE en DELETE</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Al eliminar una marca, eliminar sus productos también</span>
+<span class="keyword">ALTER TABLE</span> PRODUCTOS
+<span class="keyword">ADD CONSTRAINT</span> fk_productos_marca_cascade
+<span class="keyword">FOREIGN KEY</span> (id_marca)
+<span class="keyword">REFERENCES</span> MARCAS(id)
+<span class="keyword">ON DELETE CASCADE</span>;</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 14: CASOS ESPECIALES -->
+        <div class="section" id="casos-especiales" data-keywords="case when null coalesce nvl tips trucos">
+            <div class="section-header">
+                <h2><i class="fas fa-magic"></i> Casos Especiales y Tips</h2>
+                <div>
+                    <button class="share-btn" onclick="shareSection('casos-especiales')" title="Compartir sección">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                    <i class="fas fa-chevron-down toggle-icon"></i>
+                </div>
+            </div>
+            <div class="section-content">
+                <h3>CASE - Condicionales en SQL</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="keyword">SELECT</span> 
+    nombre,
+    <span class="keyword">CASE</span>
+        <span class="keyword">WHEN</span> stock < stock_minimo <span class="keyword">THEN</span> <span class="string">'Bajo'</span>
+        <span class="keyword">WHEN</span> stock < stock_minimo * 2 <span class="keyword">THEN</span> <span class="string">'Medio'</span>
+        <span class="keyword">ELSE</span> <span class="string">'Alto'</span>
+    <span class="keyword">END</span> <span class="keyword">AS</span> <span class="string">"Nivel Stock"</span>
+<span class="keyword">FROM</span> STOCK_ALMACEN;</pre>
+                </div>
+
+                <h3>Manejo de Valores NULL</h3>
+                <div class="note warning">
+                    <strong><i class="fas fa-database"></i> Diferencias entre Motores</strong>
+                    <ul>
+                        <li><strong>Oracle:</strong> NVL(columna, valor_defecto)</li>
+                        <li><strong>MySQL/PostgreSQL:</strong> COALESCE(columna, valor_defecto)</li>
+                        <li>COALESCE funciona en todos, pero NVL solo en Oracle</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Oracle</span>
+<span class="keyword">SELECT NVL</span>(columna, <span class="string">'Sin valor'</span>) <span class="keyword">FROM</span> tabla;
+
+<span class="comment">-- Universal (todos los motores)</span>
+<span class="keyword">SELECT COALESCE</span>(columna, <span class="string">'Sin valor'</span>) <span class="keyword">FROM</span> tabla;
+
+<span class="comment">-- Verificar NULL</span>
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> tabla <span class="keyword">WHERE</span> columna <span class="keyword">IS NULL</span>;
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> tabla <span class="keyword">WHERE</span> columna <span class="keyword">IS NOT NULL</span>;</pre>
+                </div>
+
+                <h3>UNION - Combinar Resultados</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- UNION: Elimina duplicados</span>
+<span class="keyword">SELECT</span> nombre <span class="keyword">FROM</span> CLIENTES
+<span class="keyword">UNION</span>
+<span class="keyword">SELECT</span> nombre <span class="keyword">FROM</span> PROVEEDOR_ENVIO;
+
+<span class="comment">-- UNION ALL: Mantiene duplicados (más rápido)</span>
+<span class="keyword">SELECT</span> nombre <span class="keyword">FROM</span> CLIENTES
+<span class="keyword">UNION ALL</span>
+<span class="keyword">SELECT</span> nombre <span class="keyword">FROM</span> PROVEEDOR_ENVIO;</pre>
+                </div>
+
+                <h3>WITH (CTE - Common Table Expression)</h3>
+                <p>Crea consultas temporales más legibles:</p>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- CTE para mejorar legibilidad</span>
+<span class="keyword">WITH</span> stock_bajo <span class="keyword">AS</span> (
+    <span class="keyword">SELECT</span> *
+    <span class="keyword">FROM</span> STOCK_ALMACEN
+    <span class="keyword">WHERE</span> stock < stock_minimo
+)
+<span class="keyword">SELECT</span> 
+    sb.*,
+    p.nombre <span class="keyword">AS</span> producto
+<span class="keyword">FROM</span> stock_bajo sb
+<span class="keyword">JOIN</span> PRODUCTOS p <span class="keyword">ON</span> sb.id_producto = p.id;</pre>
+                </div>
+
+                <h3>ROWNUM y LIMIT</h3>
+                <div class="note warning">
+                    <strong><i class="fas fa-database"></i> Limitación de Resultados</strong>
+                    <ul>
+                        <li><strong>Oracle (antiguo):</strong> ROWNUM</li>
+                        <li><strong>Oracle 12c+:</strong> FETCH FIRST</li>
+                        <li><strong>MySQL/PostgreSQL:</strong> LIMIT</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- Oracle antiguo</span>
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> PRODUCTOS <span class="keyword">WHERE ROWNUM</span> <= 5;
+
+<span class="comment">-- Oracle 12c+</span>
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> PRODUCTOS
+<span class="keyword">FETCH FIRST</span> 5 <span class="keyword">ROWS ONLY</span>;
+
+<span class="comment">-- MySQL/PostgreSQL</span>
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> PRODUCTOS <span class="keyword">LIMIT</span> 5;</pre>
+                </div>
+
+                <h3>DUAL - Tabla Especial de Oracle</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copiar</button>
+                    <pre><span class="comment">-- DUAL es una tabla ficticia para cálculos</span>
+<span class="keyword">SELECT</span> 2 + 2 <span class="keyword">FROM</span> DUAL;
+<span class="keyword">SELECT</span> SYSDATE <span class="keyword">FROM</span> DUAL;
+<span class="keyword">SELECT UPPER</span>(<span class="string">'hola'</span>) <span class="keyword">FROM</span> DUAL;</pre>
+                </div>
+
+                <div class="note tip">
+                    <strong><i class="fas fa-rocket"></i> Tips de Performance</strong>
+                    <ul>
+                        <li>Usa EXISTS en lugar de IN para subconsultas grandes</li>
+                        <li>Evita SELECT * en producción</li>
+                        <li>Crea índices en columnas de JOIN y WHERE</li>
+                        <li>Usa UNION ALL en vez de UNION si no necesitas eliminar duplicados</li>
+                        <li>Filtra lo más temprano posible (WHERE antes de JOIN cuando sea posible)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p><i class="fas fa-code"></i> Guía SQL de Bolsillo | Especializada en Oracle SQL con compatibilidad MySQL/PostgreSQL</p>
+        <p style="margin-top: 10px; font-size: 0.9em;">Usa el buscador para encontrar comandos rápidamente</p>
+    </footer>
+
+    <button id="scrollToTop" title="Volver arriba">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Toggle sections
+        document.querySelectorAll('.section-header').forEach(header => {
+            header.addEventListener('click', function() {
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('.toggle-icon');
+                
+                content.classList.toggle('active');
+                icon.classList.toggle('rotated');
+            });
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const sections = document.querySelectorAll('.section');
+        const searchResults = document.getElementById('searchResults');
+        const resultCount = document.getElementById('resultCount');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            let visibleCount = 0;
+            
+            sections.forEach(section => {
+                const keywords = section.dataset.keywords.toLowerCase();
+                const content = section.querySelector('.section-content').textContent.toLowerCase();
+                
+                if (searchTerm === '' || keywords.includes(searchTerm) || content.includes(searchTerm)) {
+                    section.style.display = 'block';
+                    visibleCount++;
+                    
+                    // Auto-expand if searching
+                    if (searchTerm !== '') {
+                        section.querySelector('.section-content').classList.add('active');
+                        section.querySelector('.toggle-icon').classList.add('rotated');
+                    }
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+
+            // Show search results count
+            if (searchTerm !== '') {
+                searchResults.style.display = 'block';
+                resultCount.textContent = `${visibleCount} sección${visibleCount !== 1 ? 'es' : ''} encontrada${visibleCount !== 1 ? 's' : ''}`;
+                
+                // Scroll to first result
+                const firstVisible = Array.from(sections).find(s => s.style.display !== 'none');
+                if (firstVisible) {
+                    firstVisible.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            } else {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+K or Cmd+K to focus search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+                searchInput.select();
+            }
+            
+            // ESC to clear search
+            if (e.key === 'Escape' && document.activeElement === searchInput) {
+                searchInput.value = '';
+                searchInput.dispatchEvent(new Event('input'));
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Copy code functionality
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(code).then(() => {
+                const originalHTML = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Copiado';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                    button.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Toggle all sections
+        const toggleAllBtn = document.getElementById('toggleAll');
+        let allExpanded = false;
+
+        toggleAllBtn.addEventListener('click', function() {
+            allExpanded = !allExpanded;
+            
+            sections.forEach(section => {
+                const content = section.querySelector('.section-content');
+                const icon = section.querySelector('.toggle-icon');
+                
+                if (allExpanded) {
+                    content.classList.add('active');
+                    icon.classList.add('rotated');
+                } else {
+                    content.classList.remove('active');
+                    icon.classList.remove('rotated');
+                }
+            });
+            
+            // Update button text
+            if (allExpanded) {
+                toggleAllBtn.innerHTML = '<i class="fas fa-compress-alt"></i> Colapsar Todo';
+            } else {
+                toggleAllBtn.innerHTML = '<i class="fas fa-expand-alt"></i> Expandir Todo';
+            }
+        });
+
+        // Scroll to top button
+        const scrollToTopBtn = document.getElementById('scrollToTop');
+
+        window.addEventListener('scroll', function() {
+            if (window.pageYOffset > 300) {
+                scrollToTopBtn.style.display = 'flex';
+            } else {
+                scrollToTopBtn.style.display = 'none';
+            }
+        });
+
+        scrollToTopBtn.addEventListener('click', function() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Open first section by default
+        document.querySelector('.section-content').classList.add('active');
+        document.querySelector('.toggle-icon').classList.add('rotated');
+
+        // Progress bar
+        const progressBar = document.getElementById('progressBar');
+        
+        window.addEventListener('scroll', function() {
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight - windowHeight;
+            const scrolled = (window.pageYOffset / documentHeight) * 100;
+            progressBar.style.width = scrolled + '%';
+        });
+
+        // Table of Contents
+        const tocContainer = document.getElementById('tocContainer');
+        const tocToggle = document.getElementById('tocToggle');
+        const tocList = document.getElementById('tocList');
+
+        // Generate TOC
+        sections.forEach(section => {
+            const header = section.querySelector('.section-header h2');
+            const sectionId = section.id;
+            const tocItem = document.createElement('div');
+            tocItem.className = 'toc-item';
+            tocItem.textContent = header.textContent;
+            tocItem.onclick = () => {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Open section
+                const content = section.querySelector('.section-content');
+                const icon = section.querySelector('.toggle-icon');
+                content.classList.add('active');
+                icon.classList.add('rotated');
+            };
+            tocList.appendChild(tocItem);
+        });
+
+        // Toggle TOC
+        tocToggle.addEventListener('click', function() {
+            tocContainer.classList.toggle('hidden');
+        });
+
+        // Highlight active section in TOC
+        window.addEventListener('scroll', function() {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= sectionTop - 200) {
+                    current = section.id;
+                }
+            });
+
+            document.querySelectorAll('.toc-item').forEach((item, index) => {
+                item.classList.remove('active');
+                if (sections[index].id === current) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // Share section function
+        function shareSection(sectionId) {
+            const url = window.location.origin + window.location.pathname + '#' + sectionId;
+            
+            navigator.clipboard.writeText(url).then(() => {
+                // Find the button that was clicked
+                const section = document.getElementById(sectionId);
+                const btn = section.querySelector('.share-btn');
+                const originalHTML = btn.innerHTML;
+                
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                alert('URL copiada al portapapeles: ' + url);
+            });
+        }
+
+        // Handle URL anchors on load
+        window.addEventListener('load', function() {
+            if (window.location.hash) {
+                const targetId = window.location.hash.substring(1);
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    setTimeout(() => {
+                        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        // Open the section
+                        const content = targetSection.querySelector('.section-content');
+                        const icon = targetSection.querySelector('.toggle-icon');
+                        content.classList.add('active');
+                        icon.classList.add('rotated');
+                    }, 100);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
