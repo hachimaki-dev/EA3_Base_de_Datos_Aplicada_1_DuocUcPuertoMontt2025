@@ -7,6 +7,8 @@ DROP TABLE ALMACENES CASCADE CONSTRAINT;
 DROP TABLE CLIENTES CASCADE CONSTRAINT;
 DROP TABLE METODO_PAGO CASCADE CONSTRAINT;
 DROP TABLE ESTADO_ENVIO CASCADE CONSTRAINT;
+DROP TABLE PRODUCTOS CASCADE CONSTRAINT;
+DROP TABLE REGIONES CASCADE CONSTRAINT;
 
 -- Primero vamos a crear tablas con prioridad 0
 CREATE TABLE MARCAS(
@@ -64,86 +66,87 @@ CREATE TABLE PRODUCTOS(
     id_marca NUMBER NOT NULL REFERENCES MARCAS(id)
 );
 
---Los Insert
-
--- INSERTS PARA MARCAS
-INSERT INTO MARCAS (nombre, descripcion) VALUES ('Samsung', 'Tecnología y electrónica de consumo');
-INSERT INTO MARCAS (nombre, descripcion) VALUES ('Apple', 'Dispositivos y soluciones tecnológicas premium');
-INSERT INTO MARCAS (nombre, descripcion) VALUES ('Sony', 'Electrónica, entretenimiento y gaming');
-INSERT INTO MARCAS (nombre, descripcion) VALUES ('LG', 'Electrodomésticos y tecnología del hogar');
-INSERT INTO MARCAS (nombre, descripcion) VALUES ('Nike', 'Ropa deportiva y calzado');
-INSERT INTO MARCAS (nombre, descripcion) VALUES ('Adidas', 'Equipamiento deportivo y lifestyle');
-
--- INSERTS PARA FAMILIAS
-INSERT INTO FAMILIAS (nombre) VALUES ('Electrónica');
-INSERT INTO FAMILIAS (nombre) VALUES ('Electrodomésticos');
-INSERT INTO FAMILIAS (nombre) VALUES ('Ropa y Calzado');
-INSERT INTO FAMILIAS (nombre) VALUES ('Deportes');
-INSERT INTO FAMILIAS (nombre) VALUES ('Hogar y Muebles');
-INSERT INTO FAMILIAS (nombre) VALUES ('Tecnología');
-
--- INSERTS PARA PAIS
-INSERT INTO PAIS (nombre) VALUES ('Chile');
-INSERT INTO PAIS (nombre) VALUES ('Argentina');
-INSERT INTO PAIS (nombre) VALUES ('Brasil');
-INSERT INTO PAIS (nombre) VALUES ('Perú');
-INSERT INTO PAIS (nombre) VALUES ('Colombia');
-INSERT INTO PAIS (nombre) VALUES ('Estados Unidos');
-
--- INSERTS PARA PROVEEDOR_ENVIO
-INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Chilexpress', '600-600-6000');
-INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Starken', '600-200-0102');
-INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Correos Chile', '600-950-2020');
-INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('Blue Express', '600-360-3600');
-INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('DHL Express', '800-345-345');
-INSERT INTO PROVEEDOR_ENVIO (nombre, telefono) VALUES ('FedEx Chile', '800-363-339');
-
--- INSERTS PARA ALMACENES
-INSERT INTO ALMACENES (nombre) VALUES ('Almacén Central Santiago');
-INSERT INTO ALMACENES (nombre) VALUES ('Almacén Valparaíso');
-INSERT INTO ALMACENES (nombre) VALUES ('Almacén Concepción');
-INSERT INTO ALMACENES (nombre) VALUES ('Almacén La Serena');
-INSERT INTO ALMACENES (nombre) VALUES ('Almacén Temuco');
-INSERT INTO ALMACENES (nombre) VALUES ('Almacén Puerto Montt');
-
--- INSERTS PARA CLIENTES
-INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('Juan Pérez González', '12345678-9', '912345678');
-INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('María García López', '23456789-0', '923456789');
-INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('Carlos Rodríguez Silva', '34567890-1', '934567890');
-INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('Ana Martínez Torres', '45678901-2', '945678901');
-INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('Pedro Fernández Ruiz', '56789012-3', '956789012');
-INSERT INTO CLIENTES (nombre, rut, telefono) VALUES ('Laura Sánchez Morales', '67890123-4', '967890123');
-
--- INSERTS PARA METODO_PAGO
-INSERT INTO METODO_PAGO (nombre) VALUES ('Tarjeta de Crédito');
-INSERT INTO METODO_PAGO (nombre) VALUES ('Tarjeta de Débito');
-INSERT INTO METODO_PAGO (nombre) VALUES ('Transferencia Bancaria');
-INSERT INTO METODO_PAGO (nombre) VALUES ('Efectivo');
-INSERT INTO METODO_PAGO (nombre) VALUES ('PayPal');
-INSERT INTO METODO_PAGO (nombre) VALUES ('Mercado Pago');
-
--- INSERTS PARA ESTADO_ENVIO
-INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Pendiente');
-INSERT INTO ESTADO_ENVIO (nombre) VALUES ('En Preparación');
-INSERT INTO ESTADO_ENVIO (nombre) VALUES ('En Tránsito');
-INSERT INTO ESTADO_ENVIO (nombre) VALUES ('En Reparto');
-INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Entregado');
-INSERT INTO ESTADO_ENVIO (nombre) VALUES ('Cancelado');
-
-COMMIT;
 
 
---Inserts de las tablas con dependencias
--- INSERTS PARA PRODUCTOS
-INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Galaxy S24 Ultra 256GB', 1);
-INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('iPhone 15 Pro Max 512GB', 2);
-INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('PlayStation 5 Slim Digital Edition', 3);
-INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Refrigerador Side by Side 600L', 4);
-INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Zapatillas Air Max 270 Running', 5);
-INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Smart TV OLED 65 pulgadas 4K', 4);
-INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('MacBook Pro 14 M3 16GB RAM', 2);
-INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Audífonos WH-1000XM5 Noise Cancelling', 3);
-INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Galaxy Watch 6 Classic 47mm', 1);
-INSERT INTO PRODUCTOS (nombre, id_marca) VALUES ('Polera Deportiva Ultraboost Training', 6);
+CREATE TABLE REGIONES(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(50)  NOT NULL UNIQUE,
+    id_pais NUMBER REFERENCES PAIS(id) NOT NULL
+);
 
-COMMIT;
+CREATE TABLE CIUDADES(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(50)  NOT NULL UNIQUE,
+    id_region NUMBER REFERENCES REGIONES(id) NOT NULL
+);
+
+CREATE TABLE COMUNAS(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(50)  NOT NULL UNIQUE,
+    id_ciudad NUMBER REFERENCES CIUDADES(id) NOT NULL
+);
+
+CREATE TABLE DIRECCIONES(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    calle VARCHAR2(200) NOT NULL,
+    numero VARCHAR2(6) NOT NULL,
+    id_comuna NUMBER REFERENCES COMUNAS(id) NOT NULL
+);
+
+CREATE TABLE ENVIOS(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    fecha_despacho DATE NOT NULL,
+    fecha_entrega TIMESTAMP DEFAULT SYSTIMESTAMP,
+    id_estado_envio NUMBER REFERENCES ESTADO_ENVIO(id) NOT NULL,
+    id_proveedor_envio NUMBER REFERENCES PROVEEDOR_ENVIO(id) NOT NULL
+);
+
+CREATE TABLE PAGO(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    fecha_pago TIMESTAMP DEFAULT SYSTIMESTAMP, 
+    id_metodo_pago NUMBER REFERENCES METODO_PAGO(id) NOT NULL
+);
+
+CREATE TABLE PEDIDOS(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    fecha_pedido TIMESTAMP DEFAULT SYSTIMESTAMP,
+    id_cliente NUMBER REFERENCES CLIENTES(id) NOT NULL,
+    id_envio NUMBER REFERENCES ENVIOS(id) NOT NULL,
+    id_pago NUMBER REFERENCES PAGO(id) NOT NULL
+);
+
+
+CREATE TABLE STOCK_ALMACEN(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    stock NUMBER(7) NOT NULL,
+    fecha_rebaastecimiento DATE,
+    stock_minimo NUMBER(7) NOT NULL,
+    id_producto NUMBER REFERENCES PRODUCTOS(id) NOT NULL,
+    id_almacen NUMBER REFERENCES ALMACENES(id) NOT NULL
+);
+
+
+--PIVOTES
+CREATE TABLE PRODUCTOS_PEDIDOS(
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_producto NUMBER REFERENCES PRODUCTOS(id) NOT NULL,
+    id_pedido NUMBER REFERENCES PEDIDOS(id) NOT NULL
+    cantidad NUMBER(3) NOT NULL
+);
+
+CREATE TABLE PRODUCTOS_PEDIDOS(
+    id_producto NUMBER REFERENCES PRODUCTOS(id) NOT NULL,
+    id_pedido NUMBER REFERENCES PEDIDOS(id) NOT NULL
+);
+
+
+
+
+INSERT INTO PAIS(nombre) values ('Chile');
+
+INSERT INTO REGIONES(nombre, id_pais) VALUES ('Los lagos', 1);
+INSERT INTO REGIONES(nombre) VALUES ('Los rios');
+
+commit;
+
+SELECT * FROM REGIONES;
