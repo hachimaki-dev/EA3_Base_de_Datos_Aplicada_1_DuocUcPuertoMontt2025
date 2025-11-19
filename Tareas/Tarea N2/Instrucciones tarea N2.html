@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller: Modelado de Base de Datos para Apps Reales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .guardado { display: none; }
+        .guardado.visible { display: inline-block; }
+        .highlight { background-color: #fef3c7; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-weight: 600; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto p-6">
+        
+        <!-- PORTADA -->
+        <header class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8 rounded-lg shadow-lg mb-8">
+            <h1 class="text-4xl font-bold mb-4">Taller Práctico: Base de Datos para Apps Reales</h1>
+            <p class="text-xl mb-2">Modelado Físico en Tercera Forma Normal (3FN)</p>
+            <p class="text-lg opacity-90">Oracle SQL 23c | Duración: 60 minutos</p>
+        </header>
+
+        <!-- INSTRUCCIONES GENERALES -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-info-circle text-blue-600 mr-2"></i>Cómo Usar Este Taller</h2>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <p class="font-bold text-yellow-800"><i class="fas fa-exclamation-triangle mr-2"></i>LEE ESTO PRIMERO - MUY IMPORTANTE</p>
+            </div>
+
+            <ol class="space-y-3 text-gray-700 list-decimal list-inside">
+                <li><strong>Trabajarás en equipo.</strong> Cada equipo elige UNA app conocida y UNA funcionalidad específica de esa app.</li>
+                <li><strong>Completa las tareas EN ORDEN</strong> (de la 1 a la 8). No te saltes ninguna.</li>
+                <li><strong>Escribe tus respuestas en los cuadros de texto.</strong> Tus respuestas se guardan automáticamente en tu navegador.</li>
+                <li><strong>Usa los botones:</strong> "Guardar" guarda manualmente, "Borrar respuesta" elimina todo lo que escribiste.</li>
+                <li><strong>Si recargas la página, tus respuestas seguirán ahí.</strong> No se pierden.</li>
+                <li><strong>Al terminar, revisa el checklist final</strong> antes de entregar.</li>
+            </ol>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mt-4">
+                <p class="text-blue-800"><i class="fas fa-lightbulb mr-2"></i><strong>Consejo:</strong> Si tienes dudas, revisa la sección de "Preguntas Frecuentes" al final de esta página ANTES de preguntar.</p>
+            </div>
+        </section>
+
+        <!-- QUÉ VAS A HACER -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-tasks text-green-600 mr-2"></i>¿Qué Vas a Hacer en Este Taller?</h2>
+            
+            <div class="space-y-4 text-gray-700">
+                <div class="flex items-start">
+                    <span class="bg-green-100 text-green-800 rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3 flex-shrink-0">1</span>
+                    <p><strong>Elegir una app famosa</strong> que todos conozcan (Spotify, Instagram, WhatsApp, Netflix, Uber, etc.)</p>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-green-100 text-green-800 rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3 flex-shrink-0">2</span>
+                    <p><strong>Identificar UNA característica</strong> de esa app. Por ejemplo: "dar like a fotos", "crear playlists", "dar match", "comentar videos", "pedir viaje"</p>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-green-100 text-green-800 rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3 flex-shrink-0">3</span>
+                    <p><strong>Diseñar un modelo de base de datos</strong> que represente esa funcionalidad en 3FN</p>
+                </div>
+                <div class="flex items-start">
+                    <span class="bg-green-100 text-green-800 rounded-full w-8 h-8 flex items-center justify-center font-bold mr-3 flex-shrink-0">4</span>
+                    <p><strong>Escribir código SQL</strong> para crear las tablas e insertar, actualizar, eliminar y consultar datos</p>
+                </div>
+            </div>
+
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mt-6">
+                <p class="text-red-800"><i class="fas fa-times-circle mr-2"></i><strong>NO hagas:</strong> No intentes modelar TODA la app. Solo UNA funcionalidad específica.</p>
+            </div>
+        </section>
+
+        <!-- TEORÍA DDL/DML -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-book text-purple-600 mr-2"></i>Conceptos Básicos: DDL y DML</h2>
+            
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">DDL (Data Definition Language)</h3>
+                <p class="text-gray-700 mb-2">DDL son los comandos que <strong>definen la estructura</strong> de la base de datos. Crean, modifican o eliminan objetos como tablas.</p>
+                <p class="text-gray-700">En este taller usarás: <span class="highlight">CREATE TABLE</span>, <span class="highlight">PRIMARY KEY</span>, <span class="highlight">FOREIGN KEY</span>, <span class="highlight">NOT NULL</span>, <span class="highlight">UNIQUE</span></p>
+                <div class="bg-gray-100 p-3 rounded mt-2 font-mono text-sm">
+                    Ejemplo: CREATE TABLE usuarios (id NUMBER PRIMARY KEY, nombre VARCHAR2(100) NOT NULL);
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">DML (Data Manipulation Language)</h3>
+                <p class="text-gray-700 mb-2">DML son los comandos que <strong>manipulan los datos</strong> dentro de las tablas. Insertan, actualizan, eliminan o consultan información.</p>
+                <p class="text-gray-700">En este taller usarás: <span class="highlight">INSERT</span>, <span class="highlight">UPDATE</span>, <span class="highlight">DELETE</span>, <span class="highlight">SELECT</span></p>
+                <div class="bg-gray-100 p-3 rounded mt-2 font-mono text-sm">
+                    Ejemplo: INSERT INTO usuarios (id, nombre) VALUES (1, 'María García');
+                </div>
+            </div>
+        </section>
+
+        <!-- TEORÍA 3FN -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-layer-group text-indigo-600 mr-2"></i>¿Qué es la Tercera Forma Normal (3FN)?</h2>
+            
+            <p class="text-gray-700 mb-3">La 3FN es un estándar de diseño que garantiza que tu base de datos esté <strong>bien organizada y sin redundancia</strong>.</p>
+            
+            <div class="bg-indigo-50 p-4 rounded mb-4">
+                <p class="text-gray-800 font-semibold mb-2">Una tabla está en 3FN cuando cumple:</p>
+                <ul class="list-disc list-inside space-y-1 text-gray-700 ml-4">
+                    <li>Cada campo depende de la llave primaria (no hay datos repetidos innecesariamente)</li>
+                    <li>No hay dependencias transitivas (un campo no debe depender de otro campo que no sea la llave primaria)</li>
+                    <li>Cada tabla representa un solo concepto o entidad</li>
+                </ul>
+            </div>
+
+            <p class="text-gray-700 mb-2"><strong>Ejemplo práctico:</strong></p>
+            <p class="text-gray-700 mb-2"><span class="text-red-600 font-semibold">❌ MAL:</span> Una tabla "Pedidos" que incluya: id_pedido, fecha, id_cliente, nombre_cliente, dirección_cliente</p>
+            <p class="text-gray-700"><span class="text-green-600 font-semibold">✅ BIEN:</span> Dos tablas: "Pedidos" (id_pedido, fecha, id_cliente) y "Clientes" (id_cliente, nombre, dirección)</p>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
+                <p class="text-yellow-800"><i class="fas fa-lightbulb mr-2"></i>Piensa: "¿Este dato se va a repetir muchas veces? Si sí, probablemente necesita su propia tabla."</p>
+            </div>
+        </section>
+
+        <!-- TAREA 1 -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8 border-l-4 border-blue-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-mobile-alt text-blue-600 mr-2"></i>Tarea 1: Definir App y Funcionalidad</h2>
+            
+            <div class="bg-blue-50 p-4 rounded mb-4">
+                <p class="font-semibold text-blue-900 mb-2">¿Qué debes escribir aquí?</p>
+                <ol class="list-decimal list-inside space-y-1 text-blue-800">
+                    <li>Nombre de la app que eligieron</li>
+                    <li>UNA funcionalidad específica de esa app</li>
+                    <li>Breve descripción de cómo funciona esa característica (2-3 frases)</li>
+                </ol>
+            </div>
+
+            <p class="text-gray-700 mb-2"><strong>Ejemplos válidos:</strong></p>
+            <ul class="list-disc list-inside space-y-1 text-gray-600 mb-4 ml-4">
+                <li><strong>Instagram:</strong> Funcionalidad de "comentar en publicaciones"</li>
+                <li><strong>Spotify:</strong> Funcionalidad de "crear y compartir playlists"</li>
+                <li><strong>Uber:</strong> Funcionalidad de "calificar al conductor"</li>
+                <li><strong>TikTok:</strong> Funcionalidad de "guardar videos favoritos"</li>
+            </ul>
+
+            <p class="text-red-600 font-semibold mb-4"><i class="fas fa-exclamation-circle mr-2"></i>Recuerda: Solo UNA funcionalidad, no toda la app.</p>
+
+            <textarea id="tarea1" rows="6" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ejemplo:
+App: Instagram
+Funcionalidad: Dar 'like' a publicaciones
+Descripción: Los usuarios pueden dar like a fotos y videos publicados por otros usuarios. Cada publicación puede tener múltiples likes de diferentes usuarios..."></textarea>
+            
+            <div class="flex gap-3 mt-3">
+                <button onclick="guardar(1)" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <button onclick="borrar(1)" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
+                    <i class="fas fa-trash mr-2"></i>Borrar respuesta
+                </button>
+                <span class="guardado text-green-600 font-semibold flex items-center" id="status1">
+                    <i class="fas fa-check-circle mr-2"></i>Respuesta guardada
+                </span>
+            </div>
+        </section>
+
+        <!-- TAREA 2 -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8 border-l-4 border-green-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-project-diagram text-green-600 mr-2"></i>Tarea 2: Diseñar Modelo Físico</h2>
+            
+            <div class="bg-green-50 p-4 rounded mb-4">
+                <p class="font-semibold text-green-900 mb-2">¿Qué debes escribir aquí?</p>
+                <p class="text-green-800 mb-3">Lista de tablas que necesitas con sus campos. Para cada tabla especifica:</p>
+                <ol class="list-decimal list-inside space-y-1 text-green-800 ml-4">
+                    <li>Nombre de la tabla</li>
+                    <li>Lista de campos con su tipo de dato</li>
+                    <li>Cuál es la llave primaria (PK)</li>
+                    <li>Cuáles son llaves foráneas (FK) si las hay</li>
+                    <li>Restricciones importantes (NOT NULL, UNIQUE, etc.)</li>
+                </ol>
+            </div>
+
+            <p class="text-gray-700 mb-2"><strong>Formato sugerido:</strong></p>
+            <div class="bg-gray-100 p-3 rounded mb-4 font-mono text-sm">
+Tabla: USUARIOS<br>
+- id_usuario (NUMBER) PK<br>
+- nombre (VARCHAR2(100)) NOT NULL<br>
+- email (VARCHAR2(100)) UNIQUE NOT NULL<br>
+<br>
+Tabla: PUBLICACIONES<br>
+- id_publicacion (NUMBER) PK<br>
+- id_usuario (NUMBER) FK -> USUARIOS<br>
+- contenido (VARCHAR2(500))<br>
+- fecha (DATE) NOT NULL<br>
+<br>
+Tabla: LIKES<br>
+- id_like (NUMBER) PK<br>
+- id_usuario (NUMBER) FK -> USUARIOS<br>
+- id_publicacion (NUMBER) FK -> PUBLICACIONES<br>
+- fecha (DATE) NOT NULL
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <p class="text-yellow-800"><i class="fas fa-lightbulb mr-2"></i><strong>Tip:</strong> Piensa en las "cosas" que necesitas guardar. Cada "cosa" diferente probablemente necesita su propia tabla.</p>
+            </div>
+
+            <textarea id="tarea2" rows="12" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-green-500 focus:border-transparent" placeholder="Escribe aquí el diseño de tu modelo físico..."></textarea>
+            
+            <div class="flex gap-3 mt-3">
+                <button onclick="guardar(2)" class="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <button onclick="borrar(2)" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
+                    <i class="fas fa-trash mr-2"></i>Borrar respuesta
+                </button>
+                <span class="guardado text-green-600 font-semibold flex items-center" id="status2">
+                    <i class="fas fa-check-circle mr-2"></i>Respuesta guardada
+                </span>
+            </div>
+        </section>
+
+        <!-- TAREA 3 -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8 border-l-4 border-purple-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-code text-purple-600 mr-2"></i>Tarea 3: Script DDL (CREATE TABLE)</h2>
+            
+            <div class="bg-purple-50 p-4 rounded mb-4">
+                <p class="font-semibold text-purple-900 mb-2">¿Qué debes escribir aquí?</p>
+                <p class="text-purple-800">Código SQL completo con los comandos CREATE TABLE para TODAS tus tablas. Incluye:</p>
+                <ul class="list-disc list-inside space-y-1 text-purple-800 mt-2 ml-4">
+                    <li>PRIMARY KEY en cada tabla</li>
+                    <li>FOREIGN KEY donde corresponda</li>
+                    <li>Restricciones NOT NULL, UNIQUE según tu diseño</li>
+                </ul>
+            </div>
+
+            <p class="text-gray-700 mb-2"><strong>Ejemplo de sintaxis:</strong></p>
+            <div class="bg-gray-100 p-3 rounded mb-4 font-mono text-sm">
+CREATE TABLE usuarios (<br>
+&nbsp;&nbsp;id_usuario NUMBER PRIMARY KEY,<br>
+&nbsp;&nbsp;nombre VARCHAR2(100) NOT NULL,<br>
+&nbsp;&nbsp;email VARCHAR2(100) UNIQUE NOT NULL<br>
+);<br>
+<br>
+CREATE TABLE publicaciones (<br>
+&nbsp;&nbsp;id_publicacion NUMBER PRIMARY KEY,<br>
+&nbsp;&nbsp;id_usuario NUMBER NOT NULL,<br>
+&nbsp;&nbsp;contenido VARCHAR2(500),<br>
+&nbsp;&nbsp;fecha DATE NOT NULL,<br>
+&nbsp;&nbsp;FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario)<br>
+);
+            </div>
+
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                <p class="text-red-800"><i class="fas fa-exclamation-triangle mr-2"></i><strong>Importante:</strong> Crea primero las tablas "padre" (las que no tienen FK) y luego las tablas "hijo" (las que sí tienen FK).</p>
+            </div>
+
+            <textarea id="tarea3" rows="15" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono text-sm" placeholder="CREATE TABLE ..."></textarea>
+            
+            <div class="flex gap-3 mt-3">
+                <button onclick="guardar(3)" class="bg-purple-600 text-white px-6 py-2 rounded hover:bg-purple-700 transition">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <button onclick="borrar(3)" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
+                    <i class="fas fa-trash mr-2"></i>Borrar respuesta
+                </button>
+                <span class="guardado text-green-600 font-semibold flex items-center" id="status3">
+                    <i class="fas fa-check-circle mr-2"></i>Respuesta guardada
+                </span>
+            </div>
+        </section>
+
+        <!-- TAREA 4 -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8 border-l-4 border-yellow-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-plus-circle text-yellow-600 mr-2"></i>Tarea 4: Scripts INSERT</h2>
+            
+            <div class="bg-yellow-50 p-4 rounded mb-4">
+                <p class="font-semibold text-yellow-900 mb-2">¿Qué debes escribir aquí?</p>
+                <p class="text-yellow-800">Comandos INSERT INTO para agregar datos de ejemplo a tus tablas.</p>
+                <p class="text-yellow-800 font-semibold mt-2">Requisito mínimo: 3 registros por cada tabla.</p>
+            </div>
+
+            <p class="text-gray-700 mb-2"><strong>Sintaxis:</strong></p>
+            <div class="bg-gray-100 p-3 rounded mb-4 font-mono text-sm">
+INSERT INTO usuarios (id_usuario, nombre, email)<br>
+VALUES (1, 'Ana López', 'ana@email.com');<br>
+<br>
+INSERT INTO usuarios (id_usuario, nombre, email)<br>
+VALUES (2, 'Carlos Ruiz', 'carlos@email.com');<br>
+<br>
+INSERT INTO usuarios (id_usuario, nombre, email)<br>
+VALUES (3, 'María Torres', 'maria@email.com');
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                <p class="text-blue-800"><i class="fas fa-info-circle mr-2"></i><strong>Recuerda:</strong> Inserta primero en las tablas padre (sin FK) y después en las tablas hijo (con FK).</p>
+            </div>
+
+            <textarea id="tarea4" rows="15" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-yellow-500 focus:border-transparent font-mono text-sm" placeholder="INSERT INTO ..."></textarea>
+            
+            <div class="flex gap-3 mt-3">
+                <button onclick="guardar(4)" class="bg-yellow-600 text-white px-6 py-2 rounded hover:bg-yellow-700 transition">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <button onclick="borrar(4)" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
+                    <i class="fas fa-trash mr-2"></i>Borrar respuesta
+                </button>
+                <span class="guardado text-green-600 font-semibold flex items-center" id="status4">
+                    <i class="fas fa-check-circle mr-2"></i>Respuesta guardada
+                </span>
+            </div>
+        </section>
+
+        <!-- TAREA 5 -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8 border-l-4 border-orange-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-edit text-orange-600 mr-2"></i>Tarea 5: Scripts UPDATE</h2>
+            
+            <div class="bg-orange-50 p-4 rounded mb-4">
+                <p class="font-semibold text-orange-900 mb-2">¿Qué debes escribir aquí?</p>
+                <p class="text-orange-800">Comandos UPDATE para modificar datos que ya existen en tus tablas.</p>
+                <p class="text-orange-800 font-semibold mt-2">Requisito mínimo: 2 UPDATE diferentes.</p>
+            </div>
+
+            <p class="text-gray-700 mb-2"><strong>Sintaxis:</strong></p>
+            <div class="bg-gray-100 p-3 rounded mb-4 font-mono text-sm">
+UPDATE usuarios<br>
+SET nombre = 'Ana María López', email = 'anita@email.com'<br>
+WHERE id_usuario = 1;<br>
+<br>
+UPDATE publicaciones<br>
+SET contenido = 'Contenido actualizado'<br>
+WHERE id_publicacion = 5;
+            </div>
+
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                <p class="text-red-800"><i class="fas fa-exclamation-triangle mr-2"></i><strong>¡SIEMPRE usa WHERE!</strong> Si no pones WHERE, modificarás TODOS los registros de la tabla.</p>
+            </div>
+
+            <textarea id="tarea5" rows="10" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-orange-500 focus:border-transparent font-mono text-sm" placeholder="UPDATE ..."></textarea>
+            
+            <div class="flex gap-3 mt-3">
+                <button onclick="guardar(5)" class="bg-orange-600 text-white px-6 py-2 rounded hover:bg-orange-700 transition">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <button onclick="borrar(5)" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
+                    <i class="fas fa-trash mr-2"></i>Borrar respuesta
+                </button>
+                <span class="guardado text-green-600 font-semibold flex items-center" id="status5">
+                    <i class="fas fa-check-circle mr-2"></i>Respuesta guardada
+                </span>
+            </div>
+        </section>
+
+        <!-- TAREA 6 -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8 border-l-4 border-red-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-trash-alt text-red-600 mr-2"></i>Tarea 6: Scripts DELETE</h2>
+            
+            <div class="bg-red-50 p-4 rounded mb-4">
+                <p class="font-semibold text-red-900 mb-2">¿Qué debes escribir aquí?</p>
+                <p class="text-red-800">Comandos DELETE para eliminar registros específicos de tus tablas.</p>
+                <p class="text-red-800 font-semibold mt-2">Requisito mínimo: 2 DELETE diferentes.</p>
+            </div>
+
+            <p class="text-gray-700 mb-2"><strong>Sintaxis:</strong></p>
+            <div class="bg-gray-100 p-3 rounded mb-4 font-mono text-sm">
+DELETE FROM likes<br>
+WHERE id_like = 10;<br>
+<br>
+DELETE FROM publicaciones<br>
+WHERE id_publicacion = 3;
+            </div>
+
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                <p class="text-red-800"><i class="fas fa-exclamation-triangle mr-2"></i><strong>¡SIEMPRE usa WHERE!</strong> Si no pones WHERE, eliminarás TODOS los registros de la tabla.</p>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <p class="text-yellow-800"><i class="fas fa-lightbulb mr-2"></i><strong>Tip:</strong> Si intentas eliminar un registro "padre" que tiene "hijos", Oracle te dará error. Elimina primero los registros hijo.</p>
+            </div>
+
+            <textarea id="tarea6" rows="10" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-red-500 focus:border-transparent font-mono text-sm" placeholder="DELETE FROM ..."></textarea>
+            
+            <div class="flex gap-3 mt-3">
+                <button onclick="guardar(6)" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <button onclick="borrar(6)" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
+                    <i class="fas fa-trash mr-2"></i>Borrar respuesta
+                </button>
+                <span class="guardado text-green-600 font-semibold flex items-center" id="status6">
+                    <i class="fas fa-check-circle mr-2"></i>Respuesta guardada
+                </span>
+            </div>
+        </section>
+
+        <!-- TAREA 7 -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8 border-l-4 border-teal-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-search text-teal-600 mr-2"></i>Tarea 7: Scripts SELECT</h2>
+            
+            <div class="bg-teal-50 p-4 rounded mb-4">
+                <p class="font-semibold text-teal-900 mb-2">¿Qué debes escribir aquí?</p>
+                <p class="text-teal-800">Comandos SELECT para consultar y mostrar información de tus tablas.</p>
+                <p class="text-teal-800 font-semibold mt-2">Requisito mínimo: 4 consultas SELECT diferentes.</p>
+            </div>
+
+            <p class="text-gray-700 mb-2"><strong>Ejemplos de consultas que puedes hacer:</strong></p>
+            <ul class="list-disc list-inside space-y-1 text-gray-600 mb-4 ml-4">
+                <li>Mostrar todos los registros de una tabla</li>
+                <li>Mostrar registros que cumplan una condición específica (WHERE)</li>
+                <li>Mostrar solo algunos campos específicos</li>
+                <li>Ordenar los resultados (ORDER BY)</li>
+            </ul>
+
+            <p class="text-gray-700 mb-2"><strong>Sintaxis básica:</strong></p>
+            <div class="bg-gray-100 p-3 rounded mb-4 font-mono text-sm">
+-- Consulta 1: Todos los usuarios<br>
+SELECT * FROM usuarios;<br>
+<br>
+-- Consulta 2: Publicaciones de un usuario específico<br>
+SELECT * FROM publicaciones WHERE id_usuario = 1;<br>
+<br>
+-- Consulta 3: Solo nombres y emails<br>
+SELECT nombre, email FROM usuarios;<br>
+<br>
+-- Consulta 4: Likes ordenados por fecha<br>
+SELECT * FROM likes ORDER BY fecha DESC;
+            </div>
+
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                <p class="text-blue-800"><i class="fas fa-info-circle mr-2"></i><strong>Tip:</strong> Escribe consultas útiles que mostrarían información relevante de tu funcionalidad.</p>
+            </div>
+
+            <textarea id="tarea7" rows="15" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-teal-500 focus:border-transparent font-mono text-sm" placeholder="SELECT ..."></textarea>
+            
+            <div class="flex gap-3 mt-3">
+                <button onclick="guardar(7)" class="bg-teal-600 text-white px-6 py-2 rounded hover:bg-teal-700 transition">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <button onclick="borrar(7)" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
+                    <i class="fas fa-trash mr-2"></i>Borrar respuesta
+                </button>
+                <span class="guardado text-green-600 font-semibold flex items-center" id="status7">
+                    <i class="fas fa-check-circle mr-2"></i>Respuesta guardada
+                </span>
+            </div>
+        </section>
+
+        <!-- TAREA 8 -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8 border-l-4 border-indigo-500">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4"><i class="fas fa-file-alt text-indigo-600 mr-2"></i>Tarea 8: Fundamentación Teórica</h2>
+            
+            <div class="bg-indigo-50 p-4 rounded mb-4">
+                <p class="font-semibold text-indigo-900 mb-2">¿Qué debes escribir aquí?</p>
+                <p class="text-indigo-800">Una explicación clara que justifique tu diseño. Responde estas preguntas:</p>
+                <ol class="list-decimal list-inside space-y-2 text-indigo-800 mt-3 ml-4">
+                    <li><strong>¿Por qué creaste esas tablas específicas?</strong> (¿qué representa cada una?)</li>
+                    <li><strong>¿Por qué tu modelo está en 3FN?</strong> (explica cómo evitaste redundancia)</li>
+                    <li><strong>¿Cómo se relacionan tus tablas entre sí?</strong> (explica las FK)</li>
+                    <li><strong>¿Qué decisiones importantes tomaste?</strong> (tipos de datos, restricciones, etc.)</li>
+                </ol>
+            </div>
+
+            <p class="text-gray-700 mb-2"><strong>Extensión recomendada:</strong> 2-3 párrafos bien explicados (no copies y pegues, explica con tus palabras).</p>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <p class="text-yellow-800"><i class="fas fa-lightbulb mr-2"></i><strong>Ejemplo de fundamentación:</strong></p>
+                <p class="text-sm text-yellow-800 mt-2">"Creamos tres tablas: USUARIOS, PUBLICACIONES y LIKES. La tabla USUARIOS guarda información única de cada usuario (evitando repetir nombres cada vez). PUBLICACIONES se relaciona con USUARIOS mediante una FK porque cada publicación pertenece a un usuario. LIKES conecta usuarios con publicaciones, permitiendo que un usuario dé múltiples likes a diferentes publicaciones. Este diseño está en 3FN porque no hay datos repetidos innecesariamente: el nombre del usuario solo está en la tabla USUARIOS, y si cambia, solo lo actualizamos una vez..."</p>
+            </div>
+
+            <textarea id="tarea8" rows="12" class="w-full p-3 border border-gray-300 rounded focus:ring-2 focus:ring-indigo-500 focus:border-transparent" placeholder="Escribe aquí tu fundamentación teórica..."></textarea>
+            
+            <div class="flex gap-3 mt-3">
+                <button onclick="guardar(8)" class="bg-indigo-600 text-white px-6 py-2 rounded hover:bg-indigo-700 transition">
+                    <i class="fas fa-save mr-2"></i>Guardar
+                </button>
+                <button onclick="borrar(8)" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition">
+                    <i class="fas fa-trash mr-2"></i>Borrar respuesta
+                </button>
+                <span class="guardado text-green-600 font-semibold flex items-center" id="status8">
+                    <i class="fas fa-check-circle mr-2"></i>Respuesta guardada
+                </span>
+            </div>
+        </section>
+
+        <!-- CHECKLIST FINAL -->
+        <section class="bg-gradient-to-r from-green-600 to-green-800 text-white p-6 rounded-lg shadow mb-8">
+            <h2 class="text-2xl font-bold mb-4"><i class="fas fa-clipboard-check mr-2"></i>Checklist de Entrega</h2>
+            
+            <p class="mb-4 text-lg">Antes de entregar, verifica que hayas completado TODO lo siguiente:</p>
+            
+            <div class="bg-white text-gray-800 p-4 rounded">
+                <div class="space-y-3">
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                        <input type="checkbox" class="w-5 h-5 text-green-600">
+                        <span><strong>Tarea 1:</strong> Definiste claramente la app y la funcionalidad específica</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                        <input type="checkbox" class="w-5 h-5 text-green-600">
+                        <span><strong>Tarea 2:</strong> Diseñaste el modelo con tablas, campos, PKs y FKs</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                        <input type="checkbox" class="w-5 h-5 text-green-600">
+                        <span><strong>Tarea 3:</strong> Escribiste CREATE TABLE completos para todas las tablas</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                        <input type="checkbox" class="w-5 h-5 text-green-600">
+                        <span><strong>Tarea 4:</strong> Escribiste al menos 3 INSERT por cada tabla</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                        <input type="checkbox" class="w-5 h-5 text-green-600">
+                        <span><strong>Tarea 5:</strong> Escribiste al menos 2 UPDATE con WHERE</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                        <input type="checkbox" class="w-5 h-5 text-green-600">
+                        <span><strong>Tarea 6:</strong> Escribiste al menos 2 DELETE con WHERE</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                        <input type="checkbox" class="w-5 h-5 text-green-600">
+                        <span><strong>Tarea 7:</strong> Escribiste al menos 4 SELECT diferentes</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                        <input type="checkbox" class="w-5 h-5 text-green-600">
+                        <span><strong>Tarea 8:</strong> Fundamentaste teóricamente por qué tu modelo está en 3FN</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                        <input type="checkbox" class="w-5 h-5 text-green-600">
+                        <span>Revisé que mi código SQL tenga sintaxis correcta (punto y coma, mayúsculas/minúsculas)</span>
+                    </label>
+                    <label class="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                        <input type="checkbox" class="w-5 h-5 text-green-600">
+                        <span>Todas mis respuestas muestran el mensaje "Respuesta guardada"</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="bg-yellow-500 text-yellow-900 p-4 rounded mt-4">
+                <p class="font-bold"><i class="fas fa-exclamation-triangle mr-2"></i>IMPORTANTE: Cómo entregar</p>
+                <p class="mt-2">Para entregar tu taller, copia todo el contenido de cada textarea y pégalo en un documento Word o Google Docs. Incluye el número de cada tarea. Entrega según las instrucciones de tu profesor.</p>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="bg-white p-6 rounded-lg shadow mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6"><i class="fas fa-question-circle text-blue-600 mr-2"></i>Preguntas Frecuentes (FAQ)</h2>
+            
+            <div class="space-y-4">
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Puedo elegir cualquier app?</p>
+                    <p class="text-blue-800">Sí, pero debe ser una app que tu profesor apruebe. Apps conocidas como Spotify, Instagram, WhatsApp, Netflix, Uber, TikTok, Twitter/X, YouTube, son perfectas. Si quieres elegir una menos conocida, pregunta primero.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Qué significa "una funcionalidad específica"?</p>
+                    <p class="text-blue-800">Significa UNA característica concreta, NO toda la app. Ejemplos: "dar like", "comentar", "crear playlist", "dar match", "calificar conductor", "agregar a favoritos". NO es válido decir "toda Instagram" o "el sistema de usuarios".</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Cuántas tablas debo crear?</p>
+                    <p class="text-blue-800">Depende de tu funcionalidad, pero típicamente entre 2 y 5 tablas. Si tienes solo 1 tabla, probablemente tu modelo no está en 3FN. Si tienes más de 6, probablemente estás modelando demasiado.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Mis respuestas se pierden si cierro el navegador?</p>
+                    <p class="text-blue-800">NO se pierden. Tus respuestas se guardan automáticamente en tu navegador (localStorage). Puedes cerrar la página y volver más tarde. PERO: si borras el historial del navegador o usas modo incógnito, SÍ se perderán.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Tengo que ejecutar el código SQL en Oracle?</p>
+                    <p class="text-blue-800">Eso depende de las instrucciones de tu profesor. Este taller NO ejecuta el código automáticamente. Solo lo guardas aquí para escribirlo. Pregunta a tu profesor si también debes ejecutarlo en Oracle SQL Developer o similar.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Qué pasa si mi código SQL tiene errores?</p>
+                    <p class="text-blue-800">Este taller NO verifica errores de sintaxis. Tú eres responsable de revisar tu código. Usa Oracle SQL Developer para probarlo si tienes dudas. Revisa los ejemplos de sintaxis en cada tarea.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Puedo usar tildes y eñes en los nombres de tablas/campos?</p>
+                    <p class="text-blue-800">Técnicamente sí, pero NO es recomendable. Usa solo letras sin tilde, números y guión bajo. Ejemplo: usa "usuarios" no "usuários", usa "nombre" no "nombré".</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Qué tipo de dato uso para fechas?</p>
+                    <p class="text-blue-800">Usa DATE para fechas en Oracle. Ejemplo: fecha_creacion DATE</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Qué tipo de dato uso para textos?</p>
+                    <p class="text-blue-800">Usa VARCHAR2(tamaño). Ejemplo: nombre VARCHAR2(100), email VARCHAR2(150). El número entre paréntesis es el máximo de caracteres.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Qué tipo de dato uso para números?</p>
+                    <p class="text-blue-800">Usa NUMBER. Para números enteros: NUMBER. Para decimales: NUMBER(10,2) donde 10 es total de dígitos y 2 son decimales.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Cómo sé si mi modelo está en 3FN?</p>
+                    <p class="text-blue-800">Pregúntate: "¿Tengo datos que se repiten en múltiples filas?" Si sí, probablemente NO está en 3FN. Ejemplo: si guardas el nombre del usuario en cada like que da, está mal. El nombre debe estar solo en la tabla USUARIOS.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Puedo poner más de una PRIMARY KEY en una tabla?</p>
+                    <p class="text-blue-800">NO. Cada tabla tiene UNA sola PRIMARY KEY. Puede ser un solo campo o una combinación de campos (PK compuesta), pero se declara una sola vez.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Qué orden uso para crear las tablas?</p>
+                    <p class="text-blue-800">Primero crea las tablas que NO tienen FOREIGN KEY (tablas "padre"). Después crea las tablas que SÍ tienen FOREIGN KEY (tablas "hijo"). Ejemplo: primero USUARIOS, luego PUBLICACIONES (que referencia a USUARIOS).</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Tengo que poner punto y coma (;) al final de cada comando SQL?</p>
+                    <p class="text-blue-800">SÍ. Cada comando SQL debe terminar con punto y coma (;). Es obligatorio en Oracle.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Importa si escribo en mayúsculas o minúsculas?</p>
+                    <p class="text-blue-800">Los comandos SQL (SELECT, CREATE, INSERT) tradicionalmente se escriben en MAYÚSCULAS, pero Oracle los acepta en minúsculas también. Los nombres de tablas y campos puedes escribirlos como quieras, pero sé consistente.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Qué hago si me equivoco y quiero empezar de nuevo una tarea?</p>
+                    <p class="text-blue-800">Usa el botón "Borrar respuesta" de esa tarea. Esto limpiará el textarea y eliminará lo guardado. Luego puedes escribir de nuevo.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ ¿Puedo copiar y pegar código de internet?</p>
+                    <p class="text-blue-800">Puedes buscar sintaxis y ejemplos para aprender, pero tu código debe ser TUYO, adaptado a TU funcionalidad elegida. No copies modelos completos. El objetivo es que APRENDAS.</p>
+                </div>
+
+                <div class="border-l-4 border-blue-500 bg-blue-50 p-4">
+                    <p class="font-bold text-blue-900 mb-2">❓ Mi equipo no se pone de acuerdo en qué app elegir. ¿Qué hacemos?</p>
+                    <p class="text-blue-800">Elijan la app que sea más fácil de modelar y que todos entiendan cómo funciona. Lo importante es la funcionalidad específica que elijan, no tanto cuál app sea.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white p-6 rounded-lg text-center">
+            <p class="text-lg mb-2">¿Necesitas ayuda adicional?</p>
+            <p>Consulta con tu profesor o busca en la documentación oficial de Oracle SQL 23c</p>
+            <p class="mt-4 text-sm text-gray-400">Este taller usa almacenamiento local del navegador para guardar tus respuestas</p>
+        </footer>
+
+    </div>
+
+    <script>
+        // Cargar respuestas guardadas al cargar la página
+        window.addEventListener('DOMContentLoaded', function() {
+            for (let i = 1; i <= 8; i++) {
+                const saved = localStorage.getItem('tarea' + i);
+                if (saved) {
+                    document.getElementById('tarea' + i).value = saved;
+                    document.getElementById('status' + i).classList.add('visible');
+                }
+            }
+        });
+
+        // Auto-guardar con debounce
+        let timeouts = {};
+        for (let i = 1; i <= 8; i++) {
+            document.getElementById('tarea' + i).addEventListener('input', function() {
+                clearTimeout(timeouts[i]);
+                timeouts[i] = setTimeout(function() {
+                    guardar(i);
+                }, 2000);
+            });
+        }
+
+        function guardar(num) {
+            const textarea = document.getElementById('tarea' + num);
+            const status = document.getElementById('status' + num);
+            const content = textarea.value.trim();
+            
+            if (content) {
+                localStorage.setItem('tarea' + num, content);
+                status.classList.add('visible');
+                
+                // Feedback visual
+                status.style.color = '#059669';
+                setTimeout(function() {
+                    status.style.color = '#16a34a';
+                }, 300);
+            }
+        }
+
+        function borrar(num) {
+            if (confirm('¿Estás seguro de que quieres borrar esta respuesta? Esta acción no se puede deshacer.')) {
+                document.getElementById('tarea' + num).value = '';
+                localStorage.removeItem('tarea' + num);
+                document.getElementById('status' + num).classList.remove('visible');
+            }
+        }
+    </script>
+</body>
+</html>
