@@ -1,0 +1,126 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Taller de Modelado de Base de Datos - HTML5</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0; padding: 0;
+        background: #f4f4f4;
+        color: #222;
+        line-height: 1.6;
+    }
+    section {
+        padding: 40px;
+        margin: 20px auto;
+        width: 90%;
+        max-width: 900px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+        margin-top: 0;
+    }
+    ul { padding-left: 20px; }
+</style>
+</head>
+
+<body>
+
+<section>
+    <h1>Taller: Modelado de Base de Datos para Apps Reales</h1>
+    <p>Modelado Físico en 3FN – Oracle SQL 23c<br>
+    Duración estimada: 60 minutos.</p>
+</section>
+
+<section>
+    <h2>Cómo usar este taller</h2>
+    <ul>
+        <li>Trabaja en equipo.</li>
+        <li>Completa cada tarea en orden.</li>
+        <li>Escribe tus respuestas en los cuadros del taller.</li>
+        <li>Utiliza los botones de Guardar y Borrar.</li>
+        <li>Las respuestas quedan almacenadas en el navegador (localStorage).</li>
+        <li>Revisa el checklist final antes de entregar.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Qué vas a hacer</h2>
+    <ul>
+        <li>Elegir una app famosa.</li>
+        <li>Identificar una funcionalidad específica.</li>
+        <li>Diseñar un modelo físico de base de datos.</li>
+        <li>Construir SQL DDL y DML para esa funcionalidad.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Conceptos clave</h2>
+    <h3>DDL (Data Definition Language)</h3>
+    <p>Define la estructura de la base de datos. Usarás:</p>
+    <ul>
+        <li>CREATE TABLE</li>
+        <li>PRIMARY KEY</li>
+        <li>FOREIGN KEY</li>
+        <li>UNIQUE</li>
+        <li>NOT NULL</li>
+    </ul>
+
+    <h3>DML (Data Manipulation Language)</h3>
+    <p>Manipula datos. Usarás:</p>
+    <ul>
+        <li>INSERT</li>
+        <li>UPDATE</li>
+        <li>DELETE</li>
+        <li>SELECT</li>
+    </ul>
+
+    <h3>3FN (Tercera Forma Normal)</h3>
+    <ul>
+        <li>Evita redundancias.</li>
+        <li>Toda columna depende directamente de la clave primaria.</li>
+        <li>Sin dependencias transitivas.</li>
+        <li>Una tabla representa una sola entidad.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Tarea 1: App y Funcionalidad</h2>
+    <ul>
+        <li>App elegida</li>
+        <li>Funcionalidad específica</li>
+        <li>Descripción en 2–3 frases</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Tarea 2: Modelo Físico</h2>
+    <p>Lista tablas, campos, tipos, PK, FK y restricciones.</p>
+</section>
+
+<section>
+    <h2>Tarea 3: Script DDL</h2>
+    <p>Crea todas las tablas:</p>
+    <ul>
+        <li>Primero las tablas padre.</li>
+        <li>Luego las tablas hijo (con FK).</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Tarea 4: INSERT</h2>
+    <p>Agrega 3 registros por tabla (primero las tablas padre).</p>
+</section>
+
+<section>
+    <h2>Tarea 5: UPDATE</h2>
+    <p>Crea al menos 2 operaciones UPDATE con sentido dentro de la lógica de la app.</p>
+</section>
+
+</body>
+</html>
