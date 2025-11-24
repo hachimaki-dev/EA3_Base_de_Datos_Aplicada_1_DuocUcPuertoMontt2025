@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tinder DB: SQL Hacker Workshop</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=VT323&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fira Code', monospace;
+            transition: all 0.3s ease;
+        }
+
+        .hacker-font {
+            font-family: 'VT323', monospace;
+        }
+
+        /* Scrollbar custom */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4ade80;
+            border-radius: 4px;
+        }
+
+        /* Dark Mode (Chicos Hackers - Matrix/Terminal) */
+        .theme-dark {
+            background-color: #0d1117;
+            color: #4ade80;
+            --bg-card: #161b22;
+            --border-color: #30363d;
+            --accent: #4ade80;
+            --accent-hover: #22c55e;
+            --text-muted: #8b949e;
+            --code-bg: #000000;
+            --input-bg: #0d1117;
+            --module-bg: #21262d;
+        }
+
+        /* Light Mode (Chicas Hackers - Cyberpunk/Vaporwave) */
+        .theme-light {
+            background-color: #fdf2f8;
+            /* Pink 50 */
+            color: #db2777;
+            /* Pink 600 */
+            --bg-card: #ffffff;
+            --border-color: #fbcfe8;
+            /* Pink 200 */
+            --accent: #d946ef;
+            /* Fuchsia 500 */
+            --accent-hover: #c026d3;
+            --text-muted: #9d174d;
+            --code-bg: #fce7f3;
+            --input-bg: #fff1f2;
+            --module-bg: #fdf4ff;
+        }
+
+        .theme-light ::-webkit-scrollbar-thumb {
+            background: #d946ef;
+        }
+
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            bottom: 100%;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scanline {
+            0% {
+                bottom: 100%;
+            }
+
+            100% {
+                bottom: -100%;
+            }
+        }
+
+        .shake {
+            animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+        }
+
+        @keyframes shake {
+
+            10%,
+            90% {
+                transform: translate3d(-1px, 0, 0);
+            }
+
+            20%,
+            80% {
+                transform: translate3d(2px, 0, 0);
+            }
+
+            30%,
+            50%,
+            70% {
+                transform: translate3d(-4px, 0, 0);
+            }
+
+            40%,
+            60% {
+                transform: translate3d(4px, 0, 0);
+            }
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 0.3s ease;
+        }
+
+        .fade-enter-from,
+        .fade-leave-to {
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body :class="currentTheme" class="min-h-screen relative overflow-x-hidden transition-colors duration-500">
+    <div id="app" class="container mx-auto px-4 py-6 max-w-6xl relative z-20">
+
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8 border-b-2 pb-4 gap-4"
+            :style="{ borderColor: 'var(--border-color)' }">
+            <div class="text-center md:text-left">
+                <h1 class="text-4xl md:text-5xl font-bold hacker-font tracking-wider">
+                    <span class="text-opacity-80">SQL_</span>MASTERY<span class="animate-pulse">_</span>
+                </h1>
+                <p class="text-xs md:text-sm mt-1 opacity-80">>> Database Infiltration Protocol: TINDER_DB</p>
+            </div>
+
+            <!-- Theme Toggle -->
+            <div class="flex items-center gap-4">
+                <button @click="toggleTheme"
+                    class="px-4 py-2 border-2 font-bold uppercase text-xs tracking-widest transition-all duration-300 hover:scale-105 focus:outline-none rounded-sm"
+                    :class="isDark ? 'shadow-[0_0_10px_rgba(74,222,128,0.3)]' : 'shadow-[0_0_10px_rgba(217,70,239,0.3)]'"
+                    :style="{ borderColor: 'var(--accent)', color: 'var(--accent)', backgroundColor: isDark ? 'rgba(74,222,128,0.05)' : 'rgba(217,70,239,0.05)' }">
+                    {{ isDark ? '🟢 NEO_TERMINAL' : '🌸 CYBER_POP' }}
+                </button>
+            </div>
+        </header>
+
+        <!-- Intro Section -->
+        <div v-if="currentLevel === 0" class="mb-12 p-8 border-l-4 shadow-lg rounded-r-lg"
+            :style="{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--accent)' }">
+            <h2 class="text-3xl font-bold mb-6 flex items-center gap-3 hacker-font">
+                <span class="text-4xl animate-bounce">👾</span> INICIALIZANDO SISTEMA...
+            </h2>
+            <div class="space-y-4 text-lg leading-relaxed">
+                <p>
+                    Bienvenido, recluta. Hemos interceptado la base de datos de una popular app de citas.
+                    Tu misión es extraer información crítica para el negocio, entender el comportamiento de los usuarios
+                    y optimizar el algoritmo de emparejamiento.
+                </p>
+                <p class="opacity-80 border-l-2 pl-4 italic" :style="{ borderColor: 'var(--border-color)' }">
+                    "El conocimiento es libre, pero la maestría cuesta esfuerzo."
+                </p>
+                <p>
+                    El curso está dividido en <strong>5 Módulos de Entrenamiento</strong>, diseñados para llevarte desde
+                    cero hasta un nivel operativo competente.
+                    No buscamos genios, buscamos agentes constantes.
+                </p>
+            </div>
+            <button @click="startMission"
+                class="w-full mt-8 py-4 text-xl font-bold border-2 transition-all hover:tracking-[0.2em] uppercase rounded"
+                :style="{ borderColor: 'var(--accent)', backgroundColor: 'transparent', color: 'var(--accent)' }">
+                [ START_MISSION ]
+            </button>
+        </div>
+
+        <!-- Game Area -->
+        <div v-else class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+            <!-- Sidebar: Mission Log (Modules) -->
+            <div class="lg:col-span-4 space-y-4 h-[calc(100vh-200px)] overflow-y-auto pr-2 custom-scrollbar">
+
+                <!-- Progress Bar -->
+                <div class="p-4 border-2 text-center shadow-md rounded sticky top-0 z-10 mb-4"
+                    :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-card)' }">
+                    <p class="text-xs uppercase tracking-widest mb-2 opacity-70">Nivel de Acceso</p>
+                    <div class="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                        <div class="h-full transition-all duration-1000 ease-out relative"
+                            :style="{ width: (currentLevel / totalLevels * 100) + '%', backgroundColor: 'var(--accent)' }">
+                        </div>
+                    </div>
+                    <p class="mt-2 text-xs font-mono">{{ currentLevel }} / {{ totalLevels }} MISIONES COMPLETADAS</p>
+                </div>
+
+                <!-- Modules List -->
+                <div v-for="(module, mIndex) in modules" :key="mIndex"
+                    class="border-2 rounded overflow-hidden transition-all"
+                    :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--bg-card)' }">
+
+                    <!-- Module Header -->
+                    <div class="p-3 font-bold text-sm uppercase tracking-wider cursor-pointer flex justify-between items-center"
+                        :style="{ backgroundColor: 'var(--module-bg)', color: 'var(--accent)' }"
+                        @click="module.expanded = !module.expanded">
+                        <span>{{ module.title }}</span>
+                        <span>{{ module.expanded ? '[-]' : '[+]' }}</span>
+                    </div>
+
+                    <!-- Levels List -->
+                    <div v-show="module.expanded" class="divide-y" :style="{ borderColor: 'var(--border-color)' }">
+                        <div v-for="(level, lIndex) in module.levels" :key="lIndex" @click="goToLevel(mIndex, lIndex)"
+                            class="p-3 text-xs cursor-pointer hover:bg-opacity-10 transition-colors flex items-center gap-2"
+                            :class="{'bg-opacity-10 font-bold': isCurrentLevel(mIndex, lIndex)}"
+                            :style="{ backgroundColor: isCurrentLevel(mIndex, lIndex) ? 'var(--accent)' : 'transparent' }">
+                            <span class="opacity-50 font-mono">{{ lIndex + 1 }}.</span>
+                            <span
+                                :class="{'text-opacity-100': isCurrentLevel(mIndex, lIndex), 'text-opacity-70': !isCurrentLevel(mIndex, lIndex)}">
+                                {{ level.shortTitle }}
+                            </span>
+                            <span v-if="isCurrentLevel(mIndex, lIndex)" class="ml-auto animate-pulse">●</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content: The Challenge -->
+            <div class="lg:col-span-8">
+                <div class="p-6 border-2 min-h-[600px] flex flex-col relative overflow-hidden shadow-2xl transition-all duration-500 rounded"
+                    :style="{ borderColor: 'var(--accent)', backgroundColor: 'var(--bg-card)', boxShadow: isDark ? '0 0 30px rgba(74,222,128,0.05)' : '0 0 30px rgba(217,70,239,0.05)' }">
+
+                    <!-- Scanline effect -->
+                    <div class="scanline"></div>
+
+                    <transition name="fade" mode="out-in">
+                        <div :key="currentLevel" class="flex flex-col h-full">
+                            <!-- Header Level -->
+                            <div class="flex justify-between items-start mb-6 border-b pb-4 border-dashed"
+                                :style="{ borderColor: 'var(--border-color)' }">
+                                <div>
+                                    <span class="text-xs uppercase tracking-widest opacity-60">Módulo {{
+                                        activeModuleIndex + 1 }} // Misión {{ activeLevelIndex + 1 }}</span>
+                                    <h2 class="text-2xl md:text-3xl font-bold hacker-font mt-1 tracking-wide text-transparent bg-clip-text bg-gradient-to-r"
+                                        :style="{ backgroundImage: `linear-gradient(to right, var(--accent), var(--accent-hover))` }">
+                                        {{ activeLevel.title }}
+                                    </h2>
+                                </div>
+                                <div class="text-4xl opacity-50 filter drop-shadow-lg" :title="activeLevel.shortTitle">
+                                    {{ activeLevel.icon }}
+                                </div>
+                            </div>
+
+                            <!-- Story Context -->
+                            <div class="mb-6 p-4 rounded border-l-4 bg-opacity-5"
+                                :style="{ backgroundColor: 'var(--accent)', borderColor: 'var(--accent)' }">
+                                <p class="font-bold mb-2 text-xs uppercase opacity-70 tracking-widest">>> Incoming
+                                    Transmission:</p>
+                                <p class="text-base italic font-serif leading-relaxed">"{{ activeLevel.story }}"</p>
+                            </div>
+
+                            <!-- The Task -->
+                            <div class="mb-6">
+                                <h3 class="text-lg font-bold mb-2 flex items-center gap-2 border-b inline-block pb-1"
+                                    :style="{ borderColor: 'var(--border-color)' }">
+                                    <span>⚡</span> OBJETIVO:
+                                </h3>
+                                <p class="text-lg font-medium">{{ activeLevel.task }}</p>
+                            </div>
+
+                            <!-- Hints & Solution -->
+                            <div class="mt-auto space-y-6">
+
+                                <!-- Hint Button -->
+                                <div v-if="!showHint" class="text-center">
+                                    <button @click="showHint = true"
+                                        class="text-xs underline opacity-60 hover:opacity-100 transition-opacity uppercase tracking-wider">
+                                        [ Solicitar Pista ]
+                                    </button>
+                                </div>
+                                <div v-else
+                                    class="p-3 border border-dashed rounded text-sm relative group animate-fade-in"
+                                    :style="{ borderColor: 'var(--text-muted)', color: 'var(--text-muted)' }">
+                                    <span class="absolute -top-3 left-4 px-2 text-xs bg-opacity-100 font-bold"
+                                        :style="{ backgroundColor: 'var(--bg-card)' }">HINT_SYSTEM</span>
+                                    <strong>PISTA:</strong> {{ activeLevel.hint }}
+                                </div>
+
+                                <!-- Solution Area -->
+                                <div class="border-t pt-6" :style="{ borderColor: 'var(--border-color)' }">
+
+                                    <!-- Locked State -->
+                                    <div v-if="!isUnlocked" class="space-y-3">
+                                        <button @click="showPasswordInput = !showPasswordInput"
+                                            v-if="!showPasswordInput"
+                                            class="w-full py-3 font-bold uppercase tracking-widest border transition-all flex justify-between items-center px-4 hover:bg-opacity-10 rounded"
+                                            :style="{ borderColor: 'var(--accent)', color: 'var(--accent)', backgroundColor: 'transparent' }">
+                                            <span>DESBLOQUEAR SOLUCIÓN</span>
+                                            <span>🔒</span>
+                                        </button>
+
+                                        <!-- Password Input -->
+                                        <div v-else class="flex flex-col gap-2 animate-fade-in">
+                                            <label class="text-xs uppercase tracking-widest opacity-70">Ingrese Clave de
+                                                Acceso:</label>
+                                            <div class="flex gap-2">
+                                                <input type="password" v-model="passwordAttempt"
+                                                    @keyup.enter="checkPassword"
+                                                    class="flex-1 p-3 border outline-none font-mono text-sm bg-transparent transition-all rounded"
+                                                    :class="{'shake border-red-500': passwordError}"
+                                                    :style="{ borderColor: passwordError ? 'red' : 'var(--border-color)', color: 'var(--accent)' }"
+                                                    placeholder=">_">
+                                                <button @click="checkPassword"
+                                                    class="px-6 font-bold border hover:bg-opacity-10 transition-colors rounded"
+                                                    :style="{ borderColor: 'var(--accent)', color: 'var(--accent)', backgroundColor: 'transparent' }">
+                                                    ENTER
+                                                </button>
+                                            </div>
+                                            <p v-if="passwordError" class="text-red-500 text-xs mt-1">>> ACCESO
+                                                DENEGADO. INTENTE NUEVAMENTE.</p>
+                                            <p class="text-xs opacity-40">Hint: "prometo..."</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Unlocked State -->
+                                    <div v-else class="animate-fade-in">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-xs uppercase tracking-widest font-bold text-green-500">>>
+                                                ACCESS GRANTED</span>
+                                            <button @click="lockSolution"
+                                                class="text-xs opacity-50 hover:opacity-100 hover:text-red-400">
+                                                [ BLOQUEAR ]
+                                            </button>
+                                        </div>
+                                        <div class="p-4 rounded overflow-x-auto text-sm font-mono border-l-4 shadow-inner"
+                                            :style="{ backgroundColor: 'var(--code-bg)', borderColor: 'var(--accent)' }">
+                                            <pre
+                                                class="whitespace-pre-wrap"><code class="language-sql">{{ activeLevel.solution }}</code></pre>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- Navigation -->
+                            <div class="flex justify-between mt-8 pt-4 border-t border-dashed"
+                                :style="{ borderColor: 'var(--border-color)' }">
+                                <button @click="prevLevel" :disabled="currentLevel === 1"
+                                    class="px-4 py-2 opacity-60 hover:opacity-100 disabled:opacity-20 transition-opacity flex items-center gap-2 text-sm font-bold">
+                                    <span>&lt;</span> ANTERIOR
+                                </button>
+                                <button @click="nextLevel" :disabled="currentLevel === totalLevels"
+                                    class="px-6 py-2 font-bold bg-opacity-20 hover:bg-opacity-100 transition-all flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1 rounded text-sm"
+                                    :style="{ backgroundColor: 'var(--accent)', color: isDark ? 'black' : 'white' }">
+                                    SIGUIENTE <span>></span>
+                                </button>
+                            </div>
+                        </div>
+                    </transition>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-16 text-center pb-8 border-t pt-8 opacity-60 hover:opacity-100 transition-opacity"
+            :style="{ borderColor: 'var(--border-color)' }">
+            <p class="font-bold mb-2 hacker-font text-lg">TALLER DE BASE DE DATOS APLICADA // DUOC UC // EA3</p>
+            <div class="text-sm space-y-1">
+                <p>Creado con ❤️ por <span class="font-bold" :style="{ color: 'var(--accent)' }">HachiMaki</span> para
+                    sus estudiantes y mentes curiosas del internet.</p>
+                <p class="text-xs mt-2">Co-programado por <span class="font-bold">Antigravity AI</span> // "El
+                    conocimiento compartido es poder multiplicado."</p>
+            </div>
+            <p class="mt-4 text-xs font-mono opacity-50">SYSTEM_ID: TINDER_DB_V2.5 // SECURE_MODE: ACTIVE</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                return {
+                    isDark: true,
+                    currentLevel: 0, // 0 = Intro, 1-25 = Levels
+                    showHint: false,
+
+                    // Password Logic
+                    isUnlocked: false,
+                    showPasswordInput: false,
+                    passwordAttempt: '',
+                    passwordError: false,
+                    SECRET_KEY: 'prometoaprenderlo',
+
+                    modules: [
+                        {
+                            title: "MÓDULO 1: INFILTRACIÓN BÁSICA (SELECT & WHERE)",
+                            expanded: true,
+                            levels: [
+                                {
+                                    shortTitle: "Dump Inicial",
+                                    title: "RECONOCIMIENTO DEL TERRENO",
+                                    icon: "🕵️‍♀️",
+                                    story: "Acabamos de vulnerar el firewall. Necesitamos ver qué hay en la tabla de usuarios antes de que nos detecten.",
+                                    task: "Lista TODOS los datos de la tabla USUARIOS.",
+                                    hint: "Usa el comodín * para traer todas las columnas.",
+                                    solution: "SELECT * FROM USUARIOS;"
+                                },
+                                {
+                                    shortTitle: "Lista de Spam",
+                                    title: "EXTRACCIÓN DE CONTACTOS",
+                                    icon: "📧",
+                                    story: "El equipo de marketing quiere enviar una newsletter. No necesitan toda la info, solo nombres y correos.",
+                                    task: "Selecciona solo las columnas 'nombre' y 'email' de la tabla USUARIOS.",
+                                    hint: "Especifica los nombres de las columnas separados por coma en lugar de usar *.",
+                                    solution: "SELECT nombre, email FROM USUARIOS;"
+                                },
+                                {
+                                    shortTitle: "Filtro por Zona",
+                                    title: "TARGETING GEOGRÁFICO",
+                                    icon: "📍",
+                                    story: "Queremos lanzar una campaña en Santiago (ID 1). Filtra la base de datos.",
+                                    task: "Muestra todos los usuarios que vivan en la ciudad con id_ciudad = 1.",
+                                    hint: "Usa la cláusula WHERE.",
+                                    solution: "SELECT * FROM USUARIOS WHERE id_ciudad = 1;"
+                                },
+                                {
+                                    shortTitle: "Target Específico",
+                                    title: "SEGMENTACIÓN AVANZADA",
+                                    icon: "🎯",
+                                    story: "El cliente pide mujeres (ID 2) que vivan en Santiago (ID 1).",
+                                    task: "Muestra usuarios con id_genero = 2 Y id_ciudad = 1.",
+                                    hint: "Usa el operador AND para combinar condiciones.",
+                                    solution: "SELECT * FROM USUARIOS WHERE id_genero = 2 AND id_ciudad = 1;"
+                                },
+                                {
+                                    shortTitle: "Usuarios VIP",
+                                    title: "FILTRANDO LA ÉLITE",
+                                    icon: "💎",
+                                    story: "Necesitamos identificar a los usuarios que pagan. Los planes 2 y 3 son de pago.",
+                                    task: "Muestra los usuarios cuyo id_plan sea 2 O 3.",
+                                    hint: "Puedes usar OR o el operador IN (2, 3).",
+                                    solution: "SELECT * FROM USUARIOS WHERE id_plan IN (2, 3);"
+                                }
+                            ]
+                        },
+                        {
+                            title: "MÓDULO 2: ANÁLISIS DE DATOS (FUNCIONES & ORDEN)",
+                            expanded: false,
+                            levels: [
+                                {
+                                    shortTitle: "Los Más Jóvenes",
+                                    title: "ORDENAMIENTO TEMPORAL",
+                                    icon: "👶",
+                                    story: "Queremos atraer a la Gen Z. ¿Quiénes son los usuarios más jóvenes?",
+                                    task: "Muestra nombre y fecha de nacimiento, ordenados desde el más joven al más viejo.",
+                                    hint: "Usa ORDER BY fecha_nacimiento DESC (fechas más recientes son 'mayores').",
+                                    solution: "SELECT nombre, fecha_nacimiento FROM USUARIOS ORDER BY fecha_nacimiento DESC;"
+                                },
+                                {
+                                    shortTitle: "Conteo de Víctimas",
+                                    title: "MÉTRICAS DE VOLUMEN",
+                                    icon: "🔢",
+                                    story: "El CEO pregunta cuántos usuarios tenemos registrados en total.",
+                                    task: "Cuenta el total de filas en la tabla USUARIOS.",
+                                    hint: "Usa la función de agregación COUNT(*).",
+                                    solution: "SELECT COUNT(*) FROM USUARIOS;"
+                                },
+                                {
+                                    shortTitle: "Alcance Promedio",
+                                    title: "ESTADÍSTICAS DE USO",
+                                    icon: "📏",
+                                    story: "¿Qué tan lejos están dispuestos a viajar nuestros usuarios? Calcula el promedio.",
+                                    task: "Calcula el promedio (AVG) de la columna distancia_max_km.",
+                                    hint: "Usa la función AVG().",
+                                    solution: "SELECT AVG(distancia_max_km) FROM USUARIOS;"
+                                },
+                                {
+                                    shortTitle: "El Plan Más Caro",
+                                    title: "MAXIMIZANDO REVENUE",
+                                    icon: "💰",
+                                    story: "Finanzas quiere saber cuál es el precio más alto que cobramos.",
+                                    task: "Obtén el precio máximo registrado en la tabla PLANES.",
+                                    hint: "Usa la función MAX().",
+                                    solution: "SELECT MAX(precio) FROM PLANES;"
+                                },
+                                {
+                                    shortTitle: "Buscando Patrones",
+                                    title: "BÚSQUEDA DE TEXTO",
+                                    icon: "🔍",
+                                    story: "Por alguna razón, marketing cree que los nombres que empiezan con 'A' son más propensos a comprar.",
+                                    task: "Encuentra todos los usuarios cuyo nombre empiece con la letra 'A'.",
+                                    hint: "Usa el operador LIKE con el comodín % ('A%').",
+                                    solution: "SELECT * FROM USUARIOS WHERE nombre LIKE 'A%';"
+                                }
+                            ]
+                        },
+                        {
+                            title: "MÓDULO 3: CONEXIONES DE RED (JOINS)",
+                            expanded: false,
+                            levels: [
+                                {
+                                    shortTitle: "Ubicando Objetivos",
+                                    title: "ENRIQUECIMIENTO GEOGRÁFICO",
+                                    icon: "🗺️",
+                                    story: "Los IDs de ciudad no nos dicen nada. Queremos ver el NOMBRE de la ciudad.",
+                                    task: "Haz un JOIN entre USUARIOS y CIUDADES para mostrar el nombre del usuario y el nombre de su ciudad.",
+                                    hint: "USUARIOS.id_ciudad se conecta con CIUDADES.id.",
+                                    solution: "SELECT U.nombre, C.nombre AS ciudad \nFROM USUARIOS U \nJOIN CIUDADES C ON U.id_ciudad = C.id;"
+                                },
+                                {
+                                    shortTitle: "Identidad de Género",
+                                    title: "DATOS DEMOGRÁFICOS",
+                                    icon: "⚧",
+                                    story: "Igual que antes, queremos ver el nombre del GÉNERO, no su ID.",
+                                    task: "Haz un JOIN entre USUARIOS y GENEROS.",
+                                    hint: "USUARIOS.id_genero se conecta con GENEROS.id.",
+                                    solution: "SELECT U.nombre, G.nombre AS genero \nFROM USUARIOS U \nJOIN GENEROS G ON U.id_genero = G.id;"
+                                },
+                                {
+                                    shortTitle: "Verificando Suscripciones",
+                                    title: "AUDITORÍA DE PAGOS",
+                                    icon: "💳",
+                                    story: "Muestra el nombre del usuario y el nombre de su PLAN.",
+                                    task: "JOIN entre USUARIOS y PLANES.",
+                                    hint: "USUARIOS.id_plan = PLANES.id.",
+                                    solution: "SELECT U.nombre, P.nombre AS plan \nFROM USUARIOS U \nJOIN PLANES P ON U.id_plan = P.id;"
+                                },
+                                {
+                                    shortTitle: "Perfilado Cruzado",
+                                    title: "MULTI-DIMENSIONAL JOIN",
+                                    icon: "🔗",
+                                    story: "El reporte completo: Nombre Usuario, Nombre Ciudad y Nombre Género.",
+                                    task: "Haz dos JOINs en la misma consulta (Usuarios con Ciudades y con Generos).",
+                                    hint: "Escribe un JOIN después del otro.",
+                                    solution: "SELECT U.nombre, C.nombre AS ciudad, G.nombre AS genero \nFROM USUARIOS U \nJOIN CIUDADES C ON U.id_ciudad = C.id \nJOIN GENEROS G ON U.id_genero = G.id;"
+                                },
+                                {
+                                    shortTitle: "Recuperando Evidencia",
+                                    title: "EXTRACCIÓN DE MEDIA",
+                                    icon: "📸",
+                                    story: "Necesitamos ver las fotos de perfil de los usuarios.",
+                                    task: "Muestra el nombre del usuario y la URL de su foto. (JOIN con FOTOS).",
+                                    hint: "Filtra donde es_perfil sea '1' si quieres solo la principal, o trae todas.",
+                                    solution: "SELECT U.nombre, F.url_foto \nFROM USUARIOS U \nJOIN FOTOS F ON U.id = F.id_usuario;"
+                                }
+                            ]
+                        },
+                        {
+                            title: "MÓDULO 4: REPORTES DE INTELIGENCIA (GROUP BY)",
+                            expanded: false,
+                            levels: [
+                                {
+                                    shortTitle: "Densidad por Zona",
+                                    title: "MAPA DE CALOR",
+                                    icon: "🔥",
+                                    story: "¿Cuántos usuarios tenemos en cada ciudad?",
+                                    task: "Muestra el nombre de la ciudad y la cantidad de usuarios en ella.",
+                                    hint: "JOIN Ciudades + Usuarios, luego GROUP BY nombre ciudad.",
+                                    solution: "SELECT C.nombre, COUNT(U.id) \nFROM CIUDADES C \nJOIN USUARIOS U ON C.id = U.id_ciudad \nGROUP BY C.nombre;"
+                                },
+                                {
+                                    shortTitle: "Demografía",
+                                    title: "DISTRIBUCIÓN DE GÉNERO",
+                                    icon: "🚻",
+                                    story: "¿Cuál es la distribución de géneros en nuestra app?",
+                                    task: "Cuenta cuántos usuarios hay por cada género.",
+                                    hint: "JOIN Generos + Usuarios, GROUP BY nombre genero.",
+                                    solution: "SELECT G.nombre, COUNT(U.id) \nFROM GENEROS G \nJOIN USUARIOS U ON G.id = U.id_genero \nGROUP BY G.nombre;"
+                                },
+                                {
+                                    shortTitle: "Comportamiento por Plan",
+                                    title: "ANÁLISIS DE COMPORTAMIENTO",
+                                    icon: "📉",
+                                    story: "¿Los usuarios que pagan configuran distancias más largas?",
+                                    task: "Calcula el promedio de distancia_max_km agrupado por nombre del plan.",
+                                    hint: "AVG(distancia) y GROUP BY plan.nombre.",
+                                    solution: "SELECT P.nombre, AVG(U.distancia_max_km) \nFROM PLANES P \nJOIN USUARIOS U ON P.id = U.id_plan \nGROUP BY P.nombre;"
+                                },
+                                {
+                                    shortTitle: "Zonas Calientes",
+                                    title: "FILTRO DE GRUPOS (HAVING)",
+                                    icon: "🌶️",
+                                    story: "Queremos ver solo las ciudades que tienen más de 2 usuarios registrados.",
+                                    task: "Agrupa por ciudad, cuenta usuarios, y filtra los grupos con HAVING COUNT > 2.",
+                                    hint: "HAVING va después del GROUP BY.",
+                                    solution: "SELECT C.nombre, COUNT(U.id) \nFROM CIUDADES C \nJOIN USUARIOS U ON C.id = U.id_ciudad \nGROUP BY C.nombre \nHAVING COUNT(U.id) > 2;"
+                                },
+                                {
+                                    shortTitle: "Matriz de Distribución",
+                                    title: "AGRUPACIÓN MULTI-NIVEL",
+                                    icon: "🏗️",
+                                    story: "Desglose total: Usuarios por Ciudad Y por Género.",
+                                    task: "Agrupa por nombre de ciudad Y nombre de género al mismo tiempo.",
+                                    hint: "GROUP BY C.nombre, G.nombre.",
+                                    solution: "SELECT C.nombre, G.nombre, COUNT(U.id) \nFROM USUARIOS U \nJOIN CIUDADES C ON U.id_ciudad = C.id \nJOIN GENEROS G ON U.id_genero = G.id \nGROUP BY C.nombre, G.nombre;"
+                                }
+                            ]
+                        },
+                        {
+                            title: "MÓDULO 5: OPERACIONES ESPECIALES (AVANZADO)",
+                            expanded: false,
+                            levels: [
+                                {
+                                    shortTitle: "Usuarios Fantasma",
+                                    title: "DETECCIÓN DE ANOMALÍAS",
+                                    icon: "👻",
+                                    story: "Encuentra usuarios que NO tienen fotos subidas.",
+                                    task: "Usa LEFT JOIN entre Usuarios y Fotos, y filtra donde el ID de foto sea NULL.",
+                                    hint: "WHERE F.id IS NULL.",
+                                    solution: "SELECT U.nombre \nFROM USUARIOS U \nLEFT JOIN FOTOS F ON U.id = F.id_usuario \nWHERE F.id IS NULL;"
+                                },
+                                {
+                                    shortTitle: "Forever Alone",
+                                    title: "ANÁLISIS DE SOLEDAD",
+                                    icon: "💔",
+                                    story: "Usuarios que han dado likes pero no tienen matches.",
+                                    task: "Difícil: Usuarios que están en LIKES pero NO en MATCHES. (Intenta usar NOT IN o LEFT JOIN).",
+                                    hint: "Esta es compleja. Puedes hacer LEFT JOIN con MATCHES.",
+                                    solution: "SELECT DISTINCT U.nombre \nFROM USUARIOS U \nJOIN LIKES L ON U.id = L.id_usuario_origen \nLEFT JOIN MATCHES M ON (U.id = M.id_usuario_1 OR U.id = M.id_usuario_2) \nWHERE M.id IS NULL;"
+                                },
+                                {
+                                    shortTitle: "El VIP Supremo",
+                                    title: "SUBCONSULTA ESCALAR",
+                                    icon: "👑",
+                                    story: "Encuentra al usuario que tiene el plan más caro, usando una subconsulta.",
+                                    task: "SELECT nombre FROM Usuarios WHERE id_plan = (SELECT id del plan mas caro).",
+                                    hint: "WHERE id_plan = (SELECT id FROM PLANES ORDER BY precio DESC FETCH FIRST 1 ROW ONLY).",
+                                    solution: "SELECT nombre FROM USUARIOS \nWHERE id_plan = (SELECT id FROM PLANES ORDER BY precio DESC FETCH FIRST 1 ROWS ONLY);"
+                                },
+                                {
+                                    shortTitle: "Red de Contactos",
+                                    title: "SUBCONSULTA CORRELACIONADA",
+                                    icon: "🕸️",
+                                    story: "Encuentra todos los usuarios que viven en la misma ciudad que 'Juan Pérez'.",
+                                    task: "Primero halla la ciudad de Juan, luego busca quiénes viven ahí.",
+                                    hint: "WHERE id_ciudad = (SELECT id_ciudad FROM USUARIOS WHERE nombre = 'Juan Pérez').",
+                                    solution: "SELECT nombre FROM USUARIOS \nWHERE id_ciudad = (SELECT id_ciudad FROM USUARIOS WHERE nombre = 'Juan Pérez');"
+                                },
+                                {
+                                    shortTitle: "Interceptando Comms",
+                                    title: "EL GRAN FINAL",
+                                    icon: "🕵️‍♂️",
+                                    story: "El CEO quiere leer los mensajes de los matches exitosos. Muestra: Quién dijo qué, a quién y cuándo.",
+                                    task: "Une MATCHES, MENSAJES y USUARIOS (Emisor).",
+                                    hint: "JOIN Mensajes con Usuarios (para el nombre del emisor).",
+                                    solution: "SELECT U.nombre AS dice, M.contenido, M.fecha_envio \nFROM MENSAJES M \nJOIN USUARIOS U ON M.id_usuario_emisor = U.id \nORDER BY M.fecha_envio ASC;"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            },
+            computed: {
+                currentTheme() {
+                    return this.isDark ? 'theme-dark' : 'theme-light'
+                },
+                totalLevels() {
+                    return this.modules.reduce((acc, m) => acc + m.levels.length, 0)
+                },
+                // Helper to find active level object based on currentLevel number
+                activeLevelData() {
+                    if (this.currentLevel === 0) return null
+
+                    let count = 0
+                    for (let mIndex = 0; mIndex < this.modules.length; mIndex++) {
+                        const module = this.modules[mIndex]
+                        if (this.currentLevel <= count + module.levels.length) {
+                            const lIndex = this.currentLevel - count - 1
+                            return {
+                                level: module.levels[lIndex],
+                                mIndex,
+                                lIndex
+                            }
+                        }
+                        count += module.levels.length
+                    }
+                    return null
+                },
+                activeLevel() {
+                    return this.activeLevelData ? this.activeLevelData.level : null
+                },
+                activeModuleIndex() {
+                    return this.activeLevelData ? this.activeLevelData.mIndex : 0
+                },
+                activeLevelIndex() {
+                    return this.activeLevelData ? this.activeLevelData.lIndex : 0
+                }
+            },
+            methods: {
+                toggleTheme() {
+                    this.isDark = !this.isDark
+                },
+                startMission() {
+                    this.currentLevel = 1
+                    this.resetLevelState()
+                },
+                nextLevel() {
+                    if (this.currentLevel < this.totalLevels) {
+                        this.currentLevel++
+                        this.resetLevelState()
+                        this.expandActiveModule()
+                    }
+                },
+                prevLevel() {
+                    if (this.currentLevel > 1) {
+                        this.currentLevel--
+                        this.resetLevelState()
+                        this.expandActiveModule()
+                    }
+                },
+                goToLevel(mIndex, lIndex) {
+                    // Calculate absolute level number
+                    let count = 0
+                    for (let i = 0; i < mIndex; i++) {
+                        count += this.modules[i].levels.length
+                    }
+                    this.currentLevel = count + lIndex + 1
+                    this.resetLevelState()
+                },
+                isCurrentLevel(mIndex, lIndex) {
+                    if (this.currentLevel === 0) return false
+                    const data = this.activeLevelData
+                    return data.mIndex === mIndex && data.lIndex === lIndex
+                },
+                expandActiveModule() {
+                    // Auto expand the module containing current level
+                    if (this.activeLevelData) {
+                        this.modules.forEach((m, i) => {
+                            if (i === this.activeLevelData.mIndex) m.expanded = true
+                        })
+                    }
+                },
+                resetLevelState() {
+                    this.showHint = false
+                    this.isUnlocked = false
+                    this.showPasswordInput = false
+                    this.passwordAttempt = ''
+                    this.passwordError = false
+                },
+                checkPassword() {
+                    if (this.passwordAttempt.toLowerCase().trim() === this.SECRET_KEY) {
+                        this.isUnlocked = true
+                        this.passwordError = false
+                    } else {
+                        this.passwordError = true
+                        setTimeout(() => {
+                            this.passwordError = false
+                        }, 500)
+                    }
+                },
+                lockSolution() {
+                    this.isUnlocked = false
+                    this.showPasswordInput = false
+                    this.passwordAttempt = ''
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>
