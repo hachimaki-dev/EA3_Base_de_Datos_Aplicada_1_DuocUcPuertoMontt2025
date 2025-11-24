@@ -7,7 +7,8 @@
     <title>Tinder DB: SQL Hacker Workshop</title>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=VT323&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=VT323&family=Playfair+Display:wght@400;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap"
         rel="stylesheet">
     <!-- Prism.js for SQL Syntax Highlighting -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
@@ -21,52 +22,40 @@
         }
 
         body {
-            font-family: 'Fira Code', monospace;
-            transition: background-color 0.5s ease, color 0.5s ease;
+            font-family: var(--font-main);
+            transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+            background-image: var(--bg-pattern);
+            background-size: var(--bg-size, auto);
         }
 
         .hacker-font {
-            font-family: 'VT323', monospace;
+            font-family: var(--font-header) !important;
         }
 
         /* Scrollbar custom */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 10px;
         }
 
-        .theme-dark ::-webkit-scrollbar-track {
-            background: #0d1117;
+        ::-webkit-scrollbar-track {
+            background: var(--bg-card);
         }
 
-        .theme-dark ::-webkit-scrollbar-thumb {
-            background: #00ff41;
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
             border-radius: 4px;
+            border: 2px solid var(--bg-card);
         }
 
-        .theme-dark ::-webkit-scrollbar-thumb:hover {
-            background: #00cc33;
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-hover);
         }
 
-        .theme-light ::-webkit-scrollbar-track {
-            background: #fce7f3;
-        }
+        /* --- THEME DEFINITIONS --- */
 
-        .theme-light ::-webkit-scrollbar-thumb {
-            background: #ec4899;
-            border-radius: 4px;
-        }
-
-        .theme-light ::-webkit-scrollbar-thumb:hover {
-            background: #db2777;
-        }
-
-        /* Dark Mode (Chicos Hackers - Matrix/Terminal) */
+        /* 1. Dark Mode (Neo Terminal - Matrix/Hacker) */
         .theme-dark {
-            background-color: #0a0e0f;
-            color: #00ff41;
-        }
-
-        .theme-dark {
+            --bg-color: #0a0e0f;
             --bg-card: #0d1117;
             --border-color: #1f6feb;
             --accent: #00ff41;
@@ -77,15 +66,18 @@
             --input-bg: #0d1117;
             --module-bg: #161b22;
             --shadow: rgba(0, 255, 65, 0.1);
+
+            --font-main: 'Fira Code', monospace;
+            --font-header: 'VT323', monospace;
+            --bg-pattern: none;
+
+            background-color: var(--bg-color);
+            color: var(--text-primary);
         }
 
-        /* Light Mode (Chicas Hackers - Cyberpunk/Vaporwave) */
+        /* 2. Light Mode (Cyber Pop - Vaporwave/Anime) */
         .theme-light {
-            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
-            color: #831843;
-        }
-
-        .theme-light {
+            --bg-color: #fdf2f8;
             --bg-card: #ffffff;
             --border-color: #f9a8d4;
             --accent: #ec4899;
@@ -96,6 +88,38 @@
             --input-bg: #ffffff;
             --module-bg: #fce7f3;
             --shadow: rgba(236, 72, 153, 0.15);
+
+            --font-main: 'Fira Code', monospace;
+            --font-header: 'VT323', monospace;
+            --bg-pattern: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+
+            background: var(--bg-pattern);
+            color: var(--text-primary);
+        }
+
+        /* 3. Retro Mode (Bibliotheca - Old School/Academic) */
+        .theme-retro {
+            --bg-color: #f4ecd8;
+            --bg-card: #e8dfc5;
+            --border-color: #5d4037;
+            --accent: #8d6e63;
+            /* Leather Brown */
+            --accent-hover: #5d4037;
+            --text-primary: #3e2723;
+            /* Dark Ink */
+            --text-muted: #5d4037;
+            --code-bg: #eaddcf;
+            --input-bg: #f4ecd8;
+            --module-bg: #d7ccc8;
+            --shadow: rgba(62, 39, 35, 0.2);
+
+            --font-main: 'Lora', serif;
+            --font-header: 'Playfair Display', serif;
+            --bg-pattern: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%235d4037' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+            --bg-size: auto;
+
+            background-color: var(--bg-color);
+            color: var(--text-primary);
         }
 
         .scanline {
@@ -463,7 +487,7 @@
                                     class="px-6 py-2 font-bold transition-all flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1 rounded text-sm"
                                     :style="{ 
                                         backgroundColor: 'var(--accent)', 
-                                        color: isDark ? '#000' : '#fff',
+                                        color: isDark ? '#222' : '#222',
                                         border: '2px solid var(--accent)'
                                     }">
                                     SIGUIENTE <span>></span>
@@ -497,7 +521,7 @@
         createApp({
             data() {
                 return {
-                    isDark: true,
+                    themeMode: 'dark', // 'dark', 'light', 'retro'
                     currentLevel: 0, // 0 = Intro, 1-25 = Levels
                     showHint: false,
 
@@ -773,7 +797,15 @@
             },
             computed: {
                 currentTheme() {
-                    return this.isDark ? 'theme-dark' : 'theme-light'
+                    return 'theme-' + this.themeMode
+                },
+                themeLabel() {
+                    switch (this.themeMode) {
+                        case 'dark': return '🟢 NEO_TERMINAL';
+                        case 'light': return '🌸 CYBER_POP';
+                        case 'retro': return '📜 BIBLIOTHECA';
+                        default: return '🟢 NEO_TERMINAL';
+                    }
                 },
                 totalLevels() {
                     return this.modules.reduce((acc, m) => acc + m.levels.length, 0)
@@ -1007,7 +1039,9 @@ SELECT 'Total Mensajes: ' || COUNT(*) FROM MENSAJES;`
             },
             methods: {
                 toggleTheme() {
-                    this.isDark = !this.isDark
+                    if (this.themeMode === 'dark') this.themeMode = 'light';
+                    else if (this.themeMode === 'light') this.themeMode = 'retro';
+                    else this.themeMode = 'dark';
                 },
                 startMission() {
                     this.currentLevel = 1
