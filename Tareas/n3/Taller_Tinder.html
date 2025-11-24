@@ -636,18 +636,6 @@
                             <span>{{ module.expanded ? '[-]' : '[+]' }}</span>
                         </div>
 
-                        <!-- Theory Section (if module has theory) -->
-                        <div v-if="module.theory && module.expanded"
-                            class="p-4 border-t-2 text-xs leading-relaxed whitespace-pre-line"
-                            :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--code-bg)', color: 'var(--text-primary)' }">
-                            <div class="flex items-center gap-2 mb-3 font-bold text-sm"
-                                :style="{ color: 'var(--accent)' }">
-                                <span>📚</span>
-                                <span>TEORÍA Y CONCEPTOS</span>
-                            </div>
-                            {{ module.theory }}
-                        </div>
-
                         <!-- Levels List -->
                         <div v-show="module.expanded" class="divide-y" :style="{ borderColor: 'var(--border-color)' }">
                             <div v-for="(level, lIndex) in module.levels" :key="lIndex"
@@ -867,7 +855,6 @@
                     modules: [
                         {
                             title: "MÓDULO 1: INFILTRACIÓN BÁSICA (SELECT & WHERE)",
-                            theory: "📖 FUNDAMENTOS DE SELECT\n\nSELECT es el comando más básico de SQL. Te permite extraer datos de una tabla.\n\n🔹 Sintaxis básica:\nSELECT columna1, columna2 FROM tabla;\nSELECT * FROM tabla;  -- Todas las columnas\n\n🔹 WHERE filtra filas:\nSELECT * FROM tabla WHERE condicion;\n\n🔹 Operadores de comparación:\n=  (igual)\n!= o <> (diferente)\n<, >, <=, >= (menor, mayor)\n\n🔹 Operadores lógicos:\nAND - Ambas condiciones deben ser verdaderas\nOR  - Al menos una condición debe ser verdadera\nIN  - El valor está en una lista\nLIKE - Coincidencia de patrones\n\n💡 TIPS:\n• Usa * solo para explorar, especifica columnas en producción\n• WHERE va DESPUÉS de FROM\n• Las cadenas de texto van entre comillas simples 'texto'",
                             expanded: true,
                             levels: [
                                 {
@@ -919,7 +906,6 @@
                         },
                         {
                             title: "MÓDULO 2: ANÁLISIS DE DATOS (FUNCIONES & ORDEN)",
-                            theory: "📖 FUNCIONES DE AGREGACIÓN\n\nLas funciones de agregación realizan cálculos sobre un conjunto de valores.\n\n🔹 Funciones principales:\nCOUNT(*) - Cuenta todas las filas\nCOUNT(columna) - Cuenta valores no nulos\nAVG(columna) - Promedio\nMAX(columna) - Valor máximo\nMIN(columna) - Valor mínimo\nSUM(columna) - Suma total\n\n🔹 ORDER BY ordena resultados:\nORDER BY columna ASC  -- Ascendente (por defecto)\nORDER BY columna DESC -- Descendente\n\n🔹 LIKE para patrones:\n'A%'  - Empieza con A\n'%A'  - Termina con A\n'%A%' - Contiene A\n'_A%' - Segunda letra es A\n\n💡 TIPS:\n• Para fechas, DESC muestra las más recientes primero\n• COUNT(*) incluye filas con valores NULL\n• Puedes ordenar por múltiples columnas",
                             expanded: false,
                             levels: [
                                 {
@@ -971,7 +957,6 @@
                         },
                         {
                             title: "MÓDULO 3: CONEXIONES DE RED (JOINS)",
-                            theory: "📖 ¿QUÉ ES UN JOIN?\n\nJOIN combina filas de dos o más tablas basándose en una columna relacionada.\n\n🔹 Tipos de JOIN:\nINNER JOIN - Solo filas que coinciden en AMBAS tablas\nLEFT JOIN  - Todas de la izquierda + coincidencias\nRIGHT JOIN - Todas de la derecha + coincidencias\nFULL JOIN  - Todas las filas de ambas tablas\n\n🔹 Sintaxis:\nSELECT columnas\nFROM tabla1 alias1\nJOIN tabla2 alias2 ON alias1.col = alias2.col\n\n🔹 Alias de tablas:\nU para USUARIOS\nC para CIUDADES\nG para GENEROS\nP para PLANES\nF para FOTOS\n\n💡 TIPS:\n• ON especifica la condición de unión\n• Usa alias para escribir menos\n• Puedes hacer múltiples JOINs en una consulta\n• El orden de los JOINs importa para la legibilidad",
                             expanded: false,
                             levels: [
                                 {
@@ -1023,7 +1008,6 @@
                         },
                         {
                             title: "MÓDULO 4: REPORTES DE INTELIGENCIA (GROUP BY)",
-                            theory: "📖 AGRUPACIÓN DE DATOS\n\nGROUP BY agrupa filas con valores iguales en columnas especificadas.\n\n🔹 Regla de oro:\nSi usas GROUP BY, en SELECT solo puedes poner:\n1. Columnas que están en el GROUP BY\n2. Funciones de agregación (COUNT, AVG, MAX, etc.)\n\n🔹 Sintaxis:\nSELECT columna, COUNT(*)\nFROM tabla\nGROUP BY columna\n\n🔹 HAVING vs WHERE:\nWHERE  - Filtra ANTES de agrupar\nHAVING - Filtra DESPUÉS de agrupar (usa con agregaciones)\n\n🔹 Ejemplo:\nSELECT ciudad, COUNT(*) as total\nFROM usuarios\nGROUP BY ciudad\nHAVING COUNT(*) > 5\n\n💡 TIPS:\n• GROUP BY va después de WHERE y antes de HAVING\n• Puedes agrupar por múltiples columnas\n• HAVING usa funciones de agregación",
                             expanded: false,
                             levels: [
                                 {
@@ -1075,7 +1059,6 @@
                         },
                         {
                             title: "MÓDULO 5: OPERACIONES ESPECIALES (AVANZADO)",
-                            theory: "📖 TÉCNICAS AVANZADAS\n\n🔹 LEFT JOIN y NULL:\nLEFT JOIN trae TODAS las filas de la tabla izquierda.\nSi no hay coincidencia, las columnas de la derecha son NULL.\nUsa WHERE columna IS NULL para encontrar filas sin coincidencia.\n\n🔹 SUBCONSULTAS:\nUna consulta dentro de otra consulta.\n• Escalar: Retorna UN valor\n  WHERE id = (SELECT id FROM tabla WHERE ...)\n• Lista: Retorna múltiples valores\n  WHERE id IN (SELECT id FROM tabla WHERE ...)\n\n🔹 DISTINCT:\nElimina filas duplicadas del resultado.\nSELECT DISTINCT columna FROM tabla;\n\n🔹 NOT IN:\nExcluye valores de una lista.\nWHERE id NOT IN (SELECT id FROM otra_tabla)\n\n💡 TIPS:\n• Subconsultas van entre paréntesis\n• LEFT JOIN + IS NULL = encontrar ausencias\n• DISTINCT va después de SELECT",
                             expanded: false,
                             levels: [
                                 {
@@ -1091,10 +1074,10 @@
                                     shortTitle: "Forever Alone",
                                     title: "ANÁLISIS DE SOLEDAD",
                                     icon: "💔",
-                                    story: "Usuarios que han dado likes pero no tienen matches. Carlos y Lucas están en esta situación.",
-                                    task: "Difícil: Usuarios que están en LIKES pero NO en MATCHES. Usa subconsultas con NOT IN.",
-                                    hint: "Primero encuentra quiénes dieron likes, luego excluye a quienes están en MATCHES (como usuario_1 O usuario_2).",
-                                    solution: "SELECT DISTINCT U.nombre\nFROM USUARIOS U\nWHERE U.id IN (SELECT id_usuario_origen FROM LIKES)\n  AND U.id NOT IN (\n    SELECT id_usuario_1 FROM MATCHES\n    UNION\n    SELECT id_usuario_2 FROM MATCHES\n  );"
+                                    story: "Usuarios que han dado likes pero no tienen matches.",
+                                    task: "Difícil: Usuarios que están en LIKES pero NO en MATCHES. (Intenta usar NOT IN o LEFT JOIN).",
+                                    hint: "Esta es compleja. Puedes hacer LEFT JOIN con MATCHES.",
+                                    solution: "SELECT DISTINCT U.nombre \nFROM USUARIOS U \nJOIN LIKES L ON U.id = L.id_usuario_origen \nLEFT JOIN MATCHES M ON (U.id = M.id_usuario_1 OR U.id = M.id_usuario_2) \nWHERE M.id IS NULL;"
                                 },
                                 {
                                     shortTitle: "El VIP Supremo",
