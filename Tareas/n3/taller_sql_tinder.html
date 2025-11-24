@@ -9,10 +9,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=VT323&display=swap"
         rel="stylesheet">
+    <!-- Prism.js for SQL Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Fira Code', monospace;
-            transition: all 0.3s ease;
+            transition: background-color 0.5s ease, color 0.5s ease;
         }
 
         .hacker-font {
@@ -24,57 +34,76 @@
             width: 8px;
         }
 
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
+        .theme-dark ::-webkit-scrollbar-track {
+            background: #0d1117;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: #4ade80;
+        .theme-dark ::-webkit-scrollbar-thumb {
+            background: #00ff41;
             border-radius: 4px;
+        }
+
+        .theme-dark ::-webkit-scrollbar-thumb:hover {
+            background: #00cc33;
+        }
+
+        .theme-light ::-webkit-scrollbar-track {
+            background: #fce7f3;
+        }
+
+        .theme-light ::-webkit-scrollbar-thumb {
+            background: #ec4899;
+            border-radius: 4px;
+        }
+
+        .theme-light ::-webkit-scrollbar-thumb:hover {
+            background: #db2777;
         }
 
         /* Dark Mode (Chicos Hackers - Matrix/Terminal) */
         .theme-dark {
-            background-color: #0d1117;
-            color: #4ade80;
-            --bg-card: #161b22;
-            --border-color: #30363d;
-            --accent: #4ade80;
-            --accent-hover: #22c55e;
-            --text-muted: #8b949e;
+            background-color: #0a0e0f;
+            color: #00ff41;
+        }
+
+        .theme-dark {
+            --bg-card: #0d1117;
+            --border-color: #1f6feb;
+            --accent: #00ff41;
+            --accent-hover: #00cc33;
+            --text-primary: #00ff41;
+            --text-muted: #7d8590;
             --code-bg: #000000;
             --input-bg: #0d1117;
-            --module-bg: #21262d;
+            --module-bg: #161b22;
+            --shadow: rgba(0, 255, 65, 0.1);
         }
 
         /* Light Mode (Chicas Hackers - Cyberpunk/Vaporwave) */
         .theme-light {
-            background-color: #fdf2f8;
-            /* Pink 50 */
-            color: #db2777;
-            /* Pink 600 */
-            --bg-card: #ffffff;
-            --border-color: #fbcfe8;
-            /* Pink 200 */
-            --accent: #d946ef;
-            /* Fuchsia 500 */
-            --accent-hover: #c026d3;
-            --text-muted: #9d174d;
-            --code-bg: #fce7f3;
-            --input-bg: #fff1f2;
-            --module-bg: #fdf4ff;
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+            color: #831843;
         }
 
-        .theme-light ::-webkit-scrollbar-thumb {
-            background: #d946ef;
+        .theme-light {
+            --bg-card: #ffffff;
+            --border-color: #f9a8d4;
+            --accent: #ec4899;
+            --accent-hover: #db2777;
+            --text-primary: #831843;
+            --text-muted: #9f1239;
+            --code-bg: #fdf2f8;
+            --input-bg: #ffffff;
+            --module-bg: #fce7f3;
+            --shadow: rgba(236, 72, 153, 0.15);
         }
 
         .scanline {
             width: 100%;
             height: 100px;
             z-index: 10;
-            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(0, 0, 0, 0) 100%);
-            opacity: 0.1;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(0, 0, 0, 0) 100%);
+            opacity: 0.15;
             position: absolute;
             bottom: 100%;
             animation: scanline 8s linear infinite;
@@ -144,16 +173,87 @@
                 <p class="text-xs md:text-sm mt-1 opacity-80">>> Database Infiltration Protocol: TINDER_DB</p>
             </div>
 
-            <!-- Theme Toggle -->
-            <div class="flex items-center gap-4">
+            <!-- Controls -->
+            <div class="flex items-center gap-3">
+                <!-- Downloads Button -->
+                <button @click="showDownloads = !showDownloads"
+                    class="px-4 py-2 border-2 font-bold uppercase text-xs tracking-widest transition-all duration-300 hover:scale-105 focus:outline-none rounded-sm animate-pulse"
+                    :style="{ 
+                        borderColor: '#ff6b00', 
+                        color: '#ff6b00', 
+                        backgroundColor: isDark ? 'rgba(255, 107, 0, 0.1)' : 'rgba(255, 107, 0, 0.05)',
+                        boxShadow: '0 0 15px rgba(255, 107, 0, 0.4)'
+                    }">
+                    📥 DESCARGAS
+                </button>
+
+                <!-- Theme Toggle -->
                 <button @click="toggleTheme"
                     class="px-4 py-2 border-2 font-bold uppercase text-xs tracking-widest transition-all duration-300 hover:scale-105 focus:outline-none rounded-sm"
-                    :class="isDark ? 'shadow-[0_0_10px_rgba(74,222,128,0.3)]' : 'shadow-[0_0_10px_rgba(217,70,239,0.3)]'"
-                    :style="{ borderColor: 'var(--accent)', color: 'var(--accent)', backgroundColor: isDark ? 'rgba(74,222,128,0.05)' : 'rgba(217,70,239,0.05)' }">
+                    :style="{ 
+                        borderColor: 'var(--accent)', 
+                        color: 'var(--accent)', 
+                        backgroundColor: 'var(--module-bg)',
+                        boxShadow: '0 0 10px var(--shadow)'
+                    }">
                     {{ isDark ? '🟢 NEO_TERMINAL' : '🌸 CYBER_POP' }}
                 </button>
             </div>
         </header>
+
+        <!-- Downloads Modal -->
+        <div v-if="showDownloads"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-70 backdrop-blur-sm">
+            <div class="w-full max-w-5xl max-h-[90vh] overflow-hidden rounded-lg border-4 shadow-2xl animate-fade-in"
+                :style="{ 
+                    borderColor: '#ff6b00', 
+                    backgroundColor: 'var(--bg-card)',
+                    boxShadow: '0 0 40px rgba(255, 107, 0, 0.5)'
+                }">
+
+                <!-- Modal Header -->
+                <div class="p-6 border-b-2 flex justify-between items-center"
+                    :style="{ borderColor: '#ff6b00', backgroundColor: 'var(--module-bg)' }">
+                    <div>
+                        <h2 class="text-3xl font-bold hacker-font flex items-center gap-3" style="color: #ff6b00;">
+                            <span class="text-4xl">📥</span> ZONA DE DESCARGAS
+                        </h2>
+                        <p class="text-sm mt-2 opacity-80">Script SQL completo para Oracle Database</p>
+                    </div>
+                    <button @click="showDownloads = false" class="text-3xl hover:scale-110 transition-transform"
+                        style="color: #ff6b00;">
+                        ✕
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-180px)]">
+
+                    <!-- Copy Button -->
+                    <div class="flex justify-between items-center mb-4">
+                        <p class="text-sm opacity-70">
+                            <strong>tinder_db.sql</strong> - Base de datos completa con 25 usuarios, matches y mensajes
+                        </p>
+                        <button @click="copySQLScript"
+                            class="px-4 py-2 border-2 font-bold uppercase text-xs tracking-widest transition-all hover:scale-105 rounded"
+                            :style="{ 
+                                borderColor: '#ff6b00', 
+                                color: '#ff6b00',
+                                backgroundColor: 'rgba(255, 107, 0, 0.1)'
+                            }">
+                            {{ copied ? '✓ COPIADO!' : '📋 COPIAR TODO' }}
+                        </button>
+                    </div>
+
+                    <!-- SQL Code Block with Prism -->
+                    <div class="rounded overflow-hidden border-2" :style="{ borderColor: 'var(--border-color)' }">
+                        <pre
+                            class="!m-0 !p-0 text-sm line-numbers"><code class="language-sql" ref="sqlCode">{{ sqlScript }}</code></pre>
+                    </div>
+                </div>
+
+            </div>
+        </div>
 
         <!-- Intro Section -->
         <div v-if="currentLevel === 0" class="mb-12 p-8 border-l-4 shadow-lg rounded-r-lg"
@@ -234,7 +334,11 @@
             <!-- Main Content: The Challenge -->
             <div class="lg:col-span-8">
                 <div class="p-6 border-2 min-h-[600px] flex flex-col relative overflow-hidden shadow-2xl transition-all duration-500 rounded"
-                    :style="{ borderColor: 'var(--accent)', backgroundColor: 'var(--bg-card)', boxShadow: isDark ? '0 0 30px rgba(74,222,128,0.05)' : '0 0 30px rgba(217,70,239,0.05)' }">
+                    :style="{ 
+                        borderColor: 'var(--accent)', 
+                        backgroundColor: 'var(--bg-card)', 
+                        boxShadow: '0 0 30px var(--shadow)' 
+                    }">
 
                     <!-- Scanline effect -->
                     <div class="scanline"></div>
@@ -356,8 +460,12 @@
                                     <span>&lt;</span> ANTERIOR
                                 </button>
                                 <button @click="nextLevel" :disabled="currentLevel === totalLevels"
-                                    class="px-6 py-2 font-bold bg-opacity-20 hover:bg-opacity-100 transition-all flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1 rounded text-sm"
-                                    :style="{ backgroundColor: 'var(--accent)', color: isDark ? 'black' : 'white' }">
+                                    class="px-6 py-2 font-bold transition-all flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1 rounded text-sm"
+                                    :style="{ 
+                                        backgroundColor: 'var(--accent)', 
+                                        color: isDark ? '#000' : '#fff',
+                                        border: '2px solid var(--accent)'
+                                    }">
                                     SIGUIENTE <span>></span>
                                 </button>
                             </div>
@@ -392,6 +500,10 @@
                     isDark: true,
                     currentLevel: 0, // 0 = Intro, 1-25 = Levels
                     showHint: false,
+
+                    // Downloads Modal
+                    showDownloads: false,
+                    copied: false,
 
                     // Password Logic
                     isUnlocked: false,
@@ -693,6 +805,204 @@
                 },
                 activeLevelIndex() {
                     return this.activeLevelData ? this.activeLevelData.lIndex : 0
+                },
+                sqlScript() {
+                    return `-- Script de Base de Datos Tinder (Oracle Style)
+-- Autor: Antigravity
+-- Proposito: Taller de SQL Avanzado (3FN) - EA3
+-- Version: 2.0 (Datos Ampliados)
+
+-- ==========================================
+-- 1. ELIMINACION DE TABLAS (DROPS)
+-- ==========================================
+DROP TABLE MENSAJES CASCADE CONSTRAINT;
+DROP TABLE MATCHES CASCADE CONSTRAINT;
+DROP TABLE LIKES CASCADE CONSTRAINT;
+DROP TABLE FOTOS CASCADE CONSTRAINT;
+DROP TABLE USUARIO_INTERESES CASCADE CONSTRAINT;
+DROP TABLE USUARIOS CASCADE CONSTRAINT;
+DROP TABLE CIUDADES CASCADE CONSTRAINT;
+DROP TABLE PAIS CASCADE CONSTRAINT;
+DROP TABLE PLANES CASCADE CONSTRAINT;
+DROP TABLE INTERESES CASCADE CONSTRAINT;
+DROP TABLE GENEROS CASCADE CONSTRAINT;
+
+-- ==========================================
+-- 2. CREACION DE TABLAS (CREATES)
+-- ==========================================
+
+CREATE TABLE GENEROS (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE INTERESES (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL UNIQUE,
+    categoria VARCHAR2(50)
+);
+
+CREATE TABLE PLANES (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL UNIQUE,
+    precio NUMBER(10, 2) NOT NULL,
+    descripcion VARCHAR2(200)
+);
+
+CREATE TABLE PAIS (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE CIUDADES (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL,
+    id_pais NUMBER NOT NULL REFERENCES PAIS(id)
+);
+
+CREATE TABLE USUARIOS (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR2(50) NOT NULL,
+    email VARCHAR2(100) NOT NULL UNIQUE,
+    password VARCHAR2(100) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    biografia VARCHAR2(500),
+    id_genero NUMBER NOT NULL REFERENCES GENEROS(id),
+    id_ciudad NUMBER NOT NULL REFERENCES CIUDADES(id),
+    id_plan NUMBER DEFAULT 1 NOT NULL REFERENCES PLANES(id),
+    distancia_max_km NUMBER DEFAULT 50,
+    fecha_registro TIMESTAMP DEFAULT SYSTIMESTAMP
+);
+
+CREATE TABLE FOTOS (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    url_foto VARCHAR2(255) NOT NULL,
+    es_perfil CHAR(1) DEFAULT '0' CHECK (es_perfil IN ('0', '1')),
+    id_usuario NUMBER NOT NULL REFERENCES USUARIOS(id)
+);
+
+CREATE TABLE USUARIO_INTERESES (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_usuario NUMBER NOT NULL REFERENCES USUARIOS(id),
+    id_interes NUMBER NOT NULL REFERENCES INTERESES(id),
+    CONSTRAINT uk_usuario_interes UNIQUE (id_usuario, id_interes)
+);
+
+CREATE TABLE LIKES (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_usuario_origen NUMBER NOT NULL REFERENCES USUARIOS(id),
+    id_usuario_destino NUMBER NOT NULL REFERENCES USUARIOS(id),
+    es_superlike CHAR(1) DEFAULT '0' CHECK (es_superlike IN ('0', '1')),
+    fecha_like TIMESTAMP DEFAULT SYSTIMESTAMP,
+    CONSTRAINT uk_likes UNIQUE (id_usuario_origen, id_usuario_destino),
+    CONSTRAINT chk_mismo_usuario CHECK (id_usuario_origen <> id_usuario_destino)
+);
+
+CREATE TABLE MATCHES (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_usuario_1 NUMBER NOT NULL REFERENCES USUARIOS(id),
+    id_usuario_2 NUMBER NOT NULL REFERENCES USUARIOS(id),
+    fecha_match TIMESTAMP DEFAULT SYSTIMESTAMP,
+    CONSTRAINT uk_matches UNIQUE (id_usuario_1, id_usuario_2),
+    CONSTRAINT chk_match_order CHECK (id_usuario_1 < id_usuario_2) 
+);
+
+CREATE TABLE MENSAJES (
+    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_match NUMBER NOT NULL REFERENCES MATCHES(id),
+    id_usuario_emisor NUMBER NOT NULL REFERENCES USUARIOS(id),
+    contenido VARCHAR2(1000) NOT NULL,
+    fecha_envio TIMESTAMP DEFAULT SYSTIMESTAMP,
+    leido CHAR(1) DEFAULT '0' CHECK (leido IN ('0', '1'))
+);
+
+-- ==========================================
+-- 3. POBLADO DE DATOS MASIVO (INSERTS)
+-- ==========================================
+
+-- --- GENEROS ---
+INSERT INTO GENEROS (nombre) VALUES ('Masculino');
+INSERT INTO GENEROS (nombre) VALUES ('Femenino');
+INSERT INTO GENEROS (nombre) VALUES ('No Binario');
+INSERT INTO GENEROS (nombre) VALUES ('Otro');
+
+-- --- INTERESES ---
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Trekking', 'Deportes');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Sushi', 'Comida');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Netflix', 'Entretenimiento');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Viajar', 'Estilo de Vida');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Gatos', 'Mascotas');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Perros', 'Mascotas');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Fotografía', 'Arte');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Programación', 'Tecnología');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Vino', 'Bebida');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Astrología', 'Creencias');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Crossfit', 'Deportes');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Gaming', 'Entretenimiento');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Rock', 'Música');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Pop', 'Música');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Reggaeton', 'Música');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Indie', 'Música');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Pizza', 'Comida');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Vegana', 'Comida');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Asado', 'Comida');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Leer', 'Hobbies');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Cine', 'Hobbies');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Bailar', 'Hobbies');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Yoga', 'Deportes');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Cerveza', 'Bebida');
+INSERT INTO INTERESES (nombre, categoria) VALUES ('Café', 'Bebida');
+
+-- --- PLANES ---
+INSERT INTO PLANES (nombre, precio, descripcion) VALUES ('Tinder Free', 0, 'Plan gratuito');
+INSERT INTO PLANES (nombre, precio, descripcion) VALUES ('Tinder Gold', 9990, 'Ver quien te dio like');
+INSERT INTO PLANES (nombre, precio, descripcion) VALUES ('Tinder Platinum', 19990, 'Prioridad en mensajes');
+
+-- --- PAIS Y CIUDADES ---
+INSERT INTO PAIS (nombre) VALUES ('Chile');
+INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Santiago', 1);
+INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Valparaíso', 1);
+INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Concepción', 1);
+INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Puerto Montt', 1);
+INSERT INTO CIUDADES (nombre, id_pais) VALUES ('La Serena', 1);
+INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Antofagasta', 1);
+INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Temuco', 1);
+INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Viña del Mar', 1);
+
+-- --- USUARIOS (25 Usuarios) ---
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Juan Pérez', 'juan.p@gmail.com', 'pass123', TO_DATE('1995-05-15', 'YYYY-MM-DD'), 'Busco alguien para ir al cajón del maipo.', 1, 1, 2);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('María González', 'maria.g@hotmail.com', 'pass123', TO_DATE('1998-08-20', 'YYYY-MM-DD'), 'Amante de los gatos y el sushi.', 2, 1, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Pedro Pascal', 'pedro.m@gmail.com', 'pass123', TO_DATE('1990-04-02', 'YYYY-MM-DD'), 'Quiero conocer gente.', 1, 2, 3);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Ana Roja', 'ana.red@gmail.com', 'pass123', TO_DATE('2000-12-12', 'YYYY-MM-DD'), 'Estudiante de derecho.', 2, 1, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Alex V', 'alex.v@gmail.com', 'pass123', TO_DATE('1996-03-30', 'YYYY-MM-DD'), 'Fotografía y lluvia.', 3, 4, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Sofía Vergara', 'sofi.v@gmail.com', 'pass123', TO_DATE('1993-07-10', 'YYYY-MM-DD'), 'Me encanta bailar.', 2, 1, 2);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Diego Maradona', 'diego.10@gmail.com', 'pass123', TO_DATE('1999-10-30', 'YYYY-MM-DD'), 'Fútbol y asados.', 1, 3, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Valentina Sol', 'vale.sol@gmail.com', 'pass123', TO_DATE('2001-01-15', 'YYYY-MM-DD'), 'Playa, sol y arena.', 2, 5, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Carlos Gamer', 'carlos.g@gmail.com', 'pass123', TO_DATE('1997-06-25', 'YYYY-MM-DD'), 'Main Yasuo.', 1, 1, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Laura Art', 'laura.art@gmail.com', 'pass123', TO_DATE('1994-11-11', 'YYYY-MM-DD'), 'Artista visual.', 2, 2, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Roberto Gomez', 'roberto.g@gmail.com', 'pass123', TO_DATE('1988-02-20', 'YYYY-MM-DD'), 'Ingeniero, me gusta el orden y el café.', 1, 1, 2);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Camila Vallejo', 'cami.v@gmail.com', 'pass123', TO_DATE('1992-04-28', 'YYYY-MM-DD'), 'Activista y lectora empedernida.', 2, 1, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Felipe Avello', 'felipe.pez@gmail.com', 'pass123', TO_DATE('1985-05-24', 'YYYY-MM-DD'), 'Comediante, busco alguien con sentido del humor.', 1, 3, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Daniela Vega', 'dani.v@gmail.com', 'pass123', TO_DATE('1989-06-03', 'YYYY-MM-DD'), 'Actriz y cantante lírica.', 2, 1, 3);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Javier Milei', 'javi.libertad@gmail.com', 'pass123', TO_DATE('1970-10-22', 'YYYY-MM-DD'), 'Viva la libertad carajo.', 1, 1, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Andrea P', 'andrea.p@gmail.com', 'pass123', TO_DATE('1995-09-15', 'YYYY-MM-DD'), 'Enfermera de turno, respondo cuando puedo.', 2, 4, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Miguel Bosé', 'miguel.b@gmail.com', 'pass123', TO_DATE('1960-04-03', 'YYYY-MM-DD'), 'Amante bandido.', 1, 8, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Patricia M', 'pati.m@gmail.com', 'pass123', TO_DATE('1998-12-01', 'YYYY-MM-DD'), 'Estudiante de medicina.', 2, 1, 2);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Gabriel B', 'gabo.b@gmail.com', 'pass123', TO_DATE('1986-02-11', 'YYYY-MM-DD'), 'Me gusta leer en el parque.', 1, 2, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Lucía H', 'lucia.h@gmail.com', 'pass123', TO_DATE('2002-07-07', 'YYYY-MM-DD'), 'Recién llegada a la ciudad.', 2, 3, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Fernando G', 'fer.g@gmail.com', 'pass123', TO_DATE('1991-08-30', 'YYYY-MM-DD'), 'Piloto comercial, viajo mucho.', 1, 1, 3);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Isidora J', 'isi.j@gmail.com', 'pass123', TO_DATE('1999-03-14', 'YYYY-MM-DD'), 'Vegana y animalista.', 2, 4, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Hugo S', 'hugo.s@gmail.com', 'pass123', TO_DATE('1994-01-20', 'YYYY-MM-DD'), 'Crossfit es mi pasión.', 1, 1, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Carmen T', 'carmen.t@gmail.com', 'pass123', TO_DATE('1965-11-05', 'YYYY-MM-DD'), 'Disfrutando la vida.', 2, 8, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Lucas R', 'lucas.r@gmail.com', 'pass123', TO_DATE('2003-05-12', 'YYYY-MM-DD'), 'Estudiante de informática.', 1, 2, 1);
+INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Gasparín', 'ghost@gmail.com', 'pass123', TO_DATE('1990-01-01', 'YYYY-MM-DD'), 'No tengo foto de perfil 👻', 1, 1, 1);
+
+COMMIT;
+
+-- Consultas de prueba
+SELECT 'Total Usuarios: ' || COUNT(*) FROM USUARIOS;
+SELECT 'Total Matches: ' || COUNT(*) FROM MATCHES;
+SELECT 'Total Mensajes: ' || COUNT(*) FROM MENSAJES;`
                 }
             },
             methods: {
@@ -761,7 +1071,27 @@
                     this.isUnlocked = false
                     this.showPasswordInput = false
                     this.passwordAttempt = ''
+                },
+                copySQLScript() {
+                    navigator.clipboard.writeText(this.sqlScript).then(() => {
+                        this.copied = true
+                        setTimeout(() => {
+                            this.copied = false
+                        }, 2000)
+                    })
                 }
+            },
+            mounted() {
+                // Highlight code with Prism when modal opens
+                this.$watch('showDownloads', (newVal) => {
+                    if (newVal) {
+                        this.$nextTick(() => {
+                            if (window.Prism) {
+                                Prism.highlightAll()
+                            }
+                        })
+                    }
+                })
             }
         }).mount('#app')
     </script>
