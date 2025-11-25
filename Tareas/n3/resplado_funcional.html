@@ -636,6 +636,18 @@
                             <span>{{ module.expanded ? '[-]' : '[+]' }}</span>
                         </div>
 
+                        <!-- Theory Section (if module has theory) -->
+                        <div v-if="module.theory && module.expanded"
+                            class="p-4 border-t-2 text-xs leading-relaxed whitespace-pre-line"
+                            :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--code-bg)', color: 'var(--text-primary)' }">
+                            <div class="flex items-center gap-2 mb-3 font-bold text-sm"
+                                :style="{ color: 'var(--accent)' }">
+                                <span>📚</span>
+                                <span>TEORÍA Y CONCEPTOS</span>
+                            </div>
+                            {{ module.theory }}
+                        </div>
+
                         <!-- Levels List -->
                         <div v-show="module.expanded" class="divide-y" :style="{ borderColor: 'var(--border-color)' }">
                             <div v-for="(level, lIndex) in module.levels" :key="lIndex"
@@ -725,6 +737,39 @@
 
                                     <!-- Locked State -->
                                     <div v-if="!isUnlocked" class="space-y-3">
+                                        <!-- SQL Query Input -->
+                                        <div class="mb-6 animate-fade-in">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <label class="text-xs uppercase tracking-widest opacity-70">Tu Consulta
+                                                    SQL:</label>
+                                                <span class="text-xs opacity-50"
+                                                    v-if="pokemonState && pokemonState.exists">XP:
+                                                    {{pokemonState.xp}}/{{pokemonState.level * 100}}</span>
+                                            </div>
+                                            <textarea v-model="userQuery"
+                                                class="w-full p-4 border rounded font-mono text-sm bg-opacity-10 mb-2 focus:outline-none focus:ring-1"
+                                                :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--code-bg)', color: 'var(--text-primary)' }"
+                                                rows="4" placeholder="SELECT * FROM ..."></textarea>
+
+                                            <div class="flex justify-between items-center">
+                                                <button @click="checkAnswer"
+                                                    class="px-6 py-2 font-bold uppercase tracking-widest border transition-all hover:bg-opacity-10 rounded flex items-center gap-2"
+                                                    :style="{ borderColor: 'var(--accent)', color: 'var(--accent)', backgroundColor: 'transparent' }">
+                                                    <span>EJECUTAR CÓDIGO</span>
+                                                    <span>▶</span>
+                                                </button>
+
+                                                <div v-if="feedbackMessage"
+                                                    :class="feedbackType === 'success' ? 'text-green-400' : 'text-red-400'"
+                                                    class="text-sm font-bold animate-pulse">
+                                                    {{ feedbackMessage }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="my-4 border-t opacity-20"
+                                            :style="{ borderColor: 'var(--border-color)' }"></div>
+
                                         <button @click="showPasswordInput = !showPasswordInput"
                                             v-if="!showPasswordInput"
                                             class="w-full py-3 font-bold uppercase tracking-widest border transition-all flex justify-between items-center px-4 hover:bg-opacity-10 rounded"
@@ -812,6 +857,239 @@
             </div>
             <p class="mt-4 text-xs font-mono opacity-50">SYSTEM_ID: TINDER_DB_V2.5 // SECURE_MODE: ACTIVE</p>
         </footer>
+        </footer>
+
+        <!-- ========================================= -->
+        <!-- POKEMON GAMIFICATION SYSTEM UI -->
+        <!-- ========================================= -->
+
+        <!-- Pokeball FAB (Floating Action Button) -->
+        <div v-if="currentLevel > 0"
+            class="fixed bottom-6 right-6 z-50 cursor-pointer transform transition-all duration-300 hover:scale-110"
+            :class="{'animate-bounce': pokemonNotification}" @click="showPokemonModal = true">
+
+            <!-- Egg State (Level 0, before first challenge) -->
+            <div v-if="!pokemonState.exists" class="relative">
+                <div class="w-20 h-20 rounded-full flex items-center justify-center text-5xl shadow-2xl border-4"
+                    :style="{ 
+                        background: 'linear-gradient(to bottom right, var(--bg-card), var(--input-bg))',
+                        borderColor: 'var(--accent)',
+                        boxShadow: '0 0 20px var(--shadow)'
+                    }">
+                    🥚
+                </div>
+                <div v-if="pokemonNotification" class="absolute -top-2 -right-2 text-white"
+                    :style="{ backgroundColor: 'var(--accent)' }"
+                    class="text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
+                    !
+                </div>
+            </div>
+
+            <!-- Pokemon State (After hatching) -->
+            <div v-else class="relative">
+                <!-- Pokeball Background -->
+                <div class="w-20 h-20 rounded-full flex items-center justify-center shadow-2xl pokeball-bg" :style="{ 
+                         background: 'linear-gradient(180deg, var(--accent) 50%, var(--bg-card) 50%)',
+                         borderTop: '4px solid var(--border-color)',
+                         borderBottom: '4px solid var(--border-color)',
+                         position: 'relative',
+                         boxShadow: '0 0 20px var(--shadow)'
+                     }">
+                    <!-- Center Button -->
+                    <div class="absolute w-8 h-8 rounded-full bg-white border-4 border-gray-800 flex items-center just ify-center"
+                        :style="{ zIndex: 10 }">
+                        <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: 'var(--input-bg)' }"></div>
+                    </div>
+
+                    <!-- Pokemon Sprite -->
+                    <img :src="pokemonState.species.animatedSprite || pokemonState.species.sprite"
+                        :alt="pokemonState.species.name" class="absolute w-16 h-16 object-contain pokemon-sprite"
+                        :style="{ top: '-10px', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.5))' }">
+                </div>
+
+                <!-- Level Badge -->
+                <div class="absolute -bottom-1 -right-1 text-xs font-bold px-2 py-1 rounded-full shadow-lg"
+                    :style="{ backgroundColor: 'var(--accent)', color: 'var(--bg-card)' }">
+                    Lv.{{ pokemonState.level }}
+                </div>
+
+                <!-- Notification Badge -->
+                <div v-if="pokemonNotification" class="absolute -top-2 -left-2"
+                    :style="{ backgroundColor: 'var(--accent)', color: 'var(--bg-card)' }"
+                    class="text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
+                    ⬆
+                </div>
+            </div>
+        </div>
+
+        <!-- Pokemon Modal (Pokedex Style) -->
+        <div v-if="showPokemonModal && pokemonState.exists"
+            class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black bg-opacity-80 backdrop-blur-sm"
+            @click.self="showPokemonModal = false">
+
+            <div class="w-full max-w-2xl max-h-[90vh] overflow-hidden rounded-lg border-4 shadow-2xl" :style="{ 
+                     backgroundColor: 'var(--bg-card)', 
+                     borderColor: 'var(--accent)'
+                 }">
+
+                <!-- Header -->
+                <div class="p-4 border-b-2 flex justify-between items-center"
+                    :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--module-bg)' }">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📱</span>
+                        <span class="font-bold uppercase tracking-widest">POKÉDEX</span>
+                    </div>
+                    <button @click="showPokemonModal = false"
+                        class="text-2xl opacity-70 hover:opacity-100 transition-opacity"
+                        :style="{ color: 'var(--accent)' }">
+                        ✖
+                    </button>
+                </div>
+
+                <!-- Content -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-120px)] custom-scrollbar">
+                    <!-- Pokemon Display -->
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <!-- Sprite -->
+                        <div class="flex flex-col items-center justify-center p-6 rounded-lg border-2"
+                            :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--code-bg)' }">
+                            <img :src="pokemonState.species.animatedSprite || pokemonState.species.sprite"
+                                :alt="pokemonState.species.name" class="w-48 h-48 object-contain">
+                            <div class="mt-4 text-center">
+                                <div class="text-sm opacity-60 font-mono">#{{
+                                    String(pokemonState.species.id).padStart(3, '0') }}</div>
+                                <div class="text-2xl font-bold uppercase mt-1">{{ pokemonState.nickname ||
+                                    pokemonState.species.name }}</div>
+                                <div class="flex gap-2 mt-2 justify-center">
+                                    <span v-for="type in pokemonState.species.types" :key="type"
+                                        class="px-3 py-1 rounded-full text-xs uppercase font-bold" :style="{ 
+                                              backgroundColor: 'var(--accent)',
+                                              color: 'var(--bg-card)'
+                                          }">
+                                        {{ type }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats & Info -->
+                        <div class="space-y-4">
+                            <!-- Level & EXP -->
+                            <div class="p-4 rounded-lg border-2"
+                                :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--input-bg)' }">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-bold">Level</span>
+                                    <span class="text-2xl font-bold" :style="{ color: 'var(--accent)' }">{{
+                                        pokemonState.level }}</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+                                    <div class="h-full rounded-full transition-all duration-500" :style="{ 
+                                             width: ((pokemonState.xp / (pokemonState.level * 100)) * 100) + '%',
+                                             backgroundColor: 'var(--accent)'
+                                         }">
+                                    </div>
+                                </div>
+                                <div class="text-xs opacity-60 mt-1 text-right">
+                                    {{ pokemonState.exp }}/25 Challenges
+                                </div>
+                            </div>
+
+                            <!-- Stats -->
+                            <div class="p-4 rounded-lg border-2 space-y-2"
+                                :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--input-bg)' }">
+                                <div class="font-bold mb-3 flex items-center gap-2">
+                                    <span>📊</span>
+                                    <span>STATS</span>
+                                </div>
+
+                                <div v-for="(value, stat) in pokemonState.stats" :key="stat">
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="uppercase">{{ stat }}</span>
+                                        <span class="font-bold">{{ value }}</span>
+                                    </div>
+                                    <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+                                        <div class="h-full rounded-full" :style="{ 
+                                                 width: (value / 200 * 100) + '%',
+                                                 backgroundColor: stat === 'hp' ? '#FF5555' : stat === 'attack' ? '#FFAA44' : stat === 'defense' ? '#5599FF' : '#55FF55'
+                                             }">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Moves -->
+                    <div class="p-4 rounded-lg border-2"
+                        :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--input-bg)' }">
+                        <div class="font-bold mb-3 flex items-center gap-2">
+                            <span>🎯</span>
+                            <span>MOVES ({{ pokemonState.moves.length }}/4)</span>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div v-for="(move, index) in pokemonState.moves" :key="index"
+                                class="p-3 rounded border-2 text-sm font-mono"
+                                :style="{ borderColor: 'var(--border-color)' }">
+                                • {{ move.name }}
+                            </div>
+                            <div v-for="n in (4 - pokemonState.moves.length)" :key="'empty-' + n"
+                                class="p-3 rounded border-2 text-sm opacity-30 text-center"
+                                :style="{ borderColor: 'var(--border-color)' }">
+                                - - -
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress -->
+                    <div class="mt-6 p-4 rounded-lg border-2 text-center"
+                        :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--code-bg)' }">
+                        <div class="font-bold mb-2 flex items-center justify-center gap-2">
+                            <span>🎖️</span>
+                            <span>TRAINING PROGRESS</span>
+                        </div>
+                        <p class="text-sm opacity-80">
+                            SQL Challenges Completed: <span class="font-bold" :style="{ color: 'var(--accent)' }">{{
+                                pokemonState.exp }}/25</span>
+                        </p>
+                        <p v-if="pokemonState.level < 25" class="text-xs opacity-60 mt-2">
+                            Keep training to level {{ pokemonState.level + 1 }}!
+                        </p>
+                        <p v-else class="text-sm font-bold mt-2" :style="{ color: 'var(--accent)' }">
+                            🏆 CHAMPION LEVEL REACHED! 🏆
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hatching Animation -->
+        <div v-if="showPokemonAnimation === 'hatch'"
+            class="fixed inset-0 z-[300] flex items-center justify-center bg-black bg-opacity-90">
+            <div class="text-center animate-fade-in">
+                <div class="text-9xl mb-8 animate-bounce">🐣</div>
+                <div class="text-4xl font-bold mb-4" :style="{ color: 'var(--accent)' }">
+                    ¡Tu huevo está eclosionando!
+                </div>
+                <div class="text-6xl font-bold mt-8 animate-pulse">
+                    {{ pokemonAnimationData.name.toUpperCase() }}
+                </div>
+                <img :src="pokemonAnimationData.animatedSprite || pokemonAnimationData.sprite"
+                    class="w-64 h-64 object-contain mx-auto mt-8 animate-bounce">
+                <div class="text-2xl mt-8 opacity-80">
+                    ¡Has conseguido tu primer compañero!
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Up Animation -->
+        <div v-if="showPokemonAnimation === 'levelup'"
+            class="fixed bottom-24 right-6 z-[250] bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-4 rounded-lg shadow-2xl border-4 border-yellow-300 animate-bounce">
+            <div class="text-2xl font-bold">⬆ LEVEL UP!</div>
+            <div class="text-xl mt-2">{{ pokemonState.species.name }} → Lv.{{ pokemonAnimationData.level }}</div>
+            <div v-if="pokemonAnimationData.newMove" class="text-sm mt-2 font-bold">
+                ✨ Aprendió: {{ pokemonAnimationData.newMove.name }}
+            </div>
+        </div>
 
     </div>
 
@@ -852,9 +1130,33 @@
                     passwordError: false,
                     SECRET_KEY: 'prometoaprenderlo',
 
+                    // Pokemon Gamification System
+                    showPokemonModal: false,
+                    pokemonState: {
+                        exists: false,
+                        isEgg: true,
+                        species: null,
+                        level: 0,
+                        exp: 0,
+                        moves: [],
+                        evolutionStage: 0,
+                        stats: null,
+                        nickname: null,
+                        hatchedAt: null,
+                        lastLevelUp: null
+                    },
+                    pokemonNotification: false,
+                    showPokemonAnimation: null, // 'hatch', 'levelup', 'evolution'
+                    pokemonAnimationData: null,
+
+                    // Advanced Gamification
+                    userQuery: "",
+                    feedbackMessage: "",
+                    feedbackType: "", // "success", "error", "info"
                     modules: [
                         {
                             title: "MÓDULO 1: INFILTRACIÓN BÁSICA (SELECT & WHERE)",
+                            theory: "📖 FUNDAMENTOS DE SELECT\n\nSELECT es el comando más básico de SQL. Te permite extraer datos de una tabla.\n\n🔹 Sintaxis básica:\nSELECT columna1, columna2 FROM tabla;\nSELECT * FROM tabla;  -- Todas las columnas\n\n🔹 WHERE filtra filas:\nSELECT * FROM tabla WHERE condicion;\n\n🔹 Operadores de comparación:\n=  (igual)\n!= o <> (diferente)\n<, >, <=, >= (menor, mayor)\n\n🔹 Operadores lógicos:\nAND - Ambas condiciones deben ser verdaderas\nOR  - Al menos una condición debe ser verdadera\nIN  - El valor está en una lista\nLIKE - Coincidencia de patrones\n\n💡 TIPS:\n• Usa * solo para explorar, especifica columnas en producción\n• WHERE va DESPUÉS de FROM\n• Las cadenas de texto van entre comillas simples 'texto'",
                             expanded: true,
                             levels: [
                                 {
@@ -906,6 +1208,7 @@
                         },
                         {
                             title: "MÓDULO 2: ANÁLISIS DE DATOS (FUNCIONES & ORDEN)",
+                            theory: "📖 FUNCIONES DE AGREGACIÓN\n\nLas funciones de agregación realizan cálculos sobre un conjunto de valores.\n\n🔹 Funciones principales:\nCOUNT(*) - Cuenta todas las filas\nCOUNT(columna) - Cuenta valores no nulos\nAVG(columna) - Promedio\nMAX(columna) - Valor máximo\nMIN(columna) - Valor mínimo\nSUM(columna) - Suma total\n\n🔹 ORDER BY ordena resultados:\nORDER BY columna ASC  -- Ascendente (por defecto)\nORDER BY columna DESC -- Descendente\n\n🔹 LIKE para patrones:\n'A%'  - Empieza con A\n'%A'  - Termina con A\n'%A%' - Contiene A\n'_A%' - Segunda letra es A\n\n💡 TIPS:\n• Para fechas, DESC muestra las más recientes primero\n• COUNT(*) incluye filas con valores NULL\n• Puedes ordenar por múltiples columnas",
                             expanded: false,
                             levels: [
                                 {
@@ -957,6 +1260,7 @@
                         },
                         {
                             title: "MÓDULO 3: CONEXIONES DE RED (JOINS)",
+                            theory: "📖 ¿QUÉ ES UN JOIN?\n\nJOIN combina filas de dos o más tablas basándose en una columna relacionada.\n\n🔹 Tipos de JOIN:\nINNER JOIN - Solo filas que coinciden en AMBAS tablas\nLEFT JOIN  - Todas de la izquierda + coincidencias\nRIGHT JOIN - Todas de la derecha + coincidencias\nFULL JOIN  - Todas las filas de ambas tablas\n\n🔹 Sintaxis:\nSELECT columnas\nFROM tabla1 alias1\nJOIN tabla2 alias2 ON alias1.col = alias2.col\n\n🔹 Alias de tablas:\nU para USUARIOS\nC para CIUDADES\nG para GENEROS\nP para PLANES\nF para FOTOS\n\n💡 TIPS:\n• ON especifica la condición de unión\n• Usa alias para escribir menos\n• Puedes hacer múltiples JOINs en una consulta\n• El orden de los JOINs importa para la legibilidad",
                             expanded: false,
                             levels: [
                                 {
@@ -1008,6 +1312,7 @@
                         },
                         {
                             title: "MÓDULO 4: REPORTES DE INTELIGENCIA (GROUP BY)",
+                            theory: "📖 AGRUPACIÓN DE DATOS\n\nGROUP BY agrupa filas con valores iguales en columnas especificadas.\n\n🔹 Regla de oro:\nSi usas GROUP BY, en SELECT solo puedes poner:\n1. Columnas que están en el GROUP BY\n2. Funciones de agregación (COUNT, AVG, MAX, etc.)\n\n🔹 Sintaxis:\nSELECT columna, COUNT(*)\nFROM tabla\nGROUP BY columna\n\n🔹 HAVING vs WHERE:\nWHERE  - Filtra ANTES de agrupar\nHAVING - Filtra DESPUÉS de agrupar (usa con agregaciones)\n\n🔹 Ejemplo:\nSELECT ciudad, COUNT(*) as total\nFROM usuarios\nGROUP BY ciudad\nHAVING COUNT(*) > 5\n\n💡 TIPS:\n• GROUP BY va después de WHERE y antes de HAVING\n• Puedes agrupar por múltiples columnas\n• HAVING usa funciones de agregación",
                             expanded: false,
                             levels: [
                                 {
@@ -1059,6 +1364,7 @@
                         },
                         {
                             title: "MÓDULO 5: OPERACIONES ESPECIALES (AVANZADO)",
+                            theory: "📖 TÉCNICAS AVANZADAS\n\n🔹 LEFT JOIN y NULL:\nLEFT JOIN trae TODAS las filas de la tabla izquierda.\nSi no hay coincidencia, las columnas de la derecha son NULL.\nUsa WHERE columna IS NULL para encontrar filas sin coincidencia.\n\n🔹 SUBCONSULTAS:\nUna consulta dentro de otra consulta.\n• Escalar: Retorna UN valor\n  WHERE id = (SELECT id FROM tabla WHERE ...)\n• Lista: Retorna múltiples valores\n  WHERE id IN (SELECT id FROM tabla WHERE ...)\n\n🔹 DISTINCT:\nElimina filas duplicadas del resultado.\nSELECT DISTINCT columna FROM tabla;\n\n🔹 NOT IN:\nExcluye valores de una lista.\nWHERE id NOT IN (SELECT id FROM otra_tabla)\n\n💡 TIPS:\n• Subconsultas van entre paréntesis\n• LEFT JOIN + IS NULL = encontrar ausencias\n• DISTINCT va después de SELECT",
                             expanded: false,
                             levels: [
                                 {
@@ -1074,10 +1380,10 @@
                                     shortTitle: "Forever Alone",
                                     title: "ANÁLISIS DE SOLEDAD",
                                     icon: "💔",
-                                    story: "Usuarios que han dado likes pero no tienen matches.",
-                                    task: "Difícil: Usuarios que están en LIKES pero NO en MATCHES. (Intenta usar NOT IN o LEFT JOIN).",
-                                    hint: "Esta es compleja. Puedes hacer LEFT JOIN con MATCHES.",
-                                    solution: "SELECT DISTINCT U.nombre \nFROM USUARIOS U \nJOIN LIKES L ON U.id = L.id_usuario_origen \nLEFT JOIN MATCHES M ON (U.id = M.id_usuario_1 OR U.id = M.id_usuario_2) \nWHERE M.id IS NULL;"
+                                    story: "Usuarios que han dado likes pero no tienen matches. Carlos y Lucas están en esta situación.",
+                                    task: "Difícil: Usuarios que están en LIKES pero NO en MATCHES. Usa subconsultas con NOT IN.",
+                                    hint: "Primero encuentra quiénes dieron likes, luego excluye a quienes están en MATCHES (como usuario_1 O usuario_2).",
+                                    solution: "SELECT DISTINCT U.nombre\nFROM USUARIOS U\nWHERE U.id IN (SELECT id_usuario_origen FROM LIKES)\n  AND U.id NOT IN (\n    SELECT id_usuario_1 FROM MATCHES\n    UNION\n    SELECT id_usuario_2 FROM MATCHES\n  );"
                                 },
                                 {
                                     shortTitle: "El VIP Supremo",
@@ -1408,10 +1714,13 @@ SELECT 'Total Mensajes: ' || COUNT(*) FROM MENSAJES;`
                     this.passwordAttempt = ''
                     this.passwordError = false
                 },
-                checkPassword() {
+                async checkPassword() {
                     if (this.passwordAttempt.toLowerCase().trim() === this.SECRET_KEY) {
                         this.isUnlocked = true
                         this.passwordError = false
+
+                        // Pokemon Gamification: Trigger progression
+                        // await this.completePokemonChallenge()
                     } else {
                         this.passwordError = true
                         setTimeout(() => {
@@ -1431,6 +1740,229 @@ SELECT 'Total Mensajes: ' || COUNT(*) FROM MENSAJES;`
                             this.copied = false
                         }, 2000)
                     })
+                },
+
+                normalizeSQL(sql) {
+                    return sql
+                        .toLowerCase()
+                        .replace(/\s+/g, ' ')
+                        .replace(/;\s*$/, '')
+                        .trim();
+                },
+
+                checkAnswer() {
+                    if (!this.userQuery) {
+                        this.feedbackMessage = "Por favor escribe una consulta SQL.";
+                        this.feedbackType = "error";
+                        return;
+                    }
+
+                    const normalizedUser = this.normalizeSQL(this.userQuery);
+                    const normalizedSolution = this.normalizeSQL(this.activeLevel.solution);
+
+                    this.pokemonState.totalAttempts = (this.pokemonState.totalAttempts || 0) + 1;
+
+                    if (normalizedUser === normalizedSolution) {
+                        // Check if this is the first success - hatch the egg!
+                        if (!this.pokemonState.exists) {
+                            this.feedbackMessage = "¡Correcto! Tu huevo está eclosionando...";
+                            this.feedbackType = "success";
+                            this.hatchPokemonEgg();
+
+                            if (!this.isUnlocked) {
+                                this.isUnlocked = true;
+                                this.showPasswordInput = false;
+                            }
+                            return;
+                        }
+
+                        this.feedbackMessage = "¡Correcto! Has ganado 50 XP.";
+                        this.feedbackType = "success";
+                        this.pokemonState.successfulAttempts = (this.pokemonState.successfulAttempts || 0) + 1;
+                        this.pokemonState.streak = (this.pokemonState.streak || 0) + 1;
+
+                        let xpGain = 50;
+                        if (this.pokemonState.streak > 1) {
+                            xpGain += Math.min(this.pokemonState.streak * 10, 50);
+                            this.feedbackMessage += ` ¡Racha de ${this.pokemonState.streak}! +${Math.min(this.pokemonState.streak * 10, 50)} XP extra.`;
+                        }
+
+                        this.gainXP(xpGain);
+
+                        if (!this.isUnlocked) {
+                            this.isUnlocked = true;
+                            this.showPasswordInput = false;
+                        }
+                    } else {
+                        this.feedbackMessage = "Consulta incorrecta. Inténtalo de nuevo.";
+                        this.feedbackType = "error";
+                        this.pokemonState.streak = 0;
+                    }
+                    this.savePokemonState();
+                },
+
+
+                gainXP(amount) {
+                    if (!this.pokemonState.exists) return;
+
+                    this.pokemonState.xp = (this.pokemonState.xp || 0) + amount;
+                    const xpNeeded = this.pokemonState.level * 100;
+
+                    if (this.pokemonState.xp >= xpNeeded) {
+                        this.pokemonState.xp -= xpNeeded;
+                        this.levelUpPokemon();
+                    } else {
+                        this.savePokemonState();
+                    }
+                },
+
+                // Pokemon Gamification Methods
+                async fetchPokemonFromAPI(id) {
+                    try {
+                        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+                        const data = await response.json();
+                        return {
+                            id: data.id,
+                            name: data.name.charAt(0).toUpperCase() + data.name.slice(1),
+                            sprite: data.sprites.front_default,
+                            animatedSprite: data.sprites.versions?.['generation-v']?.['black-white']?.animated?.front_default || data.sprites.front_default,
+                            types: data.types.map(t => t.type.name),
+                            baseStats: {
+                                hp: data.stats[0].base_stat,
+                                attack: data.stats[1].base_stat,
+                                defense: data.stats[2].base_stat,
+                                speed: data.stats[5].base_stat
+                            },
+                            moves: data.moves.slice(0, 20).map(m => ({
+                                name: m.move.name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+                                learnedAt: m.version_group_details[0]?.level_learned_at || 1
+                            })).sort((a, b) => a.learnedAt - b.learnedAt)
+                        };
+                    } catch (error) {
+                        console.error('Error fetching Pokemon:', error);
+                        return null;
+                    }
+                },
+
+                async hatchPokemonEgg() {
+                    const randomId = Math.floor(Math.random() * 151) + 1;
+                    const pokemonData = await this.fetchPokemonFromAPI(randomId);
+                    if (!pokemonData) return;
+
+                    this.pokemonState = {
+                        exists: true,
+                        isEgg: false,
+                        species: pokemonData,
+                        level: 1,
+                        xp: 0,
+                        maxXp: 100,
+                        streak: 0,
+                        totalAttempts: 0,
+                        successfulAttempts: 0,
+                        moves: [pokemonData.moves[0]],
+                        evolutionStage: 0,
+                        stats: this.calculatePokemonStats(pokemonData.baseStats, 1),
+                        nickname: null,
+                        hatchedAt: new Date().toISOString(),
+                        lastLevelUp: new Date().toISOString()
+                    };
+
+                    this.savePokemonState();
+                    this.showPokemonAnimation = 'hatch';
+                    this.pokemonAnimationData = pokemonData;
+                    this.pokemonNotification = true;
+
+                    setTimeout(() => {
+                        this.showPokemonAnimation = null;
+                        this.pokemonNotification = false;
+                    }, 5000);
+                },
+
+                levelUpPokemon() {
+                    if (!this.pokemonState.exists) return;
+
+                    this.pokemonState.level++;
+                    // exp is handled in gainXP now
+
+                    this.pokemonState.stats = this.calculatePokemonStats(
+                        this.pokemonState.species.baseStats,
+                        this.pokemonState.level
+                    );
+
+                    if (this.pokemonState.level % 4 === 0 && this.pokemonState.moves.length < 4) {
+                        const availableMoves = this.pokemonState.species.moves.filter(
+                            m => m.learnedAt <= this.pokemonState.level &&
+                                !this.pokemonState.moves.some(learned => learned.name === m.name)
+                        );
+                        if (availableMoves.length > 0) {
+                            this.pokemonState.moves.push(availableMoves[availableMoves.length - 1]);
+                        }
+                    }
+
+                    this.pokemonState.lastLevelUp = new Date().toISOString();
+                    this.savePokemonState();
+
+                    this.showPokemonAnimation = 'levelup';
+                    this.pokemonAnimationData = {
+                        level: this.pokemonState.level,
+                        newMove: this.pokemonState.level % 4 === 0 ? this.pokemonState.moves[this.pokemonState.moves.length - 1] : null
+                    };
+                    this.pokemonNotification = true;
+
+                    setTimeout(() => {
+                        this.showPokemonAnimation = null;
+                        this.pokemonNotification = false;
+                    }, 3000);
+                },
+
+                async completePokemonChallenge() {
+                    if (this.pokemonState.level === 0 && !this.pokemonState.exists) {
+                        await this.hatchPokemonEgg();
+                    } else if (this.pokemonState.exists) {
+                        this.levelUpPokemon();
+                    }
+                },
+
+                calculatePokemonStats(baseStats, level) {
+                    const multiplier = 1 + (level * 0.05);
+                    return {
+                        hp: Math.floor(baseStats.hp * multiplier),
+                        attack: Math.floor(baseStats.attack * multiplier),
+                        defense: Math.floor(baseStats.defense * multiplier),
+                        speed: Math.floor(baseStats.speed * multiplier)
+                    };
+                },
+
+                savePokemonState() {
+                    localStorage.setItem('sqlWorkshopPokemon', JSON.stringify(this.pokemonState));
+                },
+
+                loadPokemonState() {
+                    const saved = localStorage.getItem('sqlWorkshopPokemon');
+                    if (saved) {
+                        try {
+                            this.pokemonState = JSON.parse(saved);
+                        } catch (e) {
+                            console.error('Error loading Pokemon state:', e);
+                        }
+                    }
+                },
+
+                resetPokemon() {
+                    this.pokemonState = {
+                        exists: false,
+                        isEgg: true,
+                        species: null,
+                        level: 0,
+                        exp: 0,
+                        moves: [],
+                        evolutionStage: 0,
+                        stats: null,
+                        nickname: null,
+                        hatchedAt: null,
+                        lastLevelUp: null
+                    };
+                    localStorage.removeItem('sqlWorkshopPokemon');
                 }
             },
             mounted() {
@@ -1452,6 +1984,9 @@ SELECT 'Total Mensajes: ' || COUNT(*) FROM MENSAJES;`
                         })
                     }
                 })
+
+                // Load Pokemon state from localStorage
+                this.loadPokemonState();
             }
         }).mount('#app')
     </script>

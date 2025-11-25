@@ -1,0 +1,112 @@
+/* Theme Definitions */
+
+/* 1. Dark Mode (Neo Terminal - Matrix/Hacker) */
+.theme-dark {
+    --bg-color: #0a0e0f;
+    --bg-card: #0d1117;
+    --border-color: #1f6feb;
+    --accent: #00ff41;
+    --accent-hover: #00cc33;
+    --text-primary: #00ff41;
+    --text-muted: #7d8590;
+    --code-bg: #000000;
+    --input-bg: #0d1117;
+    --module-bg: #161b22;
+    --shadow: rgba(0, 255, 65, 0.1);
+
+    --font-main: 'Fira Code', monospace;
+    --font-header: 'VT323', monospace;
+    --bg-pattern: none;
+
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+}
+
+/* 2. Light Mode (Cyber Pop - Vaporwave/Anime) */
+.theme-light {
+    --bg-color: #fdf2f8;
+    --bg-card: #ffffff;
+    --border-color: #f9a8d4;
+    --accent: #ec4899;
+    --accent-hover: #db2777;
+    --text-primary: #831843;
+    --text-muted: #9f1239;
+    --code-bg: #fdf2f8;
+    --input-bg: #ffffff;
+    --module-bg: #fce7f3;
+    --shadow: rgba(236, 72, 153, 0.15);
+
+    --font-main: 'Fira Code', monospace;
+    --font-header: 'VT323', monospace;
+    --bg-pattern: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+
+    background: var(--bg-pattern);
+    color: var(--text-primary);
+}
+
+/* 3. Retro Mode (Bibliotheca - Old School/Academic) */
+.theme-retro {
+    --bg-color: #f4ecd8;
+    --bg-card: #e8dfc5;
+    --border-color: #5d4037;
+    --accent: #8d6e63;
+    --accent-hover: #5d4037;
+    --text-primary: #3e2723;
+    --text-muted: #5d4037;
+    --code-bg: #eaddcf;
+    --input-bg: #f4ecd8;
+    --module-bg: #d7ccc8;
+    --shadow: rgba(62, 39, 35, 0.2);
+
+    --font-main: 'Lora', serif;
+    --font-header: 'Playfair Display', serif;
+    --bg-pattern: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%235d4037' fill-opacity='0.05' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+    --bg-size: auto;
+
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+}
+
+/* 4. Pokemon Theme (PokeDex Red) */
+.theme-pokemon {
+    --bg-color: #dc0a2d;
+    --bg-card: #f2f2f2;
+    --border-color: #89061c;
+    --accent: #28aafd;
+    --accent-hover: #1e87ca;
+    --text-primary: #2b2b2b;
+    --text-muted: #585858;
+    --code-bg: #51ae5f;
+    --input-bg: #ffffff;
+    --module-bg: #dedede;
+    --shadow: rgba(0, 0, 0, 0.3);
+
+    --font-main: 'VT323', monospace;
+    --font-header: 'VT323', monospace;
+    --bg-pattern: repeating-linear-gradient(45deg, #dc0a2d, #dc0a2d 10px, #c90929 10px, #c90929 20px);
+
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+}
+
+/* 5. Star Wars Theme (Empire/Death Star) */
+.theme-starwars {
+    --bg-color: #111111;
+    --bg-card: #222222;
+    --border-color: #ff0000;
+    --accent: #ff0000;
+    --accent-hover: #cc0000;
+    --text-primary: #eeeeee;
+    --text-muted: #aaaaaa;
+    --code-bg: #000000;
+    --input-bg: #333333;
+    --module-bg: #1a1a1a;
+    --shadow: rgba(255, 0, 0, 0.2);
+
+    --font-main: 'Fira Code', monospace;
+    --font-header: 'VT323', monospace;
+    --bg-pattern: radial-gradient(circle at 50% 50%, #222222 0%, #111111 100%);
+
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+}

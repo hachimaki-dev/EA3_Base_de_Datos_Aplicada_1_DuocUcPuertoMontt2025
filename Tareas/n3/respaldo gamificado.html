@@ -14,6 +14,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -422,7 +423,72 @@
             </div>
 
             <!-- Controls -->
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 flex-wrap justify-center">
+                <!-- PokéCoins Display (always visible after hatching) -->
+                <div v-if="pokemonState.exists"
+                    class="px-4 py-2 border-2 font-bold text-sm tracking-wider transition-all duration-300 rounded flex items-center gap-2"
+                    :style="{ 
+                        borderColor: '#ffd700', 
+                        color: '#ffd700', 
+                        backgroundColor: isDark ? 'rgba(255, 215, 0, 0.1)' : 'rgba(255, 215, 0, 0.05)',
+                        boxShadow: '0 0 15px rgba(255, 215, 0, 0.3)'
+                    }">
+                    <span class="text-lg">💰</span>
+                    <span>{{ economy.pokeCoins }}</span>
+                    <span class="text-xs opacity-60">PokéCoins</span>
+                </div>
+
+                <!-- Achievements Button -->
+                <button v-if="pokemonState.exists" @click="showAchievementsModal = true"
+                    class="px-3 py-2 border-2 font-bold uppercase text-xs tracking-widest transition-all duration-300 hover:scale-105 focus:outline-none rounded"
+                    :style="{ 
+                        borderColor: 'var(--accent)', 
+                        color: 'var(--accent)', 
+                        backgroundColor: 'var(--module-bg)',
+                        boxShadow: '0 0 10px var(--shadow)'
+                    }">
+                    🏆
+                </button>
+
+                <!-- Minigames Button -->
+                <button v-if="pokemonState.exists" @click="showMinigamesModal = true"
+                    class="px-3 py-2 border-2 font-bold uppercase text-xs tracking-widest transition-all duration-300 hover:scale-105 focus:outline-none rounded"
+                    :style="{ 
+                        borderColor: 'var(--accent)', 
+                        color: 'var(--accent)', 
+                        backgroundColor: 'var(--module-bg)',
+                        boxShadow: '0 0 10px var(--shadow)'
+                    }">
+                    🎮
+                </button>
+
+                <!-- Shop Button -->
+                <button v-if="pokemonState.exists" @click="showShopModal = true"
+                    class="px-3 py-2 border-2 font-bold uppercase text-xs tracking-widest transition-all duration-300 hover:scale-105 focus:outline-none rounded"
+                    :style="{ 
+                        borderColor: 'var(--accent)', 
+                        color: 'var(--accent)', 
+                        backgroundColor: 'var(--module-bg)',
+                        boxShadow: '0 0 10px var(--shadow)'
+                    }">
+                    🏪
+                </button>
+
+                <!-- Collection Button -->
+                <button v-if="collection.length > 0" @click="showCollectionModal = true"
+                    class="px-3 py-2 border-2 font-bold uppercase text-xs tracking-widest transition-all duration-300 hover:scale-105 focus:outline-none rounded relative"
+                    :style="{ 
+                        borderColor: 'var(--accent)', 
+                        color: 'var(--accent)', 
+                        backgroundColor: 'var(--module-bg)',
+                        boxShadow: '0 0 10px var(--shadow)'
+                    }">
+                    👥
+                    <span
+                        class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{
+                        collection.length }}</span>
+                </button>
+
                 <!-- Downloads Button -->
                 <button @click="showDownloads = !showDownloads"
                     class="px-4 py-2 border-2 font-bold uppercase text-xs tracking-widest transition-all duration-300 hover:scale-105 focus:outline-none rounded-sm animate-pulse"
@@ -737,6 +803,40 @@
 
                                     <!-- Locked State -->
                                     <div v-if="!isUnlocked" class="space-y-3">
+                                        <!-- SQL Query Input -->
+                                        <div class="mb-6 animate-fade-in">
+                                            <div class="flex justify-between items-center mb-2">
+                                                <label class="text-xs uppercase tracking-widest opacity-70">Tu Consulta
+                                                    SQL:</label>
+                                                <span class="text-xs opacity-50"
+                                                    v-if="pokemonState && pokemonState.exists">XP:
+                                                    {{pokemonState.xp}}/{{pokemonState.level * 100}}</span>
+                                            </div>
+                                            <textarea v-model="userQuery"
+                                                class="w-full p-4 border rounded font-mono text-sm bg-opacity-10 mb-2 focus:outline-none focus:ring-1 transition-transform"
+                                                :class="{'shake border-red-500': feedbackType === 'error'}"
+                                                :style="{ borderColor: feedbackType === 'error' ? 'red' : 'var(--border-color)', backgroundColor: 'var(--code-bg)', color: 'var(--text-primary)' }"
+                                                rows="4" placeholder="SELECT * FROM ..."></textarea>
+
+                                            <div class="flex justify-between items-center">
+                                                <button @click="checkAnswer"
+                                                    class="px-6 py-2 font-bold uppercase tracking-widest border transition-all hover:bg-opacity-10 rounded flex items-center gap-2"
+                                                    :style="{ borderColor: 'var(--accent)', color: 'var(--accent)', backgroundColor: 'transparent' }">
+                                                    <span>EJECUTAR CÓDIGO</span>
+                                                    <span>▶</span>
+                                                </button>
+
+                                                <div v-if="feedbackMessage"
+                                                    :class="feedbackType === 'success' ? 'text-green-400' : 'text-red-400'"
+                                                    class="text-sm font-bold animate-pulse">
+                                                    {{ feedbackMessage }}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="my-4 border-t opacity-20"
+                                            :style="{ borderColor: 'var(--border-color)' }"></div>
+
                                         <button @click="showPasswordInput = !showPasswordInput"
                                             v-if="!showPasswordInput"
                                             class="w-full py-3 font-bold uppercase tracking-widest border transition-all flex justify-between items-center px-4 hover:bg-opacity-10 rounded"
@@ -833,16 +933,28 @@
         <!-- Pokeball FAB (Floating Action Button) -->
         <div v-if="currentLevel > 0"
             class="fixed bottom-6 right-6 z-50 cursor-pointer transform transition-all duration-300 hover:scale-110"
-            :class="{'animate-bounce': pokemonNotification}" @click="showPokemonModal = true">
+            :class="{'animate-bounce': pokemonNotification}" @click.left="showPokemonModal = true"
+            @click.right.prevent="clickPokemon">
+
+            <!-- Energy Badge -->
+            <div v-if="pokemonState.exists"
+                class="absolute -top-1 -left-1 bg-blue-500 text-white text-xs rounded-full px-2 py-1 font-bold shadow-lg z-10">
+                ⚡{{ pokemonState.energy }}/{{ pokemonState.maxEnergy }}
+            </div>
 
             <!-- Egg State (Level 0, before first challenge) -->
             <div v-if="!pokemonState.exists" class="relative">
-                <div class="w-20 h-20 rounded-full flex items-center justify-center text-5xl bg-gradient-to-br from-white to-gray-200 shadow-2xl border-4"
-                    :style="{ borderColor: 'var(--accent)' }">
+                <div class="w-20 h-20 rounded-full flex items-center justify-center text-5xl shadow-2xl border-4"
+                    :style="{ 
+                        background: 'linear-gradient(to bottom right, var(--bg-card), var(--input-bg))',
+                        borderColor: 'var(--accent)',
+                        boxShadow: '0 0 20px var(--shadow)'
+                    }">
                     🥚
                 </div>
-                <div v-if="pokemonNotification"
-                    class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
+                <div v-if="pokemonNotification" class="absolute -top-2 -right-2 text-white"
+                    :style="{ backgroundColor: 'var(--accent)' }"
+                    class="text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
                     !
                 </div>
             </div>
@@ -851,15 +963,16 @@
             <div v-else class="relative">
                 <!-- Pokeball Background -->
                 <div class="w-20 h-20 rounded-full flex items-center justify-center shadow-2xl pokeball-bg" :style="{ 
-                         background: 'linear-gradient(180deg, #FF0000 50%, #FFFFFF 50%)',
-                         borderTop: '4px solid #333',
-                         borderBottom: '4px solid #333',
-                         position: 'relative'
+                         background: 'linear-gradient(180deg, var(--accent) 50%, var(--bg-card) 50%)',
+                         borderTop: '4px solid var(--border-color)',
+                         borderBottom: '4px solid var(--border-color)',
+                         position: 'relative',
+                         boxShadow: '0 0 20px var(--shadow)'
                      }">
                     <!-- Center Button -->
                     <div class="absolute w-8 h-8 rounded-full bg-white border-4 border-gray-800 flex items-center just ify-center"
                         :style="{ zIndex: 10 }">
-                        <div class="w-4 h-4 rounded-full bg-gray-300"></div>
+                        <div class="w-4 h-4 rounded-full" :style="{ backgroundColor: 'var(--input-bg)' }"></div>
                     </div>
 
                     <!-- Pokemon Sprite -->
@@ -875,8 +988,9 @@
                 </div>
 
                 <!-- Notification Badge -->
-                <div v-if="pokemonNotification"
-                    class="absolute -top-2 -left-2 bg-yellow-400 text-black text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
+                <div v-if="pokemonNotification" class="absolute -top-2 -left-2"
+                    :style="{ backgroundColor: 'var(--accent)', color: 'var(--bg-card)' }"
+                    class="text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
                     ⬆
                 </div>
             </div>
@@ -944,7 +1058,7 @@
                                 </div>
                                 <div class="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
                                     <div class="h-full rounded-full transition-all duration-500" :style="{ 
-                                             width: ((pokemonState.exp % 25) / 25 * 100) + '%',
+                                             width: ((pokemonState.xp / (pokemonState.level * 100)) * 100) + '%',
                                              backgroundColor: 'var(--accent)'
                                          }">
                                     </div>
@@ -1051,6 +1165,171 @@
             </div>
         </div>
 
+        <!-- ========================================= -->
+        <!-- SHOP MODAL -->
+        <!-- ========================================= -->
+        <div v-if="showShopModal"
+            class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black bg-opacity-80 backdrop-blur-sm"
+            @click.self="showShopModal = false">
+
+            <div class="w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-lg border-4 shadow-2xl" :style="{ 
+                    backgroundColor: 'var(--bg-card)', 
+                    borderColor: '#ffd700',
+                    boxShadow: '0 0 40px rgba(255, 215, 0, 0.4)'
+                }">
+
+                <!-- Header -->
+                <div class="p-6 border-b-2 flex justify-between items-center"
+                    :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--module-bg)' }">
+                    <div>
+                        <h2 class="text-3xl font-bold hacker-font flex items-center gap-3"
+                            :style="{ color: '#ffd700' }">
+                            <span class="text-4xl">🏪</span> POKÉSHOP
+                        </h2>
+                        <p class="text-sm mt-2 opacity-80">Gasta tus PokéCoins sabiamente</p>
+                        <p class="text-lg mt-1" :style="{ color: '#ffd700' }">
+                            💰 <span class="font-bold">{{ economy.pokeCoins }}</span> PokéCoins
+                        </p>
+                    </div>
+                    <button @click="showShopModal = false"
+                        class="text-3xl opacity-70 hover:opacity-100 transition-opacity" :style="{ color: '#ffd700' }">
+                        ✖
+                    </button>
+                </div>
+
+                <!-- Items Grid -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)] custom-scrollbar">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div v-for="item in shopItems" :key="item.id"
+                            class="p-4 rounded-lg border-2 transition-all hover:scale-105 cursor-pointer"
+                            :class="{ 'opacity-50': economy.pokeCoins < item.cost }" :style="{ 
+                                borderColor: economy.pokeCoins >= item.cost ? 'var(--accent)' : 'var(--border-color)',
+                                backgroundColor: 'var(--input-bg)'
+                            }" @click="buyShopItem(item.id)">
+
+                            <!-- Item Header -->
+                            <div class="text-xl font-bold mb-2">{{ item.name }}</div>
+                            <p class="text-sm opacity-70 mb-3">{{ item.desc }}</p>
+
+                            <!-- Price -->
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold" :style="{ color: '#ffd700' }">
+                                    💰 {{ item.cost }}
+                                </span>
+                                <button class="px-3 py-1 rounded text-xs font-bold uppercase"
+                                    :disabled="economy.pokeCoins < item.cost" :style="{ 
+                                        backgroundColor: economy.pokeCoins >= item.cost ? 'var(--accent)' : '#666',
+                                        color: 'var(--bg-card)'
+                                    }">
+                                    {{ economy.pokeCoins >= item.cost ? 'COMPRAR' : 'SIN FONDOS' }}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================= -->
+        <!-- ACHIEVEMENTS MODAL -->
+        <!-- ========================================= -->
+        <div v-if="showAchievementsModal"
+            class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black bg-opacity-80 backdrop-blur-sm"
+            @click.self="showAchievementsModal = false">
+
+            <div class="w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-lg border-4 shadow-2xl" :style="{ 
+                    backgroundColor: 'var(--bg-card)', 
+                    borderColor: 'var(--accent)',
+                    boxShadow: '0 0 40px var(--shadow)'
+                }">
+
+                <!-- Header -->
+                <div class="p-6 border-b-2 flex justify-between items-center"
+                    :style="{ borderColor: 'var(--border-color)', backgroundColor: 'var(--module-bg)' }">
+                    <div>
+                        <h2 class="text-3xl font-bold hacker-font flex items-center gap-3"
+                            :style="{ color: 'var(--accent)' }">
+                            <span class="text-4xl">🏆</span> LOGROS
+                        </h2>
+                        <p class="text-sm mt-2 opacity-80">
+                            Desbloqueados: {{ Object.values(achievements).filter(a => a.unlocked).length }} / {{
+                            Object.keys(achievements).length }}
+                        </p>
+                    </div>
+                    <button @click="showAchievementsModal = false"
+                        class="text-3xl opacity-70 hover:opacity-100 transition-opacity"
+                        :style="{ color: 'var(--accent)' }">
+                        ✖
+                    </button>
+                </div>
+
+                <!-- Achievements Grid -->
+                <div class="p-6 overflow-y-auto max-h-[calc(90vh-200px)] custom-scrollbar">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div v-for="achievement in achievements" :key="achievement.id"
+                            class="p-4 rounded-lg border-2 transition-all"
+                            :class="{ 'opacity-50 grayscale': !achievement.unlocked }" :style="{ 
+                                borderColor: achievement.unlocked ? 'var(--accent)' : 'var(--border-color)',
+                                backgroundColor: achievement.unlocked ? 'var(--code-bg)' : 'var(--input-bg)'
+                            }">
+
+                            <!-- Achievement Header -->
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <div class="text-xl font-bold mb-1">{{ achievement.name }}</div>
+                                    <p class="text-sm opacity-70">{{ achievement.desc }}</p>
+                                </div>
+                                <div v-if="achievement.unlocked" class="text-3xl ml-3">✅</div>
+                                <div v-else class="text-3xl ml-3 opacity-30">🔒</div>
+                            </div>
+
+                            <!-- Progress Bar (if has target) -->
+                            <div v-if="achievement.target !== undefined" class="mb-3">
+                                <div class="flex justify-between text-xs mb-1">
+                                    <span>Progreso</span>
+                                    <span>{{ achievement.progress || 0 }} / {{ achievement.target }}</span>
+                                </div>
+                                <div class="w-full bg-gray-700 rounded-full h-2">
+                                    <div class="h-full rounded-full transition-all" :style="{ 
+                                            width: ((achievement.progress || 0) / achievement.target * 100) + '%',
+                                            backgroundColor: 'var(--accent)'
+                                        }">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Reward -->
+                            <div class="flex items-center gap-2 text-sm">
+                                <span :style="{ color: '#ffd700' }">💰 Recompensa:</span>
+                                <span class="font-bold">{{ achievement.reward }} PokéCoins</span>
+                                <span v-if="achievement.unlocked" class="ml-auto text-xs opacity-60">
+                                    ✓ Reclamado
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievement Unlock Notification -->
+        <div v-if="achievementNotification"
+            class="fixed top-24 right-6 z-[300] bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white px-6 py-4 rounded-lg shadow-2xl border-4 border-yellow-300 animate-bounce max-w-sm">
+            <div class="text-2xl font-bold mb-2">🏆 ¡LOGRO DESBLOQUEADO!</div>
+            <div class="text-xl mb-2">{{ achievementNotification.name }}</div>
+            <div class="text-sm opacity-90">{{ achievementNotification.desc }}</div>
+            <div class="text-lg mt-3 font-bold">
+                💰 +{{ achievementNotification.reward }} PokéCoins
+            </div>
+        </div>
+
+        <!-- Floating Coin Notification -->
+        <div v-if="showFloatingCoin"
+            class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[350] text-6xl font-bold animate-ping pointer-events-none"
+            :style="{ color: '#ffd700' }">
+            {{ floatingCoinAmount }}
+        </div>
+
     </div>
 
     <script>
@@ -1098,17 +1377,142 @@
                         species: null,
                         level: 0,
                         exp: 0,
+                        xp: 0,
                         moves: [],
                         evolutionStage: 0,
                         stats: null,
                         nickname: null,
                         hatchedAt: null,
-                        lastLevelUp: null
+                        lastLevelUp: null,
+
+                        // Energy System
+                        energy: 100,
+                        maxEnergy: 100,
+                        lastEnergyUpdate: null,
+
+                        // Clicking System
+                        clickPower: 5,
+                        clickCombo: 0,
+                        lastClickTime: null,
+                        totalClicks: 0,
+
+                        // Idle Farming
+                        idleCoinsPerMinute: 0,
+                        lastIdleCheck: null,
+
+                        // Progress tracking
+                        totalAttempts: 0,
+                        successfulAttempts: 0,
+                        streak: 0
                     },
                     pokemonNotification: false,
                     showPokemonAnimation: null, // 'hatch', 'levelup', 'evolution'
                     pokemonAnimationData: null,
 
+                    // Economy System
+                    economy: {
+                        pokeCoins: 100, // Starting coins
+                        totalEarned: 100,
+                        totalSpent: 0,
+                        inventory: [],
+                        activeBoosts: [] // {type, multiplier, expiresAt}
+                    },
+
+                    // Collection System
+                    collection: [],
+                    activeMonIndex: 0,
+                    showCollectionModal: false,
+
+                    // Achievements System
+                    achievements: {
+                        'first_hatch': { id: 'first_hatch', unlocked: false, name: '🥚 First Steps', desc: 'Eclosiona tu primer huevo', reward: 50 },
+                        'reach_level_10': { id: 'reach_level_10', unlocked: false, name: '🔟 Apprentice', desc: 'Alcanza nivel 10', reward: 100 },
+                        'reach_level_25': { id: 'reach_level_25', unlocked: false, name: '🏆 Master', desc: 'Alcanza nivel 25', reward: 500 },
+                        'complete_all': { id: 'complete_all', unlocked: false, name: '💯 Perfectionist', desc: 'Completa 25/25 challenges', reward: 1000 },
+                        'win_10_minigames': { id: 'win_10_minigames', unlocked: false, name: '🎮 Gamer', desc: 'Gana 10 minijuegos', reward: 200, progress: 0, target: 10 },
+                        'rich_trainer': { id: 'rich_trainer', unlocked: false, name: '💰 Rich Trainer', desc: 'Acumula 5000 monedas', reward: 300 },
+                        'click_master': { id: 'click_master', unlocked: false, name: '👆 Click Master', desc: 'Haz 1000 clicks', reward: 150, progress: 0, target: 1000 },
+                        'streak_king': { id: 'streak_king', unlocked: false, name: '🔥 Streak King', desc: 'Racha de 10 victorias SQL', reward: 250, progress: 0, target: 10 },
+                        'collector': { id: 'collector', unlocked: false, name: '📚 Collector', desc: 'Captura 5 Pokémon', reward: 400, progress: 0, target: 5 },
+                        'battle_champion': { id: 'battle_champion', unlocked: false, name: '⚔️ Battle Champion', desc: 'Gana 20 batallas', reward: 350, progress: 0, target: 20 }
+                    },
+                    showAchievementsModal: false,
+                    achievementNotification: null,
+
+                    // Minigames System
+                    minigames: {
+                        rock_paper_scissors: {
+                            id: 'rps',
+                            unlocked: true,
+                            name: '🪨📄✂️ Piedra-Papel-Tijera',
+                            wins: 0,
+                            losses: 0,
+                            cost: 0
+                        },
+                        memory_match: {
+                            id: 'memory',
+                            unlocked: false,
+                            name: '🧠 Memory Match',
+                            bestTime: null,
+                            plays: 0,
+                            cost: 300
+                        },
+                        simon_says: {
+                            id: 'simon',
+                            unlocked: false,
+                            name: '🎵 Simon Says',
+                            highScore: 0,
+                            plays: 0,
+                            cost: 400
+                        },
+                        quick_time: {
+                            id: 'qte',
+                            unlocked: false,
+                            name: '⚡ Quick Time Events',
+                            perfectHits: 0,
+                            plays: 0,
+                            cost: 350
+                        }
+                    },
+                    showMinigamesModal: false,
+                    activeMinigame: null,
+
+                    // Shop System
+                    showShopModal: false,
+                    shopItems: [
+                        { id: 'rare_candy', name: '🍬 Rare Candy', desc: '+1 nivel instantáneo', cost: 200, type: 'consumable' },
+                        { id: 'xp_boost', name: '⚡ XP Boost (×2)', desc: 'Duplica XP por 30 min', cost: 150, type: 'boost', duration: 1800000 },
+                        { id: 'power_boost', name: '💪 Power Boost', desc: '+50% clickPower por 20 min', cost: 180, type: 'boost', duration: 1200000 },
+                        { id: 'energy_tank', name: '🔋 Energy Tank', desc: 'Restaura 50 energía', cost: 100, type: 'consumable' },
+                        { id: 'new_move_slot', name: '🎯 Move Slot Upgrade', desc: 'Desbloquea 5to movimiento', cost: 500, type: 'upgrade' },
+                        { id: 'unlock_memory', name: '🧠 Unlock Memory Match', desc: 'Desbloquea minijuego', cost: 300, type: 'unlock', unlocks: 'memory_match' },
+                        { id: 'unlock_simon', name: '🎵 Unlock Simon Says', desc: 'Desbloquea minijuego', cost: 400, type: 'unlock', unlocks: 'simon_says' },
+                        { id: 'unlock_qte', name: '⚡ Unlock QTE', desc: 'Desbloquea minijuego', cost: 350, type: 'unlock', unlocks: 'quick_time' },
+                        { id: 'evolution_stone', name: '🔮 Evolution Stone', desc: 'Fuerza evolución', cost: 800, type: 'consumable' },
+                        { id: 'pokeball', name: '⚪ Poké Ball', desc: '50% captura salvaje', cost: 600, type: 'consumable', catchRate: 0.5 },
+                        { id: 'greatball', name: '🔵 Great Ball', desc: '75% captura salvaje', cost: 1200, type: 'consumable', catchRate: 0.75 },
+                        { id: 'masterball', name: '🟣 Master Ball', desc: '100% captura salvaje', cost: 5000, type: 'consumable', catchRate: 1.0 }
+                    ],
+
+                    // Battle System
+                    showBattleModal: false,
+                    battleState: null,
+                    totalBattlesWon: 0,
+
+                    // UI State
+                    showFloatingCoin: false,
+                    floatingCoinAmount: 0,
+                    floatingCoinX: 0,
+                    floatingCoinY: 0,
+
+                    // Advanced Gamification
+                    userQuery: "",
+                    feedbackMessage: "",
+                    feedbackType: "", // "success", "error", "info"
+
+                    // Intervals
+                    idleInterval: null,
+                    energyInterval: null,
                     modules: [
                         {
                             title: "MÓDULO 1: INFILTRACIÓN BÁSICA (SELECT & WHERE)",
@@ -1420,202 +1824,7 @@
                     return this.activeLevelData ? this.activeLevelData.lIndex : 0
                 },
                 sqlScript() {
-                    return `-- Script de Base de Datos Tinder (Oracle Style)
--- Autor: Antigravity
--- Proposito: Taller de SQL Avanzado (3FN) - EA3
--- Version: 2.0 (Datos Ampliados)
-
--- ==========================================
--- 1. ELIMINACION DE TABLAS (DROPS)
--- ==========================================
-DROP TABLE MENSAJES CASCADE CONSTRAINT;
-DROP TABLE MATCHES CASCADE CONSTRAINT;
-DROP TABLE LIKES CASCADE CONSTRAINT;
-DROP TABLE FOTOS CASCADE CONSTRAINT;
-DROP TABLE USUARIO_INTERESES CASCADE CONSTRAINT;
-DROP TABLE USUARIOS CASCADE CONSTRAINT;
-DROP TABLE CIUDADES CASCADE CONSTRAINT;
-DROP TABLE PAIS CASCADE CONSTRAINT;
-DROP TABLE PLANES CASCADE CONSTRAINT;
-DROP TABLE INTERESES CASCADE CONSTRAINT;
-DROP TABLE GENEROS CASCADE CONSTRAINT;
-
--- ==========================================
--- 2. CREACION DE TABLAS (CREATES)
--- ==========================================
-
-CREATE TABLE GENEROS (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nombre VARCHAR2(50) NOT NULL UNIQUE
-);
-
-CREATE TABLE INTERESES (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nombre VARCHAR2(50) NOT NULL UNIQUE,
-    categoria VARCHAR2(50)
-);
-
-CREATE TABLE PLANES (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nombre VARCHAR2(50) NOT NULL UNIQUE,
-    precio NUMBER(10, 2) NOT NULL,
-    descripcion VARCHAR2(200)
-);
-
-CREATE TABLE PAIS (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nombre VARCHAR2(50) NOT NULL UNIQUE
-);
-
-CREATE TABLE CIUDADES (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nombre VARCHAR2(50) NOT NULL,
-    id_pais NUMBER NOT NULL REFERENCES PAIS(id)
-);
-
-CREATE TABLE USUARIOS (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    nombre VARCHAR2(50) NOT NULL,
-    email VARCHAR2(100) NOT NULL UNIQUE,
-    password VARCHAR2(100) NOT NULL,
-    fecha_nacimiento DATE NOT NULL,
-    biografia VARCHAR2(500),
-    id_genero NUMBER NOT NULL REFERENCES GENEROS(id),
-    id_ciudad NUMBER NOT NULL REFERENCES CIUDADES(id),
-    id_plan NUMBER DEFAULT 1 NOT NULL REFERENCES PLANES(id),
-    distancia_max_km NUMBER DEFAULT 50,
-    fecha_registro TIMESTAMP DEFAULT SYSTIMESTAMP
-);
-
-CREATE TABLE FOTOS (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    url_foto VARCHAR2(255) NOT NULL,
-    es_perfil CHAR(1) DEFAULT '0' CHECK (es_perfil IN ('0', '1')),
-    id_usuario NUMBER NOT NULL REFERENCES USUARIOS(id)
-);
-
-CREATE TABLE USUARIO_INTERESES (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_usuario NUMBER NOT NULL REFERENCES USUARIOS(id),
-    id_interes NUMBER NOT NULL REFERENCES INTERESES(id),
-    CONSTRAINT uk_usuario_interes UNIQUE (id_usuario, id_interes)
-);
-
-CREATE TABLE LIKES (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_usuario_origen NUMBER NOT NULL REFERENCES USUARIOS(id),
-    id_usuario_destino NUMBER NOT NULL REFERENCES USUARIOS(id),
-    es_superlike CHAR(1) DEFAULT '0' CHECK (es_superlike IN ('0', '1')),
-    fecha_like TIMESTAMP DEFAULT SYSTIMESTAMP,
-    CONSTRAINT uk_likes UNIQUE (id_usuario_origen, id_usuario_destino),
-    CONSTRAINT chk_mismo_usuario CHECK (id_usuario_origen <> id_usuario_destino)
-);
-
-CREATE TABLE MATCHES (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_usuario_1 NUMBER NOT NULL REFERENCES USUARIOS(id),
-    id_usuario_2 NUMBER NOT NULL REFERENCES USUARIOS(id),
-    fecha_match TIMESTAMP DEFAULT SYSTIMESTAMP,
-    CONSTRAINT uk_matches UNIQUE (id_usuario_1, id_usuario_2),
-    CONSTRAINT chk_match_order CHECK (id_usuario_1 < id_usuario_2) 
-);
-
-CREATE TABLE MENSAJES (
-    id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    id_match NUMBER NOT NULL REFERENCES MATCHES(id),
-    id_usuario_emisor NUMBER NOT NULL REFERENCES USUARIOS(id),
-    contenido VARCHAR2(1000) NOT NULL,
-    fecha_envio TIMESTAMP DEFAULT SYSTIMESTAMP,
-    leido CHAR(1) DEFAULT '0' CHECK (leido IN ('0', '1'))
-);
-
--- ==========================================
--- 3. POBLADO DE DATOS MASIVO (INSERTS)
--- ==========================================
-
--- --- GENEROS ---
-INSERT INTO GENEROS (nombre) VALUES ('Masculino');
-INSERT INTO GENEROS (nombre) VALUES ('Femenino');
-INSERT INTO GENEROS (nombre) VALUES ('No Binario');
-INSERT INTO GENEROS (nombre) VALUES ('Otro');
-
--- --- INTERESES ---
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Trekking', 'Deportes');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Sushi', 'Comida');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Netflix', 'Entretenimiento');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Viajar', 'Estilo de Vida');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Gatos', 'Mascotas');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Perros', 'Mascotas');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Fotografía', 'Arte');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Programación', 'Tecnología');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Vino', 'Bebida');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Astrología', 'Creencias');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Crossfit', 'Deportes');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Gaming', 'Entretenimiento');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Rock', 'Música');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Pop', 'Música');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Reggaeton', 'Música');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Indie', 'Música');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Pizza', 'Comida');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Vegana', 'Comida');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Asado', 'Comida');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Leer', 'Hobbies');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Cine', 'Hobbies');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Bailar', 'Hobbies');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Yoga', 'Deportes');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Cerveza', 'Bebida');
-INSERT INTO INTERESES (nombre, categoria) VALUES ('Café', 'Bebida');
-
--- --- PLANES ---
-INSERT INTO PLANES (nombre, precio, descripcion) VALUES ('Tinder Free', 0, 'Plan gratuito');
-INSERT INTO PLANES (nombre, precio, descripcion) VALUES ('Tinder Gold', 9990, 'Ver quien te dio like');
-INSERT INTO PLANES (nombre, precio, descripcion) VALUES ('Tinder Platinum', 19990, 'Prioridad en mensajes');
-
--- --- PAIS Y CIUDADES ---
-INSERT INTO PAIS (nombre) VALUES ('Chile');
-INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Santiago', 1);
-INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Valparaíso', 1);
-INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Concepción', 1);
-INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Puerto Montt', 1);
-INSERT INTO CIUDADES (nombre, id_pais) VALUES ('La Serena', 1);
-INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Antofagasta', 1);
-INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Temuco', 1);
-INSERT INTO CIUDADES (nombre, id_pais) VALUES ('Viña del Mar', 1);
-
--- --- USUARIOS (25 Usuarios) ---
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Juan Pérez', 'juan.p@gmail.com', 'pass123', TO_DATE('1995-05-15', 'YYYY-MM-DD'), 'Busco alguien para ir al cajón del maipo.', 1, 1, 2);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('María González', 'maria.g@hotmail.com', 'pass123', TO_DATE('1998-08-20', 'YYYY-MM-DD'), 'Amante de los gatos y el sushi.', 2, 1, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Pedro Pascal', 'pedro.m@gmail.com', 'pass123', TO_DATE('1990-04-02', 'YYYY-MM-DD'), 'Quiero conocer gente.', 1, 2, 3);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Ana Roja', 'ana.red@gmail.com', 'pass123', TO_DATE('2000-12-12', 'YYYY-MM-DD'), 'Estudiante de derecho.', 2, 1, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Alex V', 'alex.v@gmail.com', 'pass123', TO_DATE('1996-03-30', 'YYYY-MM-DD'), 'Fotografía y lluvia.', 3, 4, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Sofía Vergara', 'sofi.v@gmail.com', 'pass123', TO_DATE('1993-07-10', 'YYYY-MM-DD'), 'Me encanta bailar.', 2, 1, 2);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Diego Maradona', 'diego.10@gmail.com', 'pass123', TO_DATE('1999-10-30', 'YYYY-MM-DD'), 'Fútbol y asados.', 1, 3, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Valentina Sol', 'vale.sol@gmail.com', 'pass123', TO_DATE('2001-01-15', 'YYYY-MM-DD'), 'Playa, sol y arena.', 2, 5, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Carlos Gamer', 'carlos.g@gmail.com', 'pass123', TO_DATE('1997-06-25', 'YYYY-MM-DD'), 'Main Yasuo.', 1, 1, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Laura Art', 'laura.art@gmail.com', 'pass123', TO_DATE('1994-11-11', 'YYYY-MM-DD'), 'Artista visual.', 2, 2, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Roberto Gomez', 'roberto.g@gmail.com', 'pass123', TO_DATE('1988-02-20', 'YYYY-MM-DD'), 'Ingeniero, me gusta el orden y el café.', 1, 1, 2);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Camila Vallejo', 'cami.v@gmail.com', 'pass123', TO_DATE('1992-04-28', 'YYYY-MM-DD'), 'Activista y lectora empedernida.', 2, 1, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Felipe Avello', 'felipe.pez@gmail.com', 'pass123', TO_DATE('1985-05-24', 'YYYY-MM-DD'), 'Comediante, busco alguien con sentido del humor.', 1, 3, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Daniela Vega', 'dani.v@gmail.com', 'pass123', TO_DATE('1989-06-03', 'YYYY-MM-DD'), 'Actriz y cantante lírica.', 2, 1, 3);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Javier Milei', 'javi.libertad@gmail.com', 'pass123', TO_DATE('1970-10-22', 'YYYY-MM-DD'), 'Viva la libertad carajo.', 1, 1, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Andrea P', 'andrea.p@gmail.com', 'pass123', TO_DATE('1995-09-15', 'YYYY-MM-DD'), 'Enfermera de turno, respondo cuando puedo.', 2, 4, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Miguel Bosé', 'miguel.b@gmail.com', 'pass123', TO_DATE('1960-04-03', 'YYYY-MM-DD'), 'Amante bandido.', 1, 8, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Patricia M', 'pati.m@gmail.com', 'pass123', TO_DATE('1998-12-01', 'YYYY-MM-DD'), 'Estudiante de medicina.', 2, 1, 2);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Gabriel B', 'gabo.b@gmail.com', 'pass123', TO_DATE('1986-02-11', 'YYYY-MM-DD'), 'Me gusta leer en el parque.', 1, 2, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Lucía H', 'lucia.h@gmail.com', 'pass123', TO_DATE('2002-07-07', 'YYYY-MM-DD'), 'Recién llegada a la ciudad.', 2, 3, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Fernando G', 'fer.g@gmail.com', 'pass123', TO_DATE('1991-08-30', 'YYYY-MM-DD'), 'Piloto comercial, viajo mucho.', 1, 1, 3);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Isidora J', 'isi.j@gmail.com', 'pass123', TO_DATE('1999-03-14', 'YYYY-MM-DD'), 'Vegana y animalista.', 2, 4, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Hugo S', 'hugo.s@gmail.com', 'pass123', TO_DATE('1994-01-20', 'YYYY-MM-DD'), 'Crossfit es mi pasión.', 1, 1, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Carmen T', 'carmen.t@gmail.com', 'pass123', TO_DATE('1965-11-05', 'YYYY-MM-DD'), 'Disfrutando la vida.', 2, 8, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Lucas R', 'lucas.r@gmail.com', 'pass123', TO_DATE('2003-05-12', 'YYYY-MM-DD'), 'Estudiante de informática.', 1, 2, 1);
-INSERT INTO USUARIOS (nombre, email, password, fecha_nacimiento, biografia, id_genero, id_ciudad, id_plan) VALUES ('Gasparín', 'ghost@gmail.com', 'pass123', TO_DATE('1990-01-01', 'YYYY-MM-DD'), 'No tengo foto de perfil 👻', 1, 1, 1);
-
-COMMIT;
-
--- Consultas de prueba
-SELECT 'Total Usuarios: ' || COUNT(*) FROM USUARIOS;
-SELECT 'Total Matches: ' || COUNT(*) FROM MATCHES;
-SELECT 'Total Mensajes: ' || COUNT(*) FROM MENSAJES;`
+                    return `-- Script de Base de Datos Tinder (Oracle Style)`
                 }
             },
             methods: {
@@ -1676,7 +1885,7 @@ SELECT 'Total Mensajes: ' || COUNT(*) FROM MENSAJES;`
                         this.passwordError = false
 
                         // Pokemon Gamification: Trigger progression
-                        await this.completePokemonChallenge()
+                        // await this.completePokemonChallenge()
                     } else {
                         this.passwordError = true
                         setTimeout(() => {
@@ -1696,8 +1905,521 @@ SELECT 'Total Mensajes: ' || COUNT(*) FROM MENSAJES;`
                             this.copied = false
                         }, 2000)
                     })
+                },
+
+                normalizeSQL(sql) {
+                    return sql
+                        .toLowerCase()
+                        .replace(/\s+/g, ' ')
+                        .replace(/;\s*$/, '')
+                        .trim();
+                },
+
+                checkAnswer() {
+                    if (!this.userQuery) {
+                        this.typeWriterFeedback("Por favor escribe una consulta SQL.", "error");
+                        return;
+                    }
+
+                    const normalizedUser = this.normalizeSQL(this.userQuery);
+                    const normalizedSolution = this.normalizeSQL(this.activeLevel.solution);
+
+                    this.pokemonState.totalAttempts = (this.pokemonState.totalAttempts || 0) + 1;
+
+                    if (normalizedUser === normalizedSolution) {
+                        // Check if this is the first success - hatch the egg!
+                        if (!this.pokemonState.exists) {
+                            this.typeWriterFeedback("¡Correcto! Tu huevo está eclosionando...", "success");
+                            this.hatchPokemonEgg();
+
+                            if (!this.isUnlocked) {
+                                this.isUnlocked = true;
+                                this.showPasswordInput = false;
+                            }
+                            return;
+                        }
+
+                        let msg = "¡Correcto! Has ganado 50 XP";
+                        this.pokemonState.successfulAttempts = (this.pokemonState.successfulAttempts || 0) + 1;
+                        this.pokemonState.streak = (this.pokemonState.streak || 0) + 1;
+
+                        // Base XP and Coins
+                        let xpGain = 50;
+                        let coinsGain = 30; // Base coins per challenge
+
+                        // Streak bonus
+                        if (this.pokemonState.streak > 1) {
+                            const streakBonus = Math.min(this.pokemonState.streak * 10, 50);
+                            xpGain += streakBonus;
+                            coinsGain += Math.floor(streakBonus / 2); // Half the XP bonus as coins
+                            msg += ` + ${streakBonus} XP de racha`;
+                        }
+
+                        msg += ` y ${coinsGain} 💰!`;
+
+                        this.typeWriterFeedback(msg, "success");
+                        this.gainXP(xpGain);
+                        this.earnCoins(coinsGain, 'challenge');
+                        this.triggerConfetti();
+
+                        // Check achievements
+                        this.checkAchievement('streak_king');
+                        this.checkAchievement('complete_all');
+
+                        if (!this.isUnlocked) {
+                            this.isUnlocked = true;
+                            this.showPasswordInput = false;
+                        }
+                    } else {
+                        this.typeWriterFeedback("Consulta incorrecta. Inténtalo de nuevo.", "error");
+                        this.pokemonState.streak = 0;
+                    }
+                    this.savePokemonState();
+                },
+
+                typeWriterFeedback(text, type) {
+                    this.feedbackType = type;
+                    this.feedbackMessage = "";
+                    let i = 0;
+                    const speed = 30;
+
+                    if (this.typewriterInterval) clearInterval(this.typewriterInterval);
+
+                    this.typewriterInterval = setInterval(() => {
+                        if (i < text.length) {
+                            this.feedbackMessage += text.charAt(i);
+                            i++;
+                        } else {
+                            clearInterval(this.typewriterInterval);
+                        }
+                    }, speed);
+                },
+
+                triggerConfetti() {
+                    if (window.confetti) {
+                        confetti({
+                            particleCount: 100,
+                            spread: 70,
+                            origin: { y: 0.6 },
+                            colors: ['#ff0000', '#ffffff', '#00ff00', '#0000ff']
+                        });
+                    }
+                },
+
+
+                gainXP(amount) {
+                    if (!this.pokemonState.exists) return;
+
+                    this.pokemonState.xp = (this.pokemonState.xp || 0) + amount;
+                    const xpNeeded = this.pokemonState.level * 100;
+
+                    if (this.pokemonState.xp >= xpNeeded) {
+                        this.pokemonState.xp -= xpNeeded;
+                        this.levelUpPokemon();
+                    } else {
+                        this.savePokemonState();
+                    }
+                },
+
+                // Pokemon Gamification Methods
+                async fetchPokemonFromAPI(id) {
+                    try {
+                        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+                        const data = await response.json();
+                        return {
+                            id: data.id,
+                            name: data.name.charAt(0).toUpperCase() + data.name.slice(1),
+                            sprite: data.sprites.front_default,
+                            animatedSprite: data.sprites.versions?.['generation-v']?.['black-white']?.animated?.front_default || data.sprites.front_default,
+                            types: data.types.map(t => t.type.name),
+                            baseStats: {
+                                hp: data.stats[0].base_stat,
+                                attack: data.stats[1].base_stat,
+                                defense: data.stats[2].base_stat,
+                                speed: data.stats[5].base_stat
+                            },
+                            moves: data.moves.slice(0, 20).map(m => ({
+                                name: m.move.name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+                                learnedAt: m.version_group_details[0]?.level_learned_at || 1
+                            })).sort((a, b) => a.learnedAt - b.learnedAt)
+                        };
+                    } catch (error) {
+                        console.error('Error fetching Pokemon:', error);
+                        return null;
+                    }
+                },
+
+                async hatchPokemonEgg() {
+                    const randomId = Math.floor(Math.random() * 151) + 1;
+                    const pokemonData = await this.fetchPokemonFromAPI(randomId);
+                    if (!pokemonData) return;
+
+                    this.pokemonState = {
+                        exists: true,
+                        isEgg: false,
+                        species: pokemonData,
+                        level: 1,
+                        xp: 0,
+                        maxXp: 100,
+                        streak: 0,
+                        totalAttempts: 0,
+                        successfulAttempts: 0,
+                        moves: [pokemonData.moves[0]],
+                        evolutionStage: 0,
+                        stats: this.calculatePokemonStats(pokemonData.baseStats, 1),
+                        nickname: null,
+                        hatchedAt: new Date().toISOString(),
+                        lastLevelUp: new Date().toISOString()
+                    };
+
+                    this.savePokemonState();
+                    this.showPokemonAnimation = 'hatch';
+                    this.pokemonAnimationData = pokemonData;
+                    this.pokemonNotification = true;
+                    this.triggerConfetti();
+
+                    setTimeout(() => {
+                        this.showPokemonAnimation = null;
+                        this.pokemonNotification = false;
+                    }, 5000);
+                },
+
+                levelUpPokemon() {
+                    if (!this.pokemonState.exists) return;
+
+                    this.pokemonState.level++;
+                    // exp is handled in gainXP now
+
+                    this.pokemonState.stats = this.calculatePokemonStats(
+                        this.pokemonState.species.baseStats,
+                        this.pokemonState.level
+                    );
+
+                    if (this.pokemonState.level % 4 === 0 && this.pokemonState.moves.length < 4) {
+                        const availableMoves = this.pokemonState.species.moves.filter(
+                            m => m.learnedAt <= this.pokemonState.level &&
+                                !this.pokemonState.moves.some(learned => learned.name === m.name)
+                        );
+                        if (availableMoves.length > 0) {
+                            this.pokemonState.moves.push(availableMoves[availableMoves.length - 1]);
+                        }
+                    }
+
+                    this.pokemonState.lastLevelUp = new Date().toISOString();
+                    this.savePokemonState();
+
+                    this.showPokemonAnimation = 'levelup';
+                    this.pokemonAnimationData = {
+                        level: this.pokemonState.level,
+                        newMove: this.pokemonState.level % 4 === 0 ? this.pokemonState.moves[this.pokemonState.moves.length - 1] : null
+                    };
+                    this.pokemonNotification = true;
+                    this.triggerConfetti();
+
+                    setTimeout(() => {
+                        this.showPokemonAnimation = null;
+                        this.pokemonNotification = false;
+                    }, 3000);
+                },
+
+                async completePokemonChallenge() {
+                    if (this.pokemonState.level === 0 && !this.pokemonState.exists) {
+                        await this.hatchPokemonEgg();
+                    } else if (this.pokemonState.exists) {
+                        this.levelUpPokemon();
+                    }
+                },
+
+                calculatePokemonStats(baseStats, level) {
+                    const multiplier = 1 + (level * 0.05);
+                    return {
+                        hp: Math.floor(baseStats.hp * multiplier),
+                        attack: Math.floor(baseStats.attack * multiplier),
+                        defense: Math.floor(baseStats.defense * multiplier),
+                        speed: Math.floor(baseStats.speed * multiplier)
+                    };
+                },
+
+                savePokemonState() {
+                    localStorage.setItem('sqlWorkshopPokemon', JSON.stringify(this.pokemonState));
+                },
+
+                loadPokemonState() {
+                    const saved = localStorage.getItem('sqlWorkshopPokemon');
+                    if (saved) {
+                        try {
+                            this.pokemonState = JSON.parse(saved);
+                        } catch (e) {
+                            console.error('Error loading Pokemon state:', e);
+                        }
+                    }
+                },
+
+                resetPokemon() {
+                    this.pokemonState = {
+                        exists: false,
+                        isEgg: true,
+                        species: null,
+                        level: 0,
+                        exp: 0,
+                        moves: [],
+                        evolutionStage: 0,
+                        stats: null,
+                        nickname: null,
+                        hatchedAt: null,
+                        lastLevelUp: null
+                    };
+                    localStorage.removeItem('sqlWorkshopPokemon');
+                },
+
+                // ============================================================
+                // ECONOMY SYSTEM
+                // ============================================================
+
+                earnCoins(amount, source = 'unknown') {
+                    this.economy.pokeCoins += amount;
+                    this.economy.totalEarned += amount;
+
+                    // Show floating coin animation
+                    this.floatingCoinAmount = `+${amount} 💰`;
+                    this.showFloatingCoin = true;
+
+                    setTimeout(() => {
+                        this.showFloatingCoin = false;
+                    }, 2000);
+
+                    // Check achievements
+                    this.checkAchievement('rich_trainer');
+
+                    this.saveGameState();
+                },
+
+                spendCoins(amount) {
+                    if (this.economy.pokeCoins >= amount) {
+                        this.economy.pokeCoins -= amount;
+                        this.economy.totalSpent += amount;
+                        this.saveGameState();
+                        return true;
+                    }
+                    return false;
+                },
+
+                // ============================================================
+                // SHOP SYSTEM
+                // ============================================================
+
+                buyShopItem(itemId) {
+                    const item = this.shopItems.find(i => i.id === itemId);
+                    if (!item) return false;
+
+                    // Check if can afford
+                    if (!this.spendCoins(item.cost)) {
+                        alert('❌ No tienes suficientes PokéCoins!');
+                        return false;
+                    }
+
+                    // Apply item effect
+                    switch (item.type) {
+                        case 'consumable':
+                            this.useConsumableItem(item);
+                            break;
+                        case 'boost':
+                            alert(`✅ ${item.name} activado! (Próximamente funcional)`);
+                            break;
+                        case 'unlock':
+                            this.minigames[item.unlocks].unlocked = true;
+                            alert(`✅ ${this.minigames[item.unlocks].name} desbloqueado!`);
+                            break;
+                        case 'upgrade':
+                            alert(`✅ ${item.name} comprado!`);
+                            break;
+                    }
+
+                    this.triggerConfetti();
+                    this.saveGameState();
+                    return true;
+                },
+
+                useConsumableItem(item) {
+                    switch (item.id) {
+                        case 'rare_candy':
+                            if (this.pokemonState.exists) {
+                                this.pokemonState.level++;
+                                this.pokemonState.stats = this.calculatePokemonStats(
+                                    this.pokemonState.species.baseStats,
+                                    this.pokemonState.level
+                                );
+                                this.triggerConfetti();
+                                alert(`🎉 ${this.pokemonState.species.name} alcanzó nivel ${this.pokemonState.level}!`);
+                                this.checkAchievement('reach_level_10');
+                                this.checkAchievement('reach_level_25');
+                            }
+                            break;
+                        case 'energy_tank':
+                            this.pokemonState.energy = Math.min(this.pokemonState.energy + 50, this.pokemonState.maxEnergy);
+                            alert('🔋 Energía restaurada +50!');
+                            break;
+                        case 'evolution_stone':
+                            alert('🔮 Evolution Stone usado! (Evolución disponible próximamente)');
+                            break;
+                        case 'pokeball':
+                        case 'greatball':
+                        case 'masterball':
+                            alert(`${item.name} - Sistema de captura disponible próximamente!`);
+                            break;
+                    }
+                },
+
+                // ============================================================
+                // ACHIEVEMENTS SYSTEM
+                // ============================================================
+
+                checkAchievement(achievementId) {
+                    const achievement = this.achievements[achievementId];
+                    if (!achievement || achievement.unlocked) return;
+
+                    let shouldUnlock = false;
+
+                    switch (achievementId) {
+                        case 'first_hatch':
+                            shouldUnlock = this.pokemonState.exists;
+                            break;
+                        case 'reach_level_10':
+                            shouldUnlock = this.pokemonState.level >= 10;
+                            break;
+                        case 'reach_level_25':
+                            shouldUnlock = this.pokemonState.level >= 25;
+                            break;
+                        case 'complete_all':
+                            shouldUnlock = this.currentLevel >= this.totalLevels;
+                            break;
+                        case 'rich_trainer':
+                            shouldUnlock = this.economy.totalEarned >= 5000;
+                            break;
+                        case 'click_master':
+                            if (achievement.progress === undefined) achievement.progress = 0;
+                            achievement.progress = this.pokemonState.totalClicks || 0;
+                            shouldUnlock = achievement.progress >= achievement.target;
+                            break;
+                        case 'streak_king':
+                            if (achievement.progress === undefined) achievement.progress = 0;
+                            achievement.progress = Math.max(achievement.progress, this.pokemonState.streak || 0);
+                            shouldUnlock = achievement.progress >= achievement.target;
+                            break;
+                    }
+
+                    if (shouldUnlock) {
+                        this.unlockAchievement(achievementId);
+                    }
+                },
+
+                unlockAchievement(achievementId) {
+                    const achievement = this.achievements[achievementId];
+                    if (!achievement || achievement.unlocked) return;
+
+                    achievement.unlocked = true;
+                    achievement.unlockedAt = new Date().toISOString();
+
+                    // Give reward
+                    this.earnCoins(achievement.reward, 'achievement');
+
+                    // Show notification
+                    this.achievementNotification = achievement;
+                    setTimeout(() => {
+                        this.achievementNotification = null;
+                    }, 5000);
+
+                    this.triggerConfetti();
+                    this.saveGameState();
+                },
+
+                // ============================================================
+                // CLICKING SYSTEM
+                // ============================================================
+
+                clickPokemon(event) {
+                    if (!this.pokemonState.exists || this.pokemonState.energy <= 0) return;
+
+                    // Consume energy
+                    this.pokemonState.energy--;
+                    this.pokemonState.totalClicks = (this.pokemonState.totalClicks || 0) + 1;
+
+                    // Calculate click reward
+                    const now = Date.now();
+                    const timeSinceLastClick = this.pokemonState.lastClickTime ? now - this.pokemonState.lastClickTime : 3000;
+
+                    // Combo system: if clicked within 2 seconds, increment combo
+                    if (timeSinceLastClick < 2000) {
+                        this.pokemonState.clickCombo = Math.min((this.pokemonState.clickCombo || 0) + 1, 50);
+                    } else {
+                        this.pokemonState.clickCombo = 0;
+                    }
+
+                    this.pokemonState.lastClickTime = now;
+
+                    // Calculate coins with combo multiplier (max 5x)
+                    const clickPower = this.pokemonState.clickPower || 5;
+                    const comboMultiplier = 1 + Math.min(this.pokemonState.clickCombo * 0.1, 4);
+                    const coinsEarned = Math.floor(clickPower * comboMultiplier);
+
+                    this.earnCoins(coinsEarned, 'click');
+
+                    // Check achievements
+                    this.checkAchievement('click_master');
+
+                    this.saveGameState();
+                },
+
+                // ============================================================
+                // SAVE/LOAD SYSTEM
+                // ============================================================
+
+                saveGameState() {
+                    const gameState = {
+                        version: '2.0',
+                        pokemonState: this.pokemonState,
+                        economy: this.economy,
+                        achievements: this.achievements,
+                        minigames: this.minigames
+                    };
+
+                    localStorage.setItem('sqlWorkshop_gameState', JSON.stringify(gameState));
+                },
+
+                loadGameState() {
+                    const saved = localStorage.getItem('sqlWorkshop_gameState');
+                    if (!saved) return;
+
+                    try {
+                        const gameState = JSON.parse(saved);
+
+                        if (gameState.pokemonState) {
+                            Object.assign(this.pokemonState, gameState.pokemonState);
+                        }
+                        if (gameState.economy) {
+                            Object.assign(this.economy, gameState.economy);
+                        }
+                        if (gameState.achievements) {
+                            // Merge achievements (keep structure but restore unlocked states)
+                            Object.keys(gameState.achievements).forEach(key => {
+                                if (this.achievements[key]) {
+                                    Object.assign(this.achievements[key], gameState.achievements[key]);
+                                }
+                            });
+                        }
+                        if (gameState.minigames) {
+                            Object.keys(gameState.minigames).forEach(key => {
+                                if (this.minigames[key]) {
+                                    Object.assign(this.minigames[key], gameState.minigames[key]);
+                                }
+                            });
+                        }
+                    } catch (e) {
+                        console.error('Error loading game state:', e);
+                    }
                 }
             },
+
             mounted() {
                 // Apply initial theme to body
                 document.body.className = this.currentTheme + ' min-h-screen relative overflow-x-hidden transition-colors duration-500';
@@ -1717,161 +2439,17 @@ SELECT 'Total Mensajes: ' || COUNT(*) FROM MENSAJES;`
                         })
                     }
                 })
-            },
 
-            // ========================================
-            // POKEMON GAMIFICATION SYSTEM
-            // ========================================
+                // Load Pokemon state from localStorage
+                this.loadPokemonState();
 
-            async fetchPokemonFromAPI(id) {
-                try {
-                    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-                    const data = await response.json();
+                // Load gamification game state
+                this.loadGameState();
 
-                    return {
-                        id: data.id,
-                        name: data.name.charAt(0).toUpperCase() + data.name.slice(1),
-                        sprite: data.sprites.front_default,
-                        animatedSprite: data.sprites.versions?.['generation-v']?.['black-white']?.animated?.front_default || data.sprites.front_default,
-                        types: data.types.map(t => t.type.name),
-                        baseStats: {
-                            hp: data.stats[0].base_stat,
-                            attack: data.stats[1].base_stat,
-                            defense: data.stats[2].base_stat,
-                            speed: data.stats[5].base_stat
-                        },
-                        moves: data.moves.slice(0, 20).map(m => ({
-                            name: m.move.name.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
-                            learnedAt: m.version_group_details[0]?.level_learned_at || 1
-                        })).sort((a, b) => a.learnedAt - b.learnedAt)
-                    };
-                } catch (error) {
-                    console.error('Error fetching Pokemon:', error);
-                    return null;
+                // Check for first hatch achievement
+                if (this.pokemonState.exists) {
+                    this.checkAchievement('first_hatch');
                 }
-            },
-
-            async hatchPokemonEgg() {
-                // Generate random Pokemon (Kanto region: 1-151)
-                const randomId = Math.floor(Math.random() * 151) + 1;
-                const pokemonData = await this.fetchPokemonFromAPI(randomId);
-
-                if (!pokemonData) return;
-
-                this.pokemonState = {
-                    exists: true,
-                    isEgg: false,
-                    species: pokemonData,
-                    level: 1,
-                    exp: 1,
-                    moves: [pokemonData.moves[0]], // Starting move
-                    evolutionStage: 0,
-                    stats: this.calculatePokemonStats(pokemonData.baseStats, 1),
-                    nickname: null,
-                    hatchedAt: new Date().toISOString(),
-                    lastLevelUp: new Date().toISOString()
-                };
-
-                this.savePokemonState();
-                this.showPokemonAnimation = 'hatch';
-                this.pokemonAnimationData = pokemonData;
-                this.pokemonNotification = true;
-
-                // Hide animation after 5 seconds
-                setTimeout(() => {
-                    this.showPokemonAnimation = null;
-                    this.pokemonNotification = false;
-                }, 5000);
-            },
-
-            levelUpPokemon() {
-                if (!this.pokemonState.exists) return;
-
-                this.pokemonState.level++;
-                this.pokemonState.exp++;
-                this.pokemonState.stats = this.calculatePokemonStats(
-                    this.pokemonState.species.baseStats,
-                    this.pokemonState.level
-                );
-
-                // Learn new move every 4 levels (max 4 moves)
-                if (this.pokemonState.level % 4 === 0 && this.pokemonState.moves.length < 4) {
-                    const availableMoves = this.pokemonState.species.moves.filter(
-                        m => m.learnedAt <= this.pokemonState.level &&
-                            !this.pokemonState.moves.some(learned => learned.name === m.name)
-                    );
-                    if (availableMoves.length > 0) {
-                        this.pokemonState.moves.push(availableMoves[availableMoves.length - 1]);
-                    }
-                }
-
-                this.pokemonState.lastLevelUp = new Date().toISOString();
-                this.savePokemonState();
-
-                // Show level up animation
-                this.showPokemonAnimation = 'levelup';
-                this.pokemonAnimationData = {
-                    level: this.pokemonState.level,
-                    newMove: this.pokemonState.level % 4 === 0 ? this.pokemonState.moves[this.pokemonState.moves.length - 1] : null
-                };
-                this.pokemonNotification = true;
-
-                setTimeout(() => {
-                    this.showPokemonAnimation = null;
-                    this.pokemonNotification = false;
-                }, 3000);
-            },
-
-            async completePokemonChallenge() {
-                if (this.pokemonState.level === 0 && !this.pokemonState.exists) {
-                    // First challenge - hatch egg
-                    await this.hatchPokemonEgg();
-                } else if (this.pokemonState.exists) {
-                    // Subsequent challenges - level up
-                    this.levelUpPokemon();
-                }
-            },
-
-            calculatePokemonStats(baseStats, level) {
-                const multiplier = 1 + (level * 0.05); // 5% growth per level
-                return {
-                    hp: Math.floor(baseStats.hp * multiplier),
-                    attack: Math.floor(baseStats.attack * multiplier),
-                    defense: Math.floor(baseStats.defense * multiplier),
-                    speed: Math.floor(baseStats.speed * multiplier)
-                };
-            },
-
-            savePokemonState() {
-                localStorage.setItem('sqlWorkshopPokemon', JSON.stringify(this.pokemonState));
-            },
-
-            loadPokemonState() {
-                const saved = localStorage.getItem('sqlWorkshopPokemon');
-                if (saved) {
-                    try {
-                        this.pokemonState = JSON.parse(saved);
-                    } catch (e) {
-                        console.error('Error loading Pokemon state:', e);
-                    }
-                }
-            },
-
-            resetPokemon() {
-                this.pokemonState = {
-                    exists: false,
-                    isEgg: true,
-                    species: null,
-                    level: 0,
-                    exp: 0,
-                    moves: [],
-                    evolutionStage: 0,
-                    stats: null,
-                    nickname: null,
-                    hatchedAt: null,
-                    lastLevelUp: null
-                };
-                localStorage.removeItem('sqlWorkshopPokemon');
             }
         }).mount('#app')
     </script>
