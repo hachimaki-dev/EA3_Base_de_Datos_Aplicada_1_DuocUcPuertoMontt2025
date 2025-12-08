@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Transversal - Caso A: Salmones del Sur</title>
+    <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #f4f4f4;
+            --accent-color: #2e7d32;
+            --text-color: #333;
+            --border-color: #ddd;
+            --font-main: 'Arial', sans-serif;
+            --font-reading: 'Georgia', serif;
+        }
+
+        body {
+            font-family: var(--font-reading);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+        }
+
+        .container {
+            width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+        }
+
+        header {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-info h1 {
+            font-family: var(--font-main);
+            font-size: 26px;
+            color: var(--primary-color);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-info p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .logo-box {
+            font-family: var(--font-main);
+            font-weight: bold;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 10px 20px;
+            text-transform: uppercase;
+        }
+
+        .logo-box img {
+            max-width: 180px;
+            display: block;
+        }
+
+        h2 {
+            font-family: var(--font-main);
+            color: var(--primary-color);
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 8px;
+            margin-top: 35px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            font-family: var(--font-main);
+            color: #444;
+            font-size: 17px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .instruction-box {
+            background-color: #f8fbff;
+            border-left: 5px solid var(--primary-color);
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 15px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .warning-box {
+            background-color: #fff8e1;
+            border-left: 5px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 14px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 10px;
+        }
+
+        .checklist li:before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 15px;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-family: var(--font-main);
+            font-size: 13px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        details {
+            background-color: #e8f5e9;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border: 1px solid #c8e6c9;
+        }
+
+        details summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--accent-color);
+            font-family: var(--font-main);
+            list-style: none;
+        }
+
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details summary::before {
+            content: '💡 ';
+        }
+
+        details p {
+            margin: 10px 0 0 0;
+            font-size: 0.95em;
+            color: #2e4d32;
+        }
+
+        .split-narrative {
+            display: flex;
+            gap: 20px;
+        }
+
+        .narrative-col {
+            flex: 1;
+        }
+
+        .challenge-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .challenge-box h4 {
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+            font-size: 15px;
+        }
+
+        .challenge-box p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <div class="header-info">
+                <h1>Evaluación Sumativa Transversal</h1>
+                <p>Escuela de Informática y Telecomunicaciones</p>
+                <p>Asignatura: Base de Datos Aplicada 1 BDY1101</p>
+            </div>
+            <div class="logo-box">
+                <img src="logoduocuc.jpg" alt="Logo Duoc UC">
+            </div>
+        </header>
+
+        <section>
+            <h2>Información General de la Evaluación</h2>
+
+            <table style="width: 60%; margin: auto;">
+                <tr>
+                    <th scope="row">Tiempo Asignado</th>
+                    <td>5 Horas Pedagógicas</td>
+                </tr>
+                <tr>
+                    <th scope="row">Modalidad</th>
+                    <td>Individual</td>
+                </tr>
+                <tr>
+                    <th scope="row">Ponderación</th>
+                    <td>40% de la nota final</td>
+                </tr>
+                <tr>
+                    <th scope="row">Caso Asignado</th>
+                    <td><strong>CASO A: Salmones del Sur</strong></td>
+                </tr>
+            </table>
+
+            <div class="instruction-box">
+                <h3>Formato de Entrega</h3>
+                <p>Debes subir un archivo comprimido (.zip o .rar) con el nombre:</p>
+                <p><code>BDY1101_ET_CASO_A_Nombre_Apellido.zip</code></p>
+
+                <strong>Contenido del archivo comprimido:</strong>
+                <ul class="checklist">
+                    <li>Carpeta o archivo .dmd del Data Modeler</li>
+                    <li>PDF del Modelo Lógico exportado</li>
+                    <li>PDF del Modelo Relacional exportado</li>
+                    <li>Script SQL de Creación (DDL)</li>
+                    <li>Script SQL de Poblado y Consultas (DML)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Requisitos Técnicos Generales</h2>
+
+            <h3>A. Modelamiento (Oracle Data Modeler)</h3>
+            <ul class="checklist">
+                <li><strong>Modelo Lógico (Azul):</strong> Entidades, atributos, UIDs y relaciones con cardinalidad.
+                </li>
+                <li><strong>Modelo Relacional (Amarillo):</strong> Ingeniería generada, tipos de datos coherentes.</li>
+            </ul>
+
+            <h3>B. Implementación DDL (Script de Creación)</h3>
+            <ul class="checklist">
+                <li>Tablas creadas en orden lógico (primero las que no tienen FK).</li>
+                <li><strong>PK:</strong> Numéricas y <code>GENERATED ALWAYS AS IDENTITY</code>.</li>
+                <li><strong>FK:</strong> Definidas <em>inline</em> con <code>REFERENCES</code>.</li>
+                <li>Restricciones <code>NOT NULL</code> y <code>UNIQUE</code> aplicadas donde corresponda.</li>
+            </ul>
+
+            <h3>C. Implementación DML (Datos y Consultas)</h3>
+            <ul class="checklist">
+                <li><strong>Inserts:</strong> Mínimo 5 registros por tabla.</li>
+                <li><strong>Update:</strong> 2 sentencias con WHERE.</li>
+                <li><strong>Delete:</strong> 2 sentencias con WHERE.</li>
+                <li><strong>Select:</strong> 5 consultas (simple, WHERE, COUNT, GROUP BY, JOIN).</li>
+            </ul>
+        </section>
+
+        <div class="page-break"></div>
+
+        <section>
+            <h2>CASO: SALMONES DEL SUR</h2>
+
+            <p style="text-align: justify; margin-top: 20px; line-height: 1.8;">
+                La industria de la acuicultura representa uno de los pilares fundamentales de la economía de la
+                <strong>Región de Los Lagos</strong>, especialmente en las comunas costeras como Puerto Montt, Castro y
+                Quellón. Chile es actualmente el <strong>segundo productor mundial de salmón</strong>, generando miles
+                de empleos directos e indirectos en zonas donde las alternativas laborales son limitadas. Sin embargo,
+                este crecimiento acelerado ha expuesto importantes desafíos en materia de trazabilidad, control
+                sanitario y eficiencia operacional.
+            </p>
+
+            <p style="text-align: justify; line-height: 1.8;">
+                El <strong>Servicio Nacional de Pesca y Acuicultura (Sernapesca)</strong>, dependiente del Ministerio de
+                Economía, Fomento y Turismo, tiene la misión de fiscalizar y promover el cumplimiento de la normativa
+                pesquera y acuícola, protegiendo los recursos hidrobiológicos y asegurando la inocuidad de los productos
+                destinados al consumo humano. En coordinamiento con Sernapesca, las empresas del sector deben
+                implementar sistemas de gestión que permitan la <strong>trazabilidad completa</strong> de cada lote de
+                peces cultivados, desde la siembra hasta la cosecha.
+            </p>
+
+            <p style="text-align: justify; line-height: 1.8;">
+                En este contexto regulatorio y de modernización del sector, es que usted, como <strong>especialista en
+                    tecnologías de información</strong>, ha sido convocado por una empresa salmonera regional para
+                diseñar e implementar una base de datos que permita registrar y almacene toda la información operacional
+                de sus centros de cultivo. El sistema debe permitir el registro diario de eventos de alimentación,
+                control de costos por insumos, identificación de lotes activos por jaula, y generación de reportes de
+                trazabilidad que cumplan con los estándares exigidos por la autoridad sanitaria.
+            </p>
+
+            <p style="text-align: justify; line-height: 1.8;">
+                Adicionalmente, para cumplir con este objetivo y los requerimientos del sistema, la empresa ha definido
+                que toda la información relacionada con <strong>centros de cultivo, jaulas, lotes, especies, tipos de
+                    alimento y eventos de alimentación</strong> debe estar centralizada en una base de datos relacional
+                robusta, que permita consultas analíticas y auditorías en tiempo real.
+            </p>
+
+            <h2 style="margin-top: 40px;">CASO A: Gestión de Jaulas "Salmones del Sur"</h2>
+
+            <div class="instruction-box">
+                <div class="split-narrative">
+                    <div class="narrative-col">
+                        <h3>Situación Actual</h3>
+                        <p>"Salmones del Sur" opera centros de cultivo en el Seno de Reloncaví. Actualmente registran la
+                            alimentación de forma manual en cuadernos, lo que provoca pérdida de datos y errores en el
+                            cálculo de costos de alimentación.</p>
+                    </div>
+                    <div class="narrative-col">
+                        <h3>El Desafío</h3>
+                        <p>El Gerente de Operaciones necesita un <strong>sistema digital</strong> para trazar
+                            exactamente cuánto alimento consume cada lote de peces. Esto permitirá optimizar el engorde
+                            y
+                            gestionar el stock de alimento de manera eficiente.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Historias de Usuario (Requerimientos Funcionales)</h3>
+            <ul>
+                <li>"Como <strong>Operario</strong>, registro la alimentación diaria (tipo de alimento y cantidad en
+                    kilos) de forma
+                    digital."</li>
+                <li>"Como <strong>Gerente</strong>, visualizo qué especie y lote está en cada jaula de mis centros."
+                </li>
+                <li>"Como <strong>Analista de Costos</strong>, calculo el gasto acumulado de alimento por centro de
+                    cultivo."</li>
+            </ul>
+
+            <h3>Reglas de Negocio (Pistas para el Modelo)</h3>
+            <ol>
+                <li><strong>Infraestructura:</strong> Un Centro de Cultivo (con ubicación) contiene múltiples Jaulas.
+                </li>
+                <li><strong>Población:</strong> Una Jaula contiene UN Lote de UNA Especie específica (Salar, Coho,
+                    Trucha, etc.).</li>
+                <li><strong>Insumos:</strong> Existen diferentes Tipos de Alimento (identificados por Marca, Calibre y
+                    Costo por kilo).</li>
+                <li><strong>Proceso Transaccional:</strong> Cada Evento de Alimentación registra: Fecha, Lote
+                    alimentado, Tipo de Alimento usado y Cantidad en kilos.</li>
+            </ol>
+
+            <details>
+                <summary>Ayuda / Pista de Modelado</summary>
+                <p>Identifica la relación principal: Un "Evento de Alimentación" conecta un "Lote" con un "Tipo de
+                    Alimento". ¿Dónde guardarías la fecha y la cantidad de kilos? Esa es tu entidad asociativa o tabla
+                    de hechos.
+                    Piensa también en cómo se relacionan los Centros con las Jaulas, y las Jaulas con los Lotes.</p>
+            </details>
+
+            <div class="warning-box">
+                <strong>Importante:</strong> Presta atención al orden de creación de tablas. Las tablas que tienen
+                Foreign Keys deben crearse DESPUÉS de las tablas a las que referencian. Esto evitará errores de "tabla
+                no
+                encontrada" al ejecutar tu script DDL.
+            </div>
+        </section>
+
+        <section>
+            <h2>Desafíos SQL a Resolver</h2>
+            <p>A continuación se presentan los <strong>9 desafíos SQL</strong> que debes implementar en tu script de
+                <strong>Poblado y Consultas (DML)</strong>. Cada desafío simula una necesidad real del negocio.
+            </p>
+
+            <h3>Consultas SELECT (5 desafíos)</h3>
+
+            <div class="challenge-box">
+                <h4>Desafío 1: Reporte de Infraestructura (SELECT Simple)</h4>
+                <p><strong>Tu Rol:</strong> Analista de Operaciones</p>
+                <p><strong>Contexto:</strong> La gerencia necesita un listado rápido de todas las instalaciones
+                    físicas para una auditoría.</p>
+                <p><strong>Misión:</strong> Escribe una consulta que liste todos los <strong>Centros de
+                        Cultivo</strong> registrados en el sistema.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 2: Auditoría de Capacidad (SELECT con WHERE)</h4>
+                <p><strong>Tu Rol:</strong> Jefe de Centro</p>
+                <p><strong>Contexto:</strong> Se requiere identificar las jaulas más grandes para programar la
+                    próxima siembra de Salmón Salar.</p>
+                <p><strong>Misión:</strong> Muestra solo las <strong>Jaulas</strong> que tengan una capacidad
+                    mayor a <strong>5000</strong> unidades.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 3: Censo de Población (SELECT con COUNT)</h4>
+                <p><strong>Tu Rol:</strong> Veterinario</p>
+                <p><strong>Contexto:</strong> Necesitamos saber cuántos grupos de peces activos estamos
+                    monitoreando actualmente.</p>
+                <p><strong>Misión:</strong> Utiliza una función de agregado para contar cuántos
+                    <strong>Lotes</strong> existen en total en la base de datos.
+                </p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 4: Balance de Biodiversidad (SELECT con GROUP BY)</h4>
+                <p><strong>Tu Rol:</strong> Biólogo Marino</p>
+                <p><strong>Contexto:</strong> Queremos visualizar la distribución de nuestra producción según el
+                    tipo de pez cultivado.</p>
+                <p><strong>Misión:</strong> Cuenta cuántos lotes existen agrupados por <strong>Especie</strong>.
+                </p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 5: Reporte Legible (SELECT con JOIN)</h4>
+                <p><strong>Tu Rol:</strong> Gerente General</p>
+                <p><strong>Contexto:</strong> Los reportes actuales solo muestran IDs numéricos que nadie
+                    entiende.</p>
+                <p><strong>Misión:</strong> Lista el Código del Lote junto con el <strong>Nombre de su
+                        Especie</strong> (uniendo las tablas Lote y Especie mediante JOIN).</p>
+            </div>
+
+            <h3>Operaciones UPDATE (2 desafíos)</h3>
+
+            <div class="challenge-box">
+                <h4>Desafío 6: Corrección de Obra (UPDATE Simple)</h4>
+                <p><strong>Tu Rol:</strong> Jefe de Mantenimiento</p>
+                <p><strong>Contexto:</strong> Se detectó un error en la digitalización de los planos de la jaula
+                    'J-101'.</p>
+                <p><strong>Misión:</strong> Actualiza la capacidad de la jaula con código <strong>'J-101'</strong>
+                    para que
+                    sea <strong>52000</strong> unidades.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 7: Negociación con Proveedor (UPDATE con WHERE)</h4>
+                <p><strong>Tu Rol:</strong> Jefe de Adquisiciones</p>
+                <p><strong>Contexto:</strong> El proveedor 'BioMar' ha ajustado sus tarifas debido al alza del
+                    dólar.</p>
+                <p><strong>Misión:</strong> Actualiza el costo de <strong>todos</strong> los alimentos de la
+                    marca <strong>'BioMar'</strong> a <strong>1250</strong> pesos por kilo.</p>
+            </div>
+
+            <h3>Operaciones DELETE (2 desafíos)</h3>
+
+            <div class="challenge-box">
+                <h4>Desafío 8: Registro Duplicado (DELETE Simple)</h4>
+                <p><strong>Tu Rol:</strong> Administrador de BD</p>
+                <p><strong>Contexto:</strong> El sistema registró dos veces un mismo evento de alimentación por
+                    error de red.</p>
+                <p><strong>Misión:</strong> Elimina el registro de alimentación con el ID <strong>10</strong>.
+                </p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 9: Limpieza de Pruebas (DELETE con Condición)</h4>
+                <p><strong>Tu Rol:</strong> Tester QA</p>
+                <p><strong>Contexto:</strong> Se crearon datos ficticios para probar el sistema que deben ser
+                    borrados antes de salir a producción.</p>
+                <p><strong>Misión:</strong> Elimina el lote con código <strong>'L-ERR-01'</strong> de la base de
+                    datos.</p>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <section>
+            <h2>Rúbrica de Evaluación (Puntaje Total: 100 puntos)</h2>
+
+            <table style="font-size: 11px;">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Criterio</th>
+                        <th style="width: 10%;">Puntaje</th>
+                        <th style="width: 70%;">Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3"><strong>Modelo Lógico</strong></td>
+                        <td>15 pts</td>
+                        <td>Todas las entidades identificadas correctamente, atributos pertinentes, UIDs definidos,
+                            relaciones con cardinalidad precisa.</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>Modelo completo con errores menores en cardinalidades o falta de 1 entidad secundaria.</td>
+                    </tr>
+                    <tr>
+                        <td>5 pts</td>
+                        <td>Modelo incompleto o con errores conceptuales importantes.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Modelo Relacional</strong></td>
+                        <td>10 pts</td>
+                        <td>Ingeniería correcta, tipos de datos apropiados, FK correctamente propagadas.</td>
+                    </tr>
+                    <tr>
+                        <td>6 pts</td>
+                        <td>Modelo generado con errores menores en tipos de datos.</td>
+                    </tr>
+                    <tr>
+                        <td>3 pts</td>
+                        <td>Modelo con errores significativos o no generado desde el lógico.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Script DDL</strong></td>
+                        <td>30 pts</td>
+                        <td>Todas las tablas creadas en orden correcto, PK con IDENTITY, FK inline, constraints
+                            aplicados, ejecuta sin errores.</td>
+                    </tr>
+                    <tr>
+                        <td>20 pts</td>
+                        <td>Script completo con 1-2 errores menores (falta algún NOT NULL, orden incorrecto
+                            solucionable).</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>Script con múltiples errores o no ejecuta completamente.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Poblado (INSERT)</strong></td>
+                        <td>15 pts</td>
+                        <td>Mínimo 5 registros por tabla, datos realistas, orden correcto de inserción, ejecuta sin
+                            errores.</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>Inserts completos con datos poco realistas o menos de 5 registros en algunas tablas.</td>
+                    </tr>
+                    <tr>
+                        <td>5 pts</td>
+                        <td>Inserts incompletos o con errores de ejecución.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Consultas SELECT</strong></td>
+                        <td>15 pts</td>
+                        <td>Las 5 consultas implementadas correctamente según los desafíos planteados.</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>4 de 5 consultas correctas.</td>
+                    </tr>
+                    <tr>
+                        <td>5 pts</td>
+                        <td>3 o menos consultas correctas.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>UPDATE y DELETE</strong></td>
+                        <td>10 pts</td>
+                        <td>Los 4 desafíos (2 UPDATE + 2 DELETE) implementados correctamente con WHERE apropiado.</td>
+                    </tr>
+                    <tr>
+                        <td>6 pts</td>
+                        <td>3 de 4 operaciones correctas.</td>
+                    </tr>
+                    <tr>
+                        <td>3 pts</td>
+                        <td>2 o menos operaciones correctas.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Orden y Limpieza</strong></td>
+                        <td>5 pts</td>
+                        <td>Scripts bien comentados, código indentado, nombres de archivos según formato solicitado.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3 pts</td>
+                        <td>Scripts legibles pero con poca documentación.</td>
+                    </tr>
+                    <tr>
+                        <td>1 pt</td>
+                        <td>Código desorganizado o sin comentarios.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="instruction-box">
+                <h3>Escala de Calificación (60% de exigencia)</h3>
+                <table style="width: 50%; margin: 10px auto;">
+                    <tr>
+                        <th>Puntaje</th>
+                        <th>Nota</th>
+                    </tr>
+                    <tr>
+                        <td>100 - 95</td>
+                        <td>7.0</td>
+                    </tr>
+                    <tr>
+                        <td>94 - 85</td>
+                        <td>6.0 - 6.9</td>
+                    </tr>
+                    <tr>
+                        <td>84 - 75</td>
+                        <td>5.0 - 5.9</td>
+                    </tr>
+                    <tr>
+                        <td>74 - 60</td>
+                        <td>4.0 - 4.9</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            < 60</td>
+                        <td>1.0 - 3.9</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2>Checklist de Autoevaluación Antes de Entregar</h2>
+
+            <ul class="checklist">
+                <li>Tengo el archivo .dmd del Data Modeler guardado</li>
+                <li>Exporté el PDF del Modelo Lógico (diagrama azul)</li>
+                <li>Exporté el PDF del Modelo Relacional (diagrama amarillo)</li>
+                <li>Mi script DDL ejecuta completamente sin errores</li>
+                <li>Todas las PK tienen GENERATED ALWAYS AS IDENTITY</li>
+                <li>Todas las FK están definidas inline con REFERENCES</li>
+                <li>Inserté al menos 5 registros en cada tabla</li>
+                <li>Resolví los 5 desafíos SELECT correctamente</li>
+                <li>Resolví los 2 desafíos UPDATE correctamente</li>
+                <li>Resolví los 2 desafíos DELETE correctamente</li>
+                <li>Mis scripts tienen comentarios explicativos</li>
+                <li>El archivo ZIP tiene el nombre correcto</li>
+                <li>Verifiqué que el ZIP contiene TODOS los archivos requeridos</li>
+            </ul>
+        </section>
+
+        <footer
+            style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ccc; text-align: center; color: #666; font-size: 12px;">
+            <p>Escuela de Informática y Telecomunicaciones - Duoc UC</p>
+            <p>Base de Datos Aplicada 1 | Evaluación Transversal</p>
+        </footer>
+    </div>
+
+</body>
+
+</html>

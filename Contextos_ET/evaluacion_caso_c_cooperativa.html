@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Transversal - Caso C: Cooperativa Lana y Madera</title>
+    <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #f4f4f4;
+            --accent-color: #2e7d32;
+            --text-color: #333;
+            --border-color: #ddd;
+            --font-main: 'Arial', sans-serif;
+            --font-reading: 'Georgia', serif;
+        }
+
+        body {
+            font-family: var(--font-reading);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+        }
+
+        .container {
+            width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+        }
+
+        header {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-info h1 {
+            font-family: var(--font-main);
+            font-size: 26px;
+            color: var(--primary-color);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-info p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .logo-box {
+            font-family: var(--font-main);
+            font-weight: bold;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 10px 20px;
+            text-transform: uppercase;
+        }
+
+        .logo-box img {
+            max-width: 180px;
+            display: block;
+        }
+
+        h2 {
+            font-family: var(--font-main);
+            color: var(--primary-color);
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 8px;
+            margin-top: 35px;
+            font-size: 20px;
+        }
+
+        h3 {
+            font-family: var(--font-main);
+            color: #444;
+            font-size: 17px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .instruction-box {
+            background-color: #f8fbff;
+            border-left: 5px solid var(--primary-color);
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 15px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .warning-box {
+            background-color: #fff8e1;
+            border-left: 5px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 14px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 10px;
+        }
+
+        .checklist li:before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 15px;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-family: var(--font-main);
+            font-size: 13px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        details {
+            background-color: #e8f5e9;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border: 1px solid #c8e6c9;
+        }
+
+        details summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--accent-color);
+            font-family: var(--font-main);
+            list-style: none;
+        }
+
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details summary::before {
+            content: '💡 ';
+        }
+
+        details p {
+            margin: 10px 0 0 0;
+            font-size: 0.95em;
+            color: #2e4d32;
+        }
+
+        .split-narrative {
+            display: flex;
+            gap: 20px;
+        }
+
+        .narrative-col {
+            flex: 1;
+        }
+
+        .challenge-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .challenge-box h4 {
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+            font-size: 15px;
+        }
+
+        .challenge-box p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <div class="header-info">
+                <h1>Evaluación Sumativa Transversal</h1>
+                <p>Escuela de Informática y Telecomunicaciones</p>
+                <p>Asignatura: Base de Datos Aplicada 1 BDY1101</p>
+            </div>
+            <div class="logo-box">
+                <img src="logoduocuc.jpg" alt="Logo Duoc UC">
+            </div>
+        </header>
+
+        <section>
+            <h2>Información General de la Evaluación</h2>
+
+            <table style="width: 60%; margin: auto;">
+                <tr>
+                    <th scope="row">Tiempo Asignado</th>
+                    <td>5 Horas Pedagógicas</td>
+                </tr>
+                <tr>
+                    <th scope="row">Modalidad</th>
+                    <td>Individual</td>
+                </tr>
+                <tr>
+                    <th scope="row">Ponderación</th>
+                    <td>40% de la nota final</td>
+                </tr>
+                <tr>
+                    <th scope="row">Caso Asignado</th>
+                    <td><strong>CASO C: Cooperativa Lana y Madera</strong></td>
+                </tr>
+            </table>
+
+            <div class="instruction-box">
+                <h3>Formato de Entrega</h3>
+                <p>Debes subir un archivo comprimido (.zip o .rar) con el nombre:</p>
+                <p><code>BDY1101_ET_CASO_C_Nombre_Apellido.zip</code></p>
+
+                <strong>Contenido del archivo comprimido:</strong>
+                <ul class="checklist">
+                    <li>Carpeta o archivo .dmd del Data Modeler</li>
+                    <li>PDF del Modelo Lógico exportado</li>
+                    <li>PDF del Modelo Relacional exportado</li>
+                    <li>Script SQL de Creación (DDL)</li>
+                    <li>Script SQL de Poblado y Consultas (DML)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Requisitos Técnicos Generales</h2>
+
+            <h3>A. Modelamiento (Oracle Data Modeler)</h3>
+            <ul class="checklist">
+                <li><strong>Modelo Lógico (Azul):</strong> Entidades, atributos, UIDs y relaciones con cardinalidad.
+                </li>
+                <li><strong>Modelo Relacional (Amarillo):</strong> Ingeniería generada, tipos de datos coherentes.</li>
+            </ul>
+
+            <h3>B. Implementación DDL (Script de Creación)</h3>
+            <ul class="checklist">
+                <li>Tablas creadas en orden lógico (primero las que no tienen FK).</li>
+                <li><strong>PK:</strong> Numéricas y <code>GENERATED ALWAYS AS IDENTITY</code>.</li>
+                <li><strong>FK:</strong> Definidas <em>inline</em> con <code>REFERENCES</code>.</li>
+                <li>Restricciones <code>NOT NULL</code> y <code>UNIQUE</code> aplicadas donde corresponda.</li>
+            </ul>
+
+            <h3>C. Implementación DML (Datos y Consultas)</h3>
+            <ul class="checklist">
+                <li><strong>Inserts:</strong> Mínimo 5 registros por tabla.</li>
+                <li><strong>Update:</strong> 2 sentencias con WHERE.</li>
+                <li><strong>Delete:</strong> 2 sentencias con WHERE.</li>
+                <li><strong>Select:</strong> 5 consultas (simple, WHERE, COUNT, GROUP BY, JOIN).</li>
+            </ul>
+        </section>
+
+        <div class="page-break"></div>
+
+        <section>
+            <h2>CASO: COOPERATIVA LANA Y MADERA</h2>
+
+            <p style="text-align: justify; margin-top: 20px; line-height: 1.8;">
+                El <strong>desarrollo de economías locales</strong> y el fortalecimiento del comercio justo han sido
+                prioridades estratégicas para el Estado de Chile, especialmente en territorios insulares y rurales donde
+                la agricultura y la pesca tradicional ya no son suficientes para sostener a las familias. En la
+                <strong>provincia de Chiloé</strong>, el artesanado textil y la carpintería en madera nativa representan
+                una importante fuente de identidad cultural y sustento económico para cientos de microempresarios que
+                trabajan de forma independiente, pero que enfrentan dificultades para acceder a mercados formales.
+            </p>
+
+            <p style="text-align: justify; line-height: 1.8;">
+                El <strong>Instituto de Desarrollo Agropecuario (INDAP)</strong> y el <strong>Servicio de Cooperación
+                    Técnica (SERCOTEC)</strong>, organismos dependientes del Ministerio de Agricultura y del Ministerio
+                de Economía respectivamente, tienen la misión de promover la asociatividad, la innovación y la
+                formalización de pequeños productores y emprendedores. Esto incluye el apoyo técnico y financiero para
+                la creación de <strong>cooperativas de trabajo</strong>, donde artesanos y productores locales se
+                agrupan para compartir infraestructura, reducir costos operacionales y acceder a canales de
+                comercialización más amplios.
+            </p>
+
+            <p style="text-align: justify; line-height: 1.8;">
+                En este contexto de políticas de fomento productivo y asociatividad, es que usted, como
+                <strong>especialista en tecnologías de información</strong>, ha sido contratado por una cooperativa de
+                artesanos de Chiloé para diseñar e implementar una base de datos que permita gestionar un
+                <strong>sistema de punto de venta (POS) compartido</strong>. El sistema debe permitir el registro
+                individualizado de ventas por artesano, control de inventario por productor, cálculo automático de
+                comisiones según los acuerdos internos, y generación de reportes financieros para rendir cuentas ante
+                los socios y organismos fiscalizadores como el Servicio de Impuestos Internos (SII).
+            </p>
+
+            <p style="text-align: justify; line-height: 1.8;">
+                Adicionalmente, para cumplir con este objetivo y los requerimientos del sistema, la cooperativa ha
+                definido que toda la información relacionada con <strong>artesanos, productos, categorías, clientes,
+                    ventas y detalles de venta</strong> debe estar centralizada en una base de datos relacional que
+                permita transparencia, auditoría y equidad en la distribución de ingresos entre los socios.
+            </p>
+
+            <h2 style="margin-top: 40px;">CASO C: Cooperativa "Lana y Madera"</h2>
+
+            <div class="instruction-box">
+                <div class="split-narrative">
+                    <div class="narrative-col">
+                        <h3>Situación Actual</h3>
+                        <p>Artesanos locales comparten un local comercial para vender sus productos textiles y de
+                            madera,
+                            pero actualmente sus ventas se mezclan en un sistema manual. Al fin de mes es difícil
+                            calcular
+                            cuánto debe recibir cada artesano según lo que realmente vendió de su producción.</p>
+                    </div>
+                    <div class="narrative-col">
+                        <h3>El Desafío</h3>
+                        <p>Crear un <strong>sistema POS (Punto de Venta)</strong> centralizado. Cada venta debe detallar
+                            qué productos salieron del inventario y quién los fabricó, permitiendo calcular
+                            automáticamente
+                            las comisiones a pagar a cada artesano al final de cada período.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Historias de Usuario (Requerimientos Funcionales)</h3>
+            <ul>
+                <li>"Como <strong>Cajero</strong>, registro ventas que contienen múltiples productos fabricados por
+                    distintos artesanos en una sola transacción."</li>
+                <li>"Como <strong>Artesano</strong>, consulto mis ventas clasificadas por categoría de producto (Lana,
+                    Madera, etc.) para analizar mi producción."</li>
+                <li>"Como <strong>Administrador</strong>, identifico si el cliente es frecuente (registrado) o anónimo
+                    para
+                    gestionar promociones."</li>
+            </ul>
+
+            <h3>Reglas de Negocio (Pistas para el Modelo)</h3>
+            <ol>
+                <li><strong>Proveedores Internos:</strong> Artesanos (cada uno con su porcentaje de comisión pactado con
+                    la
+                    cooperativa).</li>
+                <li><strong>Inventario:</strong> Cada Producto tiene Precio, Stock y Categoría. Además, cada producto
+                    pertenece a UN Artesano creador.</li>
+                <li><strong>Clientes:</strong> Pueden ser registrados (con RUT/email) o anónimos. El campo cliente es
+                    opcional en la venta.</li>
+                <li><strong>Transacción de Venta:</strong> Consta de dos niveles:
+                    <ul>
+                        <li><strong>Cabecera (Venta):</strong> Fecha, Total, Cliente (opcional)</li>
+                        <li><strong>Detalle de Venta:</strong> Producto específico, Cantidad, Precio histórico al
+                            momento de
+                            la venta</li>
+                    </ul>
+                </li>
+            </ol>
+
+            <details>
+                <summary>Ayuda / Pista de Modelado</summary>
+                <p>El desafío principal de este caso es manejar la <strong>relación muchos-a-muchos</strong> entre VENTA
+                    y PRODUCTO. Una venta puede tener muchos productos diferentes, y un producto puede aparecer en
+                    muchas
+                    ventas a lo largo del tiempo. Esta relación N:M se resuelve con una <strong>tabla
+                        intermedia</strong> llamada DETALLE_VENTA, que además guarda información adicional importante
+                    como
+                    la cantidad y el precio histórico (no el precio actual del producto, sino el que tenía al momento de
+                    esa
+                    venta específica).</p>
+            </details>
+
+            <div class="warning-box">
+                <strong>⚠️ Importante:</strong> NO conectes VENTA directamente con PRODUCTO. Debe existir siempre una
+                tabla DETALLE_VENTA (o similar) que actúe como "puente". Esta tabla intermedia contendrá la cantidad de
+                cada producto en esa venta y el precio_unitario histórico (que puede diferir del precio actual del
+                producto
+                en inventario).
+            </div>
+        </section>
+
+        <section>
+            <h2>Desafíos SQL a Resolver</h2>
+            <p>A continuación se presentan los <strong>9 desafíos SQL</strong> que debes implementar en tu script de
+                <strong>Poblado y Consultas (DML)</strong>. Cada desafío simula una necesidad real del negocio.
+            </p>
+
+            <h3>Consultas SELECT (5 desafíos)</h3>
+
+            <div class="challenge-box">
+                <h4>Desafío 1: Catálogo Web (SELECT Simple)</h4>
+                <p><strong>Tu Rol:</strong> Webmaster</p>
+                <p><strong>Contexto:</strong> Estamos actualizando la tienda online y necesitamos exportar todo el
+                    inventario disponible.</p>
+                <p><strong>Misión:</strong> Genera una consulta que traiga todos los <strong>Productos</strong>
+                    registrados en el sistema.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 2: Alerta de Stock (SELECT con WHERE)</h4>
+                <p><strong>Tu Rol:</strong> Jefe de Bodega</p>
+                <p><strong>Contexto:</strong> Debemos avisar a los artesanos qué productos se están agotando para que
+                    repongan stock.</p>
+                <p><strong>Misión:</strong> Muestra solo los <strong>Productos</strong> que tengan un stock menor
+                    a <strong>10</strong> unidades.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 3: Memoria Anual (SELECT con COUNT)</h4>
+                <p><strong>Tu Rol:</strong> Presidente de la Cooperativa</p>
+                <p><strong>Contexto:</strong> Para la cuenta pública anual, necesitamos saber cuántos socios activos
+                    tiene la cooperativa.</p>
+                <p><strong>Misión:</strong> Cuenta el número total de <strong>Artesanos</strong> inscritos en el
+                    sistema.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 4: Balance de Inventario (SELECT con GROUP BY)</h4>
+                <p><strong>Tu Rol:</strong> Contador</p>
+                <p><strong>Contexto:</strong> Queremos saber cuánto inventario total tenemos acumulado por cada tipo
+                    de
+                    material o categoría.</p>
+                <p><strong>Misión:</strong> Suma el stock total agrupado por <strong>Categoría</strong> (ejemplo:
+                    total en Lana, total en Madera).</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 5: Etiquetado (SELECT con JOIN)</h4>
+                <p><strong>Tu Rol:</strong> Encargado de Tienda</p>
+                <p><strong>Contexto:</strong> Las etiquetas de precio deben indicar quién hizo cada producto para
+                    darle
+                    un valor personal y de trazabilidad.</p>
+                <p><strong>Misión:</strong> Lista el Nombre del Producto junto con el <strong>Nombre del
+                        Artesano</strong> creador (uniendo las tablas Producto y Artesano).</p>
+            </div>
+
+            <h3>Operaciones UPDATE (2 desafíos)</h3>
+
+            <div class="challenge-box">
+                <h4>Desafío 6: Valor Agregado (UPDATE Simple)</h4>
+                <p><strong>Tu Rol:</strong> Artesano Textil</p>
+                <p><strong>Contexto:</strong> Los ponchos han subido de plusvalía comercial por la temporada de
+                    invierno.</p>
+                <p><strong>Misión:</strong> Aumenta el precio del producto <strong>'Poncho Chilote'</strong> en
+                    un <strong>10%</strong> (multiplica el precio actual por 1.1).</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 7: Premio Antigüedad (UPDATE con WHERE)</h4>
+                <p><strong>Tu Rol:</strong> Tesorero de la Cooperativa</p>
+                <p><strong>Contexto:</strong> Un socio fundador con años de antigüedad ha negociado una mejor
+                    comisión
+                    sobre sus ventas.</p>
+                <p><strong>Misión:</strong> Actualiza el porcentaje de comisión del artesano con ID
+                    <strong>5</strong> al <strong>15%</strong>.
+                </p>
+            </div>
+
+            <h3>Operaciones DELETE (2 desafíos)</h3>
+
+            <div class="challenge-box">
+                <h4>Desafío 8: Depuración Catálogo (DELETE Simple)</h4>
+                <p><strong>Tu Rol:</strong> Administrador del Sistema</p>
+                <p><strong>Contexto:</strong> Un producto antiguo ya no se fabrica más y está ensuciando la base de
+                    datos con información obsoleta.</p>
+                <p><strong>Misión:</strong> Elimina el producto con ID <strong>99</strong> del sistema.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 9: Corrección Contable (DELETE con Condición)</h4>
+                <p><strong>Tu Rol:</strong> Analista Contable</p>
+                <p><strong>Contexto:</strong> Una línea de venta se ingresó por duplicado en el sistema y está
+                    descuadrando la caja diaria.</p>
+                <p><strong>Misión:</strong> Elimina el detalle de venta con ID <strong>101</strong> de la base de
+                    datos.</p>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <section>
+            <h2>Rúbrica de Evaluación (Puntaje Total: 100 puntos)</h2>
+
+            <table style="font-size: 11px;">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Criterio</th>
+                        <th style="width: 10%;">Puntaje</th>
+                        <th style="width: 70%;">Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3"><strong>Modelo Lógico</strong></td>
+                        <td>15 pts</td>
+                        <td>Entidades correctas (Artesano, Categoría, Producto, Cliente, Venta, Detalle_Venta), relación
+                            N:M resuelta correctamente con entidad intermedia.</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>Modelo completo con errores menores o falta tabla intermedia pero intenta resolver N:M.</td>
+                    </tr>
+                    <tr>
+                        <td>5 pts</td>
+                        <td>Modelo incompleto o relación N:M no resuelta (VENTA conectada directamente a PRODUCTO).</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Modelo Relacional</strong></td>
+                        <td>10 pts</td>
+                        <td>Ingeniería correcta, DETALLE_VENTA con FK a VENTA y PRODUCTO, atributos precio_unitario y
+                            cantidad presentes.</td>
+                    </tr>
+                    <tr>
+                        <td>6 pts</td>
+                        <td>Modelo generado con errores menores en tipos de datos.</td>
+                    </tr>
+                    <tr>
+                        <td>3 pts</td>
+                        <td>Modelo con errores significativos de diseño.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Script DDL</strong></td>
+                        <td>30 pts</td>
+                        <td>Tablas en orden correcto, tabla intermedia DETALLE_VENTA correctamente implementada con sus
+                            2
+                            FK, precio_unitario guardado, todas las PK con IDENTITY, ejecuta sin errores.</td>
+                    </tr>
+                    <tr>
+                        <td>20 pts</td>
+                        <td>Script completo con 1-2 errores menores o falta precio_unitario pero estructura correcta.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>Script con errores significativos o tabla intermedia mal diseñada.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Poblado (INSERT)</strong></td>
+                        <td>15 pts</td>
+                        <td>Mínimo 5 registros por tabla, al menos una venta con múltiples productos en el detalle,
+                            datos
+                            realistas.</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>Inserts completos con datos poco realistas o menos registros.</td>
+                    </tr>
+                    <tr>
+                        <td>5 pts</td>
+                        <td>Inserts incompletos o con errores.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Consultas SELECT</strong></td>
+                        <td>15 pts</td>
+                        <td>Las 5 consultas implementadas correctamente, GROUP BY con SUM funcional, JOIN entre Producto
+                            y
+                            Artesano correcto.</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>4 de 5 consultas correctas.</td>
+                    </tr>
+                    <tr>
+                        <td>5 pts</td>
+                        <td>3 o menos consultas correctas.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>UPDATE y DELETE</strong></td>
+                        <td>10 pts</td>
+                        <td>Los 4 desafíos implementados correctamente, UPDATE con cálculo (multiplicación) funcional.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>6 pts</td>
+                        <td>3 de 4 operaciones correctas.</td>
+                    </tr>
+                    <tr>
+                        <td>3 pts</td>
+                        <td>2 o menos operaciones correctas.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Orden y Limpieza</strong></td>
+                        <td>5 pts</td>
+                        <td>Scripts bien comentados, código ordenado, nombres correctos.</td>
+                    </tr>
+                    <tr>
+                        <td>3 pts</td>
+                        <td>Scripts legibles con poca documentación.</td>
+                    </tr>
+                    <tr>
+                        <td>1 pt</td>
+                        <td>Código desorganizado.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="instruction-box">
+                <h3>Escala de Calificación (60% de exigencia)</h3>
+                <table style="width: 50%; margin: 10px auto;">
+                    <tr>
+                        <th>Puntaje</th>
+                        <th>Nota</th>
+                    </tr>
+                    <tr>
+                        <td>100 - 95</td>
+                        <td>7.0</td>
+                    </tr>
+                    <tr>
+                        <td>94 - 85</td>
+                        <td>6.0 - 6.9</td>
+                    </tr>
+                    <tr>
+                        <td>84 - 75</td>
+                        <td>5.0 - 5.9</td>
+                    </tr>
+                    <tr>
+                        <td>74 - 60</td>
+                        <td>4.0 - 4.9</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            < 60</td>
+                        <td>1.0 - 3.9</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2>Checklist de Autoevaluación Antes de Entregar</h2>
+
+            <ul class="checklist">
+                <li>Identifiqué correctamente la relación muchos-a-muchos entre VENTA y PRODUCTO</li>
+                <li>Creé la tabla DETALLE_VENTA como entidad intermedia</li>
+                <li>DETALLE_VENTA tiene Foreign Keys hacia VENTA y PRODUCTO</li>
+                <li>Incluí el atributo precio_unitario en DETALLE_VENTA (precio histórico)</li>
+                <li>PRODUCTO tiene Foreign Keys hacia ARTESANO y CATEGORIA</li>
+                <li>La relación CLIENTE → VENTA permite valores NULL (ventas anónimas)</li>
+                <li>Exporté el PDF del Modelo Lógico y Relacional</li>
+                <li>Mi script DDL ejecuta completamente sin errores</li>
+                <li>Inserté al menos 5 registros en cada tabla</li>
+                <li>Creé al menos una venta con múltiples productos diferentes</li>
+                <li>Resolví los 5 desafíos SELECT correctamente (incluido SUM con GROUP BY)</li>
+                <li>Resolví los 2 desafíos UPDATE (uno con multiplicación)</li>
+                <li>Resolví los 2 desafíos DELETE correctamente</li>
+                <li>El archivo ZIP tiene el nombre correcto</li>
+            </ul>
+        </section>
+
+        <footer
+            style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ccc; text-align: center; color: #666; font-size: 12px;">
+            <p>Escuela de Informática y Telecomunicaciones - Duoc UC</p>
+            <p>Base de Datos Aplicada 1 | Evaluación Transversal</p>
+        </footer>
+    </div>
+
+</body>
+
+</html>

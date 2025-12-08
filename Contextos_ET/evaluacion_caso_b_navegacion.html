@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Transversal - Caso B: Navegación Tenglo</title>
+    <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #f4f4f4;
+            --accent-color: #2e7d32;
+            --text-color: #333;
+            --border-color: #ddd;
+            --font-main: 'Arial', sans-serif;
+            --font-reading: 'Georgia', serif;
+        }
+
+        body {
+            font-family: var(--font-reading);
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            background-color: #fff;
+        }
+
+        .container {
+            width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+            background: white;
+        }
+
+        header {
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-info h1 {
+            font-family: var(--font-main);
+            font-size: 26px;
+            color: var(--primary-color);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .header-info p {
+            margin: 5px 0 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .logo-box {
+            font-family: var(--font-main);
+            font-weight: bold;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 10px 20px;
+            text-transform: uppercase;
+        }
+
+        .logo-box img {
+            max-width: 180px;
+            display: block;
+        }
+
+        h2 {
+            font-family: var(--font-main);
+            color: var(--primary-color);
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 8px;
+            margin-top: 35px;
+            font-size: 20px;
+        }
+
+        h3 {
+            font-family: var(--font-main);
+            color: #444;
+            font-size: 17px;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        .instruction-box {
+            background-color: #f8fbff;
+            border-left: 5px solid var(--primary-color);
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 15px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .warning-box {
+            background-color: #fff8e1;
+            border-left: 5px solid #ff9800;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 14px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 10px;
+        }
+
+        .checklist li:before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
+        ul,
+        ol {
+            margin-bottom: 15px;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-family: var(--font-main);
+            font-size: 13px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        th,
+        td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        details {
+            background-color: #e8f5e9;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border: 1px solid #c8e6c9;
+        }
+
+        details summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--accent-color);
+            font-family: var(--font-main);
+            list-style: none;
+        }
+
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details summary::before {
+            content: '💡 ';
+        }
+
+        details p {
+            margin: 10px 0 0 0;
+            font-size: 0.95em;
+            color: #2e4d32;
+        }
+
+        .split-narrative {
+            display: flex;
+            gap: 20px;
+        }
+
+        .narrative-col {
+            flex: 1;
+        }
+
+        .challenge-box {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .challenge-box h4 {
+            color: var(--primary-color);
+            margin: 0 0 10px 0;
+            font-size: 15px;
+        }
+
+        .challenge-box p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .container {
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .page-break {
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <div class="header-info">
+                <h1>Evaluación Sumativa Transversal</h1>
+                <p>Escuela de Informática y Telecomunicaciones</p>
+                <p>Asignatura: Base de Datos Aplicada 1 BDY1101</p>
+            </div>
+            <div class="logo-box">
+                <img src="logoduocuc.jpg" alt="Logo Duoc UC">
+            </div>
+        </header>
+
+        <section>
+            <h2>Información General de la Evaluación</h2>
+
+            <table style="width: 60%; margin: auto;">
+                <tr>
+                    <th scope="row">Tiempo Asignado</th>
+                    <td>5 Horas Pedagógicas</td>
+                </tr>
+                <tr>
+                    <th scope="row">Modalidad</th>
+                    <td>Individual</td>
+                </tr>
+                <tr>
+                    <th scope="row">Ponderación</th>
+                    <td>40% de la nota final</td>
+                </tr>
+                <tr>
+                    <th scope="row">Caso Asignado</th>
+                    <td><strong>CASO B: Navegación Tenglo</strong></td>
+                </tr>
+            </table>
+
+            <div class="instruction-box">
+                <h3>Formato de Entrega</h3>
+                <p>Debes subir un archivo comprimido (.zip o .rar) con el nombre:</p>
+                <p><code>BDY1101_ET_CASO_B_Nombre_Apellido.zip</code></p>
+
+                <strong>Contenido del archivo comprimido:</strong>
+                <ul class="checklist">
+                    <li>Carpeta o archivo .dmd del Data Modeler</li>
+                    <li>PDF del Modelo Lógico exportado</li>
+                    <li>PDF del Modelo Relacional exportado</li>
+                    <li>Script SQL de Creación (DDL)</li>
+                    <li>Script SQL de Poblado y Consultas (DML)</li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>Requisitos Técnicos Generales</h2>
+
+            <h3>A. Modelamiento (Oracle Data Modeler)</h3>
+            <ul class="checklist">
+                <li><strong>Modelo Lógico (Azul):</strong> Entidades, atributos, UIDs y relaciones con cardinalidad.
+                </li>
+                <li><strong>Modelo Relacional (Amarillo):</strong> Ingeniería generada, tipos de datos coherentes.</li>
+            </ul>
+
+            <h3>B. Implementación DDL (Script de Creación)</h3>
+            <ul class="checklist">
+                <li>Tablas creadas en orden lógico (primero las que no tienen FK).</li>
+                <li><strong>PK:</strong> Numéricas y <code>GENERATED ALWAYS AS IDENTITY</code>.</li>
+                <li><strong>FK:</strong> Definidas <em>inline</em> con <code>REFERENCES</code>.</li>
+                <li>Restricciones <code>NOT NULL</code> y <code>UNIQUE</code> aplicadas donde corresponda.</li>
+            </ul>
+
+            <h3>C. Implementación DML (Datos y Consultas)</h3>
+            <ul class="checklist">
+                <li><strong>Inserts:</strong> Mínimo 5 registros por tabla.</li>
+                <li><strong>Update:</strong> 2 sentencias con WHERE.</li>
+                <li><strong>Delete:</strong> 2 sentencias con WHERE.</li>
+                <li><strong>Select:</strong> 5 consultas (simple, WHERE, COUNT, GROUP BY, JOIN).</li>
+            </ul>
+        </section>
+
+        <div class="page-break"></div>
+
+        <section>
+            <h2>CASO: NAVEGACIÓN TENGLO</h2>
+
+            <p style="text-align: justify; margin-top: 20px; line-height: 1.8;">
+                La <strong>conectividad marítima</strong> en la Región de Los Lagos es un elemento esencial para la
+                calidad de vida de miles de habitantes que residen en islas como Tenglo, Maillen, Mechuque y otras
+                localidades aisladas del archipiélago de Chiloé. El transporte de pasajeros por vía acuática no solo
+                cumple una función turística, sino que representa el <strong>único medio de acceso</strong> a servicios
+                básicos como educación, salud y comercio para comunidades insulares que no cuentan con puentes ni
+                carreteras.
+            </p>
+
+            <p style="text-align: justify; line-height: 1.8;">
+                La <strong>Dirección General del Territorio Marítimo y de Marina Mercante (Directemar)</strong>,
+                dependiente de la Armada de Chile, tiene la misión de fiscalizar el cumplimiento de la normativa
+                marítima, velar por la seguridad de la navegación y proteger la vida humana en el mar. Esto incluye la
+                supervisión de embarcaciones menores que prestan servicios de transporte de pasajeros, exigiendo que
+                cada <strong>zarpe (salida de embarcación)</strong> cuente con un registro formal que identifique: la
+                embarcación utilizada, el patrón responsable, la ruta autorizada y la nómina completa de pasajeros a
+                bordo.
+            </p>
+
+            <p style="text-align: justify; line-height: 1.8;">
+                En este contexto normativo y de profesionalización del sector, es que usted, como <strong>especialista
+                    en tecnologías de información</strong>, ha sido contratado por una empresa de transporte marítimo
+                local para diseñar e implementar una base de datos que permita registrar y gestionar toda la operación
+                diaria de zarpes. El sistema debe permitir la emisión de manifiestos de pasajeros para fiscalización
+                marítima, control de capacidad de embarcaciones, asignación de patrones certificados, y generación de
+                documentos tributarios válidos ante el Servicio de Impuestos Internos (SII).
+            </p>
+
+            <p style="text-align: justify; line-height: 1.8;">
+                Adicionalmente, para cumplir con este objetivo y los requerimientos del sistema, la empresa ha definido
+                que toda la información relacionada con <strong>lanchas, patrones, rutas, zarpes, tickets y
+                    pasajeros</strong> debe estar centralizada en una base de datos relacional que permita auditorías,
+                consultas históricas y reportes de seguridad en cumplimiento con la normativa vigente.
+            </p>
+
+            <h2 style="margin-top: 40px;">CASO B: Turismo "Navegación Tenglo"</h2>
+
+            <div class="instruction-box">
+                <div class="split-narrative">
+                    <div class="narrative-col">
+                        <h3>Situación Actual</h3>
+                        <p>La empresa conecta el terminal de Angelmó con islas cercanas mediante lanchas de pasajeros.
+                            Actualmente venden tickets en papel sin asignar capitán ni llevar registro formal de los
+                            pasajeros por zarpe, incumpliendo normativas de la Armada de Chile y el SII.</p>
+                    </div>
+                    <div class="narrative-col">
+                        <h3>El Desafío</h3>
+                        <p>Necesitan formalizar cada <strong>ZARPE</strong> (salida de embarcación). El sistema debe
+                            asociar la lancha utilizada, el capitán a cargo y la lista de pasajeros con sus tarifas
+                            diferenciadas, para emitir manifiestos legales y documentos tributarios válidos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Historias de Usuario (Requerimientos Funcionales)</h3>
+            <ul>
+                <li>"Como <strong>Vendedor</strong>, registro la venta de tickets asignados a un zarpe específico,
+                    diferenciando entre tarifa Turista y Residente."</li>
+                <li>"Como <strong>Jefe de Flota</strong>, asigno qué Patrón y qué Lancha realizarán cada zarpe en una
+                    ruta
+                    determinada."</li>
+                <li>"Como <strong>Fiscalizador de la Armada</strong>, reviso el histórico completo de pasajeros
+                    transportados
+                    por cada zarpe realizado."</li>
+            </ul>
+
+            <h3>Reglas de Negocio (Pistas para el Modelo)</h3>
+            <ol>
+                <li><strong>Activos Físicos:</strong> Lanchas (identificadas por Matrícula, tienen Capacidad) y Patrones
+                    (identificados por RUT, poseen Licencia de navegación).</li>
+                <li><strong>Servicio:</strong> Rutas predefinidas con precio base (ejemplo: Angelmó-Tenglo $3500, Vuelta
+                    a la
+                    Isla $4500).</li>
+                <li><strong>Operación (Evento Central):</strong> Un Zarpe específico ocurre en una Fecha/Hora
+                    determinada y
+                    está compuesto por: 1 Lancha + 1 Patrón + 1 Ruta.</li>
+                <li><strong>Venta:</strong> Cada Ticket está asociado a UN Zarpe específico. La tarifa puede variar
+                    según el
+                    tipo de pasajero (Turista paga precio completo, Residente obtiene descuento).</li>
+            </ol>
+
+            <details>
+                <summary>Ayuda / Pista de Modelado</summary>
+                <p>Piensa en "ZARPE" como el evento central del sistema, similar a un "vuelo de avión". Un zarpe
+                    específico (ejemplo: zarpe del 15 de marzo a las 10:00) utiliza UNA lancha, es dirigido por UN
+                    patrón,
+                    y sigue UNA ruta. Muchos tickets (pasajes) pertenecen a ese zarpe, pero cada ticket pertenece a un
+                    solo
+                    zarpe. Evita conectar directamente Lancha con Ticket; la relación debe ser: Lancha → Zarpe → Ticket.
+                </p>
+            </details>
+
+            <div class="warning-box">
+                <strong>Importante:</strong> El modelo debe reflejar que un ZARPE es la entidad que "une" a Lancha,
+                Patrón y Ruta en un momento específico del tiempo. Los Tickets son consecuencia de ese zarpe y deben
+                referenciar al zarpe, no directamente a la lancha o al patrón.
+            </div>
+        </section>
+
+        <section>
+            <h2>Desafíos SQL a Resolver</h2>
+            <p>A continuación se presentan los <strong>9 desafíos SQL</strong> que debes implementar en tu script de
+                <strong>Poblado y Consultas (DML)</strong>. Cada desafío simula una necesidad real del negocio.
+            </p>
+
+            <h3>Consultas SELECT (5 desafíos)</h3>
+
+            <div class="challenge-box">
+                <h4>Desafío 1: Nómina de Personal (SELECT Simple)</h4>
+                <p><strong>Tu Rol:</strong> Asistente de RRHH</p>
+                <p><strong>Contexto:</strong> Necesitamos validar qué capitanes están habilitados en el sistema
+                    para el pago de sueldos mensual.</p>
+                <p><strong>Misión:</strong> Genera un listado de todos los <strong>Patrones</strong> registrados en
+                    la base de datos.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 2: Tour Masivo (SELECT con WHERE)</h4>
+                <p><strong>Tu Rol:</strong> Coordinador de Turismo</p>
+                <p><strong>Contexto:</strong> Llegará un grupo grande de turistas y necesitamos saber qué
+                    embarcaciones tienen capacidad suficiente.</p>
+                <p><strong>Misión:</strong> Muestra solo las <strong>Lanchas</strong> que tengan una capacidad
+                    mayor a <strong>20</strong> pasajeros.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 3: Estadísticas de Tráfico (SELECT con COUNT)</h4>
+                <p><strong>Tu Rol:</strong> Gerente de Operaciones</p>
+                <p><strong>Contexto:</strong> La autoridad marítima nos solicita el volumen total de movimientos del
+                    mes para estadísticas portuarias.</p>
+                <p><strong>Misión:</strong> Cuenta el número total de <strong>Zarpes</strong> que se han
+                    realizado en el sistema.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 4: Cálculo de Horas Extra (SELECT con GROUP BY)</h4>
+                <p><strong>Tu Rol:</strong> Encargado de Pagos</p>
+                <p><strong>Contexto:</strong> Necesitamos saber la carga laboral de cada capitán para balancear
+                    turnos y calcular bonos.</p>
+                <p><strong>Misión:</strong> Muestra cuántos zarpes ha realizado cada <strong>Patrón</strong>
+                    (agrupando por ID del patrón).</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 5: Fiscalización Armada (SELECT con JOIN)</h4>
+                <p><strong>Tu Rol:</strong> Fiscalizador de la Armada</p>
+                <p><strong>Contexto:</strong> En una inspección oficial, se requiere ver el historial de zarpes con
+                    el detalle de la embarcación utilizada.</p>
+                <p><strong>Misión:</strong> Lista la fecha del Zarpe junto con la <strong>Matrícula de la
+                        Lancha</strong> asociada (uniendo las tablas Zarpe y Lancha).</p>
+            </div>
+
+            <h3>Operaciones UPDATE (2 desafíos)</h3>
+
+            <div class="challenge-box">
+                <h4>Desafío 6: Ajuste Inflacionario (UPDATE Simple)</h4>
+                <p><strong>Tu Rol:</strong> Gerente Comercial</p>
+                <p><strong>Contexto:</strong> Debido al alza de combustibles, debemos ajustar las tarifas base de
+                    los servicios turísticos.</p>
+                <p><strong>Misión:</strong> Actualiza el precio base de la ruta <strong>'Vuelta a la
+                        Isla'</strong> a <strong>5000</strong> pesos.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 7: Ascenso de Personal (UPDATE con WHERE)</h4>
+                <p><strong>Tu Rol:</strong> Jefe de Flota</p>
+                <p><strong>Contexto:</strong> Un patrón ha completado exitosamente sus cursos de perfeccionamiento y
+                    debe actualizarse su categoría de licencia.</p>
+                <p><strong>Misión:</strong> Actualiza la licencia del patrón con RUT
+                    <strong>'12345678-9'</strong> a clase <strong>'A'</strong>.
+                </p>
+            </div>
+
+            <h3>Operaciones DELETE (2 desafíos)</h3>
+
+            <div class="challenge-box">
+                <h4>Desafío 8: Devolución a Cliente (DELETE Simple)</h4>
+                <p><strong>Tu Rol:</strong> Cajero</p>
+                <p><strong>Contexto:</strong> Un cliente solicitó reembolso inmediato de un ticket emitido por error
+                    antes de la salida del zarpe.</p>
+                <p><strong>Misión:</strong> Elimina el ticket con código <strong>'T-009'</strong> del sistema.</p>
+            </div>
+
+            <div class="challenge-box">
+                <h4>Desafío 9: Mal Clima (DELETE con Condición)</h4>
+                <p><strong>Tu Rol:</strong> Supervisor de Seguridad</p>
+                <p><strong>Contexto:</strong> Un zarpe programado debió cancelarse definitivamente por condiciones
+                    climáticas adversas (temporal).</p>
+                <p><strong>Misión:</strong> Elimina el zarpe con ID <strong>50</strong> del sistema.</p>
+            </div>
+        </section>
+
+        <div class="page-break"></div>
+
+        <section>
+            <h2>Rúbrica de Evaluación (Puntaje Total: 100 puntos)</h2>
+
+            <table style="font-size: 11px;">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Criterio</th>
+                        <th style="width: 10%;">Puntaje</th>
+                        <th style="width: 70%;">Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3"><strong>Modelo Lógico</strong></td>
+                        <td>15 pts</td>
+                        <td>Entidades correctas (Lancha, Patrón, Ruta, Zarpe, Ticket), relaciones bien definidas, ZARPE
+                            como entidad central identificado correctamente.</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>Modelo completo con errores menores en cardinalidades.</td>
+                    </tr>
+                    <tr>
+                        <td>5 pts</td>
+                        <td>Modelo incompleto o ZARPE no modelado como entidad central.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Modelo Relacional</strong></td>
+                        <td>10 pts</td>
+                        <td>Ingeniería correcta, FK apropiadamente propagadas desde ZARPE.</td>
+                    </tr>
+                    <tr>
+                        <td>6 pts</td>
+                        <td>Modelo generado con errores menores.</td>
+                    </tr>
+                    <tr>
+                        <td>3 pts</td>
+                        <td>Modelo con errores significativos de diseño.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Script DDL</strong></td>
+                        <td>30 pts</td>
+                        <td>Tablas en orden correcto, ZARPE con 3 FK (Lancha, Patrón, Ruta), TICKET con FK a ZARPE,
+                            todas
+                            las PK con IDENTITY, ejecuta sin errores.</td>
+                    </tr>
+                    <tr>
+                        <td>20 pts</td>
+                        <td>Script completo con 1-2 errores menores o falta alguna constraint.</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>Script con errores significativos o relaciones incorrectas.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Poblado (INSERT)</strong></td>
+                        <td>15 pts</td>
+                        <td>Mínimo 5 registros por tabla, al menos un zarpe con múltiples tickets, datos realistas.</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>Inserts completos con datos poco realistas o menos registros.</td>
+                    </tr>
+                    <tr>
+                        <td>5 pts</td>
+                        <td>Inserts incompletos o con errores.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Consultas SELECT</strong></td>
+                        <td>15 pts</td>
+                        <td>Las 5 consultas implementadas correctamente, JOIN entre Zarpe y Lancha funcional.</td>
+                    </tr>
+                    <tr>
+                        <td>10 pts</td>
+                        <td>4 de 5 consultas correctas.</td>
+                    </tr>
+                    <tr>
+                        <td>5 pts</td>
+                        <td>3 o menos consultas correctas.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>UPDATE y DELETE</strong></td>
+                        <td>10 pts</td>
+                        <td>Los 4 desafíos implementados correctamente.</td>
+                    </tr>
+                    <tr>
+                        <td>6 pts</td>
+                        <td>3 de 4 operaciones correctas.</td>
+                    </tr>
+                    <tr>
+                        <td>3 pts</td>
+                        <td>2 o menos operaciones correctas.</td>
+                    </tr>
+
+                    <tr>
+                        <td rowspan="3"><strong>Orden y Limpieza</strong></td>
+                        <td>5 pts</td>
+                        <td>Scripts bien comentados, código ordenado, nombres correctos.</td>
+                    </tr>
+                    <tr>
+                        <td>3 pts</td>
+                        <td>Scripts legibles con poca documentación.</td>
+                    </tr>
+                    <tr>
+                        <td>1 pt</td>
+                        <td>Código desorganizado.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="instruction-box">
+                <h3>Escala de Calificación (60% de exigencia)</h3>
+                <table style="width: 50%; margin: 10px auto;">
+                    <tr>
+                        <th>Puntaje</th>
+                        <th>Nota</th>
+                    </tr>
+                    <tr>
+                        <td>100 - 95</td>
+                        <td>7.0</td>
+                    </tr>
+                    <tr>
+                        <td>94 - 85</td>
+                        <td>6.0 - 6.9</td>
+                    </tr>
+                    <tr>
+                        <td>84 - 75</td>
+                        <td>5.0 - 5.9</td>
+                    </tr>
+                    <tr>
+                        <td>74 - 60</td>
+                        <td>4.0 - 4.9</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            < 60</td>
+                        <td>1.0 - 3.9</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2>Checklist de Autoevaluación Antes de Entregar</h2>
+
+            <ul class="checklist">
+                <li>Identifiqué correctamente ZARPE como la entidad central del sistema</li>
+                <li>ZARPE tiene Foreign Keys hacia Lancha, Patrón y Ruta</li>
+                <li>TICKET tiene Foreign Key hacia ZARPE (no hacia Lancha directamente)</li>
+                <li>Exporté el PDF del Modelo Lógico y Relacional</li>
+                <li>Mi script DDL ejecuta completamente sin errores</li>
+                <li>Todas las PK tienen GENERATED ALWAYS AS IDENTITY</li>
+                <li>Inserté al menos 5 registros en cada tabla</li>
+                <li>Creé al menos un zarpe con múltiples tickets asociados</li>
+                <li>Resolví los 5 desafíos SELECT correctamente</li>
+                <li>Resolví los 2 desafíos UPDATE correctamente</li>
+                <li>Resolví los 2 desafíos DELETE correctamente</li>
+                <li>Mis scripts tienen comentarios explicativos</li>
+                <li>El archivo ZIP tiene el nombre correcto</li>
+            </ul>
+        </section>
+
+        <footer
+            style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #ccc; text-align: center; color: #666; font-size: 12px;">
+            <p>Escuela de Informática y Telecomunicaciones - Duoc UC</p>
+            <p>Base de Datos Aplicada 1 | Evaluación Transversal</p>
+        </footer>
+    </div>
+
+</body>
+
+</html>

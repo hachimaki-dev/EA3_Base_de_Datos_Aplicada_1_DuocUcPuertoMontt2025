@@ -462,106 +462,6 @@
                     🎮
                 </button>
 
-                <!-- Collection Modal -->
-                <div v-if="showCollectionModal"
-                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm">
-                    <div
-                        class="bg-gray-900 border-2 border-gray-700 rounded-xl w-full max-w-4xl h-[80vh] flex flex-col shadow-2xl overflow-hidden relative">
-                        <button @click="showCollectionModal = false"
-                            class="absolute top-4 right-4 text-gray-400 hover:text-white z-10">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-
-                        <div class="p-6 border-b border-gray-800 bg-gray-800">
-                            <h2 class="text-2xl font-bold text-yellow-400 flex items-center gap-2">
-                                📚 Colección Pokémon <span class="text-sm text-gray-400">({{ collection ?
-                                    collection.length : 0 }})</span>
-                            </h2>
-                        </div>
-
-                        <div class="flex-1 overflow-y-auto p-6 custom-scrollbar">
-                            <div v-if="!collection || collection.length === 0" class="text-center text-gray-500 mt-20">
-                                <div class="text-6xl mb-4">🕸️</div>
-                                <p>Aún no has atrapado ningún Pokémon.</p>
-                                <p class="text-sm mt-2">¡Compra Pokéballs en la tienda!</p>
-                            </div>
-
-                            <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                <!-- Main Pokemon -->
-                                <div v-if="pokemonState.exists"
-                                    class="bg-gray-800 rounded-lg p-4 border-2 border-yellow-500 relative group hover:bg-gray-700 transition-colors">
-                                    <div
-                                        class="absolute top-2 right-2 text-xs bg-yellow-500 text-black px-2 py-0.5 rounded font-bold">
-                                        MAIN</div>
-                                    <img :src="pokemonState.species.sprite" class="w-24 h-24 mx-auto object-contain">
-                                    <div class="text-center mt-2">
-                                        <div class="font-bold">{{ pokemonState.species.name }}</div>
-                                        <div class="text-xs text-gray-400">Lv. {{ pokemonState.level }}</div>
-                                    </div>
-                                </div>
-
-                                <!-- Collection Pokemon -->
-                                <div v-for="(mon, idx) in collection" :key="idx"
-                                    class="bg-gray-800 rounded-lg p-4 border border-gray-700 relative group hover:bg-gray-700 transition-colors">
-                                    <img :src="mon.sprite" class="w-24 h-24 mx-auto object-contain">
-                                    <div class="text-center mt-2">
-                                        <div class="font-bold">{{ mon.name }} <span v-if="mon.isShiny"
-                                                class="text-yellow-400">✨</span></div>
-                                        <div class="text-xs text-gray-400">Lv. {{ mon.level }}</div>
-                                        <div class="text-[10px] text-gray-500 mt-1">Atrapado con {{ mon.caughtWith }}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Minigames Modal -->
-                <div v-if="showMinigamesModal"
-                    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80 backdrop-blur-sm">
-                    <div
-                        class="bg-gray-900 border-2 border-gray-700 rounded-xl w-full max-w-2xl p-8 relative shadow-2xl">
-                        <button @click="showMinigamesModal = false; activeMinigame = null"
-                            class="absolute top-4 right-4 text-gray-400 hover:text-white">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-
-                        <div v-if="activeMinigame === 'rps'" class="text-center">
-                            <h2 class="text-3xl font-bold text-blue-400 mb-2">🪨📄✂️ Piedra, Papel o Tijera</h2>
-                            <p class="text-gray-400 mb-8">¡Gana a la IA para conseguir monedas!</p>
-
-                            <div class="flex justify-center gap-8 mb-8">
-                                <button @click="playRPS('rock')"
-                                    class="w-24 h-24 bg-gray-800 rounded-full border-4 border-gray-600 hover:border-blue-500 hover:scale-110 transition-all text-4xl flex items-center justify-center">🪨</button>
-                                <button @click="playRPS('paper')"
-                                    class="w-24 h-24 bg-gray-800 rounded-full border-4 border-gray-600 hover:border-blue-500 hover:scale-110 transition-all text-4xl flex items-center justify-center">📄</button>
-                                <button @click="playRPS('scissors')"
-                                    class="w-24 h-24 bg-gray-800 rounded-full border-4 border-gray-600 hover:border-blue-500 hover:scale-110 transition-all text-4xl flex items-center justify-center">✂️</button>
-                            </div>
-
-                            <div class="grid grid-cols-3 gap-4 text-sm bg-gray-800 p-4 rounded-lg">
-                                <div class="text-green-400">Victorias: {{ minigames.rock_paper_scissors.wins }}</div>
-                                <div class="text-gray-400">Empates: {{ minigames.rock_paper_scissors.plays -
-                                    minigames.rock_paper_scissors.wins - minigames.rock_paper_scissors.losses }}</div>
-                                <div class="text-red-400">Derrotas: {{ minigames.rock_paper_scissors.losses }}</div>
-                            </div>
-                        </div>
-
-                        <div v-else class="text-center py-12">
-                            <div class="text-4xl mb-4">🚧</div>
-                            <h3 class="text-xl font-bold">En Construcción</h3>
-                            <p class="text-gray-500">Este minijuego estará disponible pronto.</p>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Shop Button -->
                 <button v-if="pokemonState.exists" @click="showShopModal = true"
                     class="px-3 py-2 border-2 font-bold uppercase text-xs tracking-widest transition-all duration-300 hover:scale-105 focus:outline-none rounded"
@@ -826,12 +726,7 @@
                                     :class="{'text-opacity-100': isCurrentLevel(mIndex, lIndex), 'text-opacity-70': !isCurrentLevel(mIndex, lIndex)}">
                                     {{ level.shortTitle }}
                                 </span>
-
-                                <!-- Status Icons -->
-                                <span v-if="completedLevels.includes(getLevelAbsoluteIndex(mIndex, lIndex))"
-                                    class="ml-auto text-green-500">✅</span>
-                                <span v-else-if="isLevelLocked(mIndex, lIndex)" class="ml-auto opacity-50">🔒</span>
-                                <span v-else-if="isCurrentLevel(mIndex, lIndex)" class="ml-auto animate-pulse">●</span>
+                                <span v-if="isCurrentLevel(mIndex, lIndex)" class="ml-auto animate-pulse">●</span>
                             </div>
                         </div>
                     </div>
@@ -1104,15 +999,6 @@
                     Lv.{{ pokemonState.level }}
                 </div>
 
-                <!-- Evolution Button -->
-                <div v-if="canEvolve"
-                    class="absolute -bottom-12 left-1/2 transform -translate-x-1/2 w-full text-center">
-                    <button @click="evolvePokemon"
-                        class="px-3 py-1 bg-yellow-400 text-black text-xs font-bold rounded-full shadow-lg animate-bounce hover:scale-110 transition-transform border-2 border-white">
-                        ✨ EVOLUCIONAR
-                    </button>
-                </div>
-
                 <!-- Notification Badge -->
                 <div v-if="pokemonNotification" class="absolute -top-2 -left-2"
                     :style="{ backgroundColor: 'var(--accent)', color: 'var(--bg-card)' }"
@@ -1288,35 +1174,6 @@
             <div class="text-xl mt-2">{{ pokemonState.species.name }} → Lv.{{ pokemonAnimationData.level }}</div>
             <div v-if="pokemonAnimationData.newMove" class="text-sm mt-2 font-bold">
                 ✨ Aprendió: {{ pokemonAnimationData.newMove.name }}
-            </div>
-        </div>
-
-        <!-- Evolution Animation -->
-        <div v-if="showPokemonAnimation === 'evolution'"
-            class="fixed inset-0 z-[300] flex items-center justify-center bg-black bg-opacity-95">
-            <div class="text-center animate-fade-in">
-                <div class="text-4xl font-bold mb-8 text-white animate-pulse">
-                    ¿Qué? ¡{{ pokemonState.species.name }} está evolucionando!
-                </div>
-
-                <div class="relative w-64 h-64 mx-auto mb-8">
-                    <!-- Old Pokemon -->
-                    <img :src="pokemonAnimationData.oldSprite"
-                        class="absolute inset-0 w-full h-full object-contain animate-ping opacity-50">
-
-                    <!-- New Pokemon -->
-                    <img :src="pokemonAnimationData.newSprite"
-                        class="absolute inset-0 w-full h-full object-contain animate-bounce z-10">
-                </div>
-
-                <div class="text-5xl font-bold text-yellow-400 mt-8 animate-bounce">
-                    ¡Felicidades! ¡Tu {{ pokemonState.species.name }} evolucionó a {{ pokemonAnimationData.newName }}!
-                </div>
-
-                <button @click="showPokemonAnimation = null"
-                    class="mt-12 px-8 py-3 bg-white text-black font-bold rounded-full hover:scale-110 transition-transform">
-                    CONTINUAR
-                </button>
             </div>
         </div>
 
@@ -1517,9 +1374,6 @@
                     showDownloads: false,
                     copied: false,
 
-                    // Level Progression
-                    completedLevels: [], // Array of level indices (0-based absolute index)
-
                     // Password Logic
                     isUnlocked: false,
                     showPasswordInput: false,
@@ -1566,8 +1420,6 @@
                     pokemonNotification: false,
                     showPokemonAnimation: null, // 'hatch', 'levelup', 'evolution'
                     pokemonAnimationData: null,
-                    canEvolve: false,
-                    evolutionTarget: null,
 
                     // Economy System
                     economy: {
@@ -2007,12 +1859,6 @@
                 },
                 nextLevel() {
                     if (this.currentLevel < this.totalLevels) {
-                        // Check if current level is completed
-                        if (!this.completedLevels.includes(this.currentLevel)) {
-                            this.typeWriterFeedback("🔒 Debes completar el nivel actual para avanzar.", "error");
-                            return;
-                        }
-
                         this.currentLevel++
                         this.resetLevelState()
                         this.expandActiveModule()
@@ -2031,15 +1877,7 @@
                     for (let i = 0; i < mIndex; i++) {
                         count += this.modules[i].levels.length
                     }
-                    const targetLevel = count + lIndex + 1;
-
-                    // Check if previous level is completed (allow going back or to next unlocked)
-                    if (targetLevel > 1 && !this.completedLevels.includes(targetLevel - 1) && targetLevel > (Math.max(0, ...this.completedLevels) + 1)) {
-                        this.typeWriterFeedback("🔒 Nivel bloqueado. Completa los anteriores.", "error");
-                        return;
-                    }
-
-                    this.currentLevel = targetLevel
+                    this.currentLevel = count + lIndex + 1
                     this.resetLevelState()
                 },
                 isCurrentLevel(mIndex, lIndex) {
@@ -2165,12 +2003,6 @@
                             this.isUnlocked = true;
                             this.showPasswordInput = false;
                         }
-
-                        // Mark level as completed
-                        if (!this.completedLevels.includes(this.currentLevel)) {
-                            this.completedLevels.push(this.currentLevel);
-                            this.saveGameState();
-                        }
                     } else {
                         this.typeWriterFeedback("Consulta incorrecta. Inténtalo de nuevo.", "error");
                         this.pokemonState.streak = 0;
@@ -2208,30 +2040,10 @@
                 },
 
 
-                getLevelAbsoluteIndex(mIndex, lIndex) {
-                    let count = 0;
-                    for (let i = 0; i < mIndex; i++) {
-                        count += this.modules[i].levels.length;
-                    }
-                    return count + lIndex + 1;
-                },
-
-                isLevelLocked(mIndex, lIndex) {
-                    const absIndex = this.getLevelAbsoluteIndex(mIndex, lIndex);
-                    // Level 1 is never locked
-                    if (absIndex === 1) return false;
-                    // Locked if previous level is not completed
-                    return !this.completedLevels.includes(absIndex - 1);
-                },
-
                 gainXP(amount) {
                     if (!this.pokemonState.exists) return;
 
-                    // Apply XP Boost if active
-                    const xpBoost = this.economy.activeBoosts.find(b => b.type === 'xp_boost');
-                    const finalAmount = xpBoost ? amount * 2 : amount;
-
-                    this.pokemonState.xp = (this.pokemonState.xp || 0) + finalAmount;
+                    this.pokemonState.xp = (this.pokemonState.xp || 0) + amount;
                     const xpNeeded = this.pokemonState.level * 100;
 
                     if (this.pokemonState.xp >= xpNeeded) {
@@ -2243,28 +2055,16 @@
                 },
 
                 // Pokemon Gamification Methods
-                async fetchPokemonFromAPI(id, isShiny = false) {
+                async fetchPokemonFromAPI(id) {
                     try {
                         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
                         const data = await response.json();
-
-                        // Fetch species data for evolution info
-                        const speciesResponse = await fetch(data.species.url);
-                        const speciesData = await speciesResponse.json();
-
-                        const sprite = isShiny ? data.sprites.front_shiny : data.sprites.front_default;
-                        const animatedSprite = isShiny
-                            ? (data.sprites.versions?.['generation-v']?.['black-white']?.animated?.front_shiny || sprite)
-                            : (data.sprites.versions?.['generation-v']?.['black-white']?.animated?.front_default || sprite);
-
                         return {
                             id: data.id,
                             name: data.name.charAt(0).toUpperCase() + data.name.slice(1),
-                            sprite: sprite,
-                            animatedSprite: animatedSprite,
-                            isShiny: isShiny,
+                            sprite: data.sprites.front_default,
+                            animatedSprite: data.sprites.versions?.['generation-v']?.['black-white']?.animated?.front_default || data.sprites.front_default,
                             types: data.types.map(t => t.type.name),
-                            evolutionChainUrl: speciesData.evolution_chain.url,
                             baseStats: {
                                 hp: data.stats[0].base_stat,
                                 attack: data.stats[1].base_stat,
@@ -2282,30 +2082,9 @@
                     }
                 },
 
-                getRandomBasicPokemonId() {
-                    // List of Basic Pokemon that can evolve (Starters, popular lines, etc.)
-                    // Gen 1-9 mix
-                    const basicPokemon = [
-                        1, 4, 7, 10, 13, 16, 19, 21, 23, 25, 27, 29, 32, 35, 37, 39, 41, 43, 46, 48, 50, 52, 54, 56, 58, 60, 63, 66, 69, 72, 74, 77, 79, 81, 84, 86, 88, 90, 92, 96, 98, 100, 102, 104, 109, 111, 116, 118, 120, 123, 129, 133, 147, // Gen 1
-                        152, 155, 158, 161, 163, 165, 167, 170, 172, 175, 177, 179, 183, 187, 191, 194, 204, 209, 215, 216, 218, 220, 223, 228, 231, 236, 239, 246, // Gen 2
-                        252, 255, 258, 261, 263, 265, 270, 273, 276, 278, 280, 283, 285, 287, 290, 293, 296, 299, 304, 307, 309, 316, 318, 320, 322, 325, 328, 331, 333, 339, 341, 343, 345, 347, 349, 353, 355, 361, 363, 371, 374, // Gen 3
-                        387, 390, 393, 396, 399, 401, 403, 406, 408, 410, 412, 415, 418, 425, 427, 431, 434, 436, 443, 446, 449, 451, 453, 456, 458, // Gen 4
-                        495, 498, 501, 504, 506, 509, 511, 513, 515, 517, 519, 522, 524, 529, 532, 535, 540, 543, 546, 548, 551, 554, 557, 559, 562, 564, 566, 568, 570, 572, 574, 577, 580, 582, 585, 588, 590, 592, 595, 597, 599, 602, 605, 607, 610, 613, 616, 619, 622, 624, 627, 629, 633, // Gen 5
-                        650, 653, 656, 659, 661, 664, 667, 669, 672, 674, 677, 679, 682, 684, 686, 688, 690, 692, 694, 696, 698, 704, 708, 712, 714, // Gen 6
-                        722, 725, 728, 731, 734, 736, 739, 742, 744, 747, 749, 751, 753, 755, 757, 759, 761, 767, 769, 782, // Gen 7
-                        810, 813, 816, 819, 821, 824, 827, 831, 833, 835, 837, 840, 843, 846, 848, 850, 852, 854, 856, 859, 863, 868, 871, 872, 878, // Gen 8
-                        906, 909, 912, 915, 917, 919, 921, 924, 926, 928, 935, 938, 940, 942, 944, 946, 948, 951, 953, 955, 957, 960, 963, 965, 969, 971 // Gen 9
-                    ];
-                    return basicPokemon[Math.floor(Math.random() * basicPokemon.length)];
-                },
-
                 async hatchPokemonEgg() {
-                    const randomId = this.getRandomBasicPokemonId();
-
-                    // Shiny Chance: 1% (1/100)
-                    const isShiny = Math.random() < 0.01;
-
-                    const pokemonData = await this.fetchPokemonFromAPI(randomId, isShiny);
+                    const randomId = Math.floor(Math.random() * 151) + 1;
+                    const pokemonData = await this.fetchPokemonFromAPI(randomId);
                     if (!pokemonData) return;
 
                     this.pokemonState = {
@@ -2373,110 +2152,7 @@
                     setTimeout(() => {
                         this.showPokemonAnimation = null;
                         this.pokemonNotification = false;
-
-                        // Check for evolution after level up animation
-                        this.checkEvolutionAvailability();
                     }, 3000);
-                },
-
-                async checkEvolutionAvailability(itemUsed = null) {
-                    if (!this.pokemonState.exists || !this.pokemonState.species.evolutionChainUrl) return;
-
-                    try {
-                        const response = await fetch(this.pokemonState.species.evolutionChainUrl);
-                        const data = await response.json();
-
-                        // Recursive function to find current species in chain
-                        const findSpecies = (chain) => {
-                            if (chain.species.name === this.pokemonState.species.name.toLowerCase()) {
-                                return chain;
-                            }
-                            for (const evolution of chain.evolves_to) {
-                                const found = findSpecies(evolution);
-                                if (found) return found;
-                            }
-                            return null;
-                        };
-
-                        const currentChainLink = findSpecies(data.chain);
-
-                        if (currentChainLink && currentChainLink.evolves_to.length > 0) {
-                            // Check first evolution option (simplified)
-                            const evolution = currentChainLink.evolves_to[0];
-                            const details = evolution.evolution_details[0];
-
-                            let canEvolveNow = false;
-
-                            // Level Up Trigger
-                            if (details.trigger.name === 'level-up') {
-                                if (details.min_level && this.pokemonState.level >= details.min_level) {
-                                    canEvolveNow = true;
-                                } else if (!details.min_level && details.min_happiness) {
-                                    // Happiness evolution (simulate with level 20 or high clicks)
-                                    if (this.pokemonState.level >= 20) canEvolveNow = true;
-                                } else if (!details.min_level) {
-                                    // Default fallback for other level-up conditions
-                                    if (this.pokemonState.level >= 25) canEvolveNow = true;
-                                }
-                            }
-                            // Item Trigger
-                            else if (details.trigger.name === 'use-item' || itemUsed === 'evolution_stone') {
-                                if (itemUsed === 'evolution_stone') {
-                                    canEvolveNow = true;
-                                }
-                            }
-                            // Trade Trigger (simulate with item)
-                            else if (details.trigger.name === 'trade' && itemUsed === 'evolution_stone') {
-                                canEvolveNow = true;
-                            }
-
-                            if (canEvolveNow) {
-                                this.canEvolve = true;
-                                this.evolutionTarget = {
-                                    name: evolution.species.name,
-                                    url: evolution.species.url,
-                                    id: evolution.species.url.split('/').slice(-2, -1)[0]
-                                };
-
-                                // If triggered by item, evolve immediately
-                                if (itemUsed) {
-                                    this.evolvePokemon();
-                                }
-                            }
-                        }
-                    } catch (error) {
-                        console.error('Error checking evolution:', error);
-                    }
-                },
-
-                async evolvePokemon() {
-                    if (!this.evolutionTarget) return;
-
-                    const oldSprite = this.pokemonState.species.sprite;
-
-                    // Fetch new species data
-                    const newPokemonData = await this.fetchPokemonFromAPI(this.evolutionTarget.id, this.pokemonState.species.isShiny);
-
-                    if (newPokemonData) {
-                        this.pokemonAnimationData = {
-                            oldSprite: oldSprite,
-                            newSprite: newPokemonData.sprite,
-                            newName: newPokemonData.name
-                        };
-
-                        this.showPokemonAnimation = 'evolution';
-
-                        // Update State
-                        this.pokemonState.species = newPokemonData;
-                        this.pokemonState.evolutionStage++;
-                        this.pokemonState.stats = this.calculatePokemonStats(newPokemonData.baseStats, this.pokemonState.level);
-
-                        this.canEvolve = false;
-                        this.evolutionTarget = null;
-
-                        this.savePokemonState();
-                        this.triggerConfetti();
-                    }
                 },
 
                 async completePokemonChallenge() {
@@ -2581,25 +2257,14 @@
                             this.useConsumableItem(item);
                             break;
                         case 'boost':
-                            // Add boost to active list
-                            const expiresAt = Date.now() + item.duration;
-                            this.economy.activeBoosts.push({
-                                id: item.id,
-                                type: item.id,
-                                name: item.name,
-                                expiresAt: expiresAt
-                            });
-                            alert(`✅ ${item.name} activado! Duración: ${item.duration / 60000} min.`);
+                            alert(`✅ ${item.name} activado! (Próximamente funcional)`);
                             break;
                         case 'unlock':
                             this.minigames[item.unlocks].unlocked = true;
                             alert(`✅ ${this.minigames[item.unlocks].name} desbloqueado!`);
                             break;
                         case 'upgrade':
-                            if (item.id === 'new_move_slot') {
-                                this.pokemonState.maxMoves = (this.pokemonState.maxMoves || 4) + 1;
-                                alert(`✅ ${item.name} comprado! Ahora puedes aprender hasta ${this.pokemonState.maxMoves} movimientos.`);
-                            }
+                            alert(`✅ ${item.name} comprado!`);
                             break;
                     }
 
@@ -2628,18 +2293,12 @@
                             alert('🔋 Energía restaurada +50!');
                             break;
                         case 'evolution_stone':
-                            this.checkEvolutionAvailability('evolution_stone');
-                            // Alert handled inside check if successful, or here if not
-                            setTimeout(() => {
-                                if (!this.canEvolve && !this.showPokemonAnimation) {
-                                    alert('❌ Este Pokémon no puede evolucionar con este ítem ahora.');
-                                }
-                            }, 1000);
+                            alert('🔮 Evolution Stone usado! (Evolución disponible próximamente)');
                             break;
                         case 'pokeball':
                         case 'greatball':
                         case 'masterball':
-                            this.catchPokemonGacha(item);
+                            alert(`${item.name} - Sistema de captura disponible próximamente!`);
                             break;
                     }
                 },
@@ -2732,12 +2391,7 @@
                     this.pokemonState.lastClickTime = now;
 
                     // Calculate coins with combo multiplier (max 5x)
-                    let clickPower = this.pokemonState.clickPower || 5;
-
-                    // Apply Power Boost
-                    const powerBoost = this.economy.activeBoosts.find(b => b.type === 'power_boost');
-                    if (powerBoost) clickPower = Math.floor(clickPower * 1.5);
-
+                    const clickPower = this.pokemonState.clickPower || 5;
                     const comboMultiplier = 1 + Math.min(this.pokemonState.clickCombo * 0.1, 4);
                     const coinsEarned = Math.floor(clickPower * comboMultiplier);
 
@@ -2758,7 +2412,6 @@
                         version: '2.0',
                         pokemonState: this.pokemonState,
                         economy: this.economy,
-                        completedLevels: this.completedLevels,
                         achievements: this.achievements,
                         minigames: this.minigames
                     };
@@ -2779,9 +2432,6 @@
                         if (gameState.economy) {
                             Object.assign(this.economy, gameState.economy);
                         }
-                        if (gameState.completedLevels) {
-                            this.completedLevels = gameState.completedLevels;
-                        }
                         if (gameState.achievements) {
                             // Merge achievements (keep structure but restore unlocked states)
                             Object.keys(gameState.achievements).forEach(key => {
@@ -2800,126 +2450,6 @@
                     } catch (e) {
                         console.error('Error loading game state:', e);
                     }
-                },
-
-                // ============================================================
-                // CATCHING SYSTEM (GACHA)
-                // ============================================================
-                async catchPokemonGacha(ballItem) {
-                    // Visual feedback
-                    alert(`Lanzando ${ballItem.name}...`);
-
-                    // Determine rarity/shiny chance based on ball
-                    let shinyChance = 0.01; // 1% base
-                    if (ballItem.id === 'greatball') shinyChance = 0.05; // 5%
-                    if (ballItem.id === 'masterball') shinyChance = 0.15; // 15%
-
-                    const isShiny = Math.random() < shinyChance;
-                    const randomId = this.getRandomBasicPokemonId(); // Use basic pool for now
-
-                    const newPokemon = await this.fetchPokemonFromAPI(randomId, isShiny);
-
-                    if (newPokemon) {
-                        // Add metadata
-                        newPokemon.caughtAt = new Date().toISOString();
-                        newPokemon.caughtWith = ballItem.name;
-                        newPokemon.level = 1; // Caught at lvl 1
-
-                        // Add to collection
-                        if (!this.collection) this.collection = [];
-                        this.collection.push(newPokemon);
-
-                        // Show success
-                        this.pokemonAnimationData = {
-                            oldSprite: ballItem.id === 'masterball' ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/master-ball.png' : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png', // Placeholder
-                            newSprite: newPokemon.sprite,
-                            newName: newPokemon.name
-                        };
-                        // We reuse evolution animation for catch for now, or create a new one
-                        // Let's just use a nice alert + confetti for MVP
-                        this.triggerConfetti();
-
-                        // Check achievement
-                        this.checkAchievement('collector');
-
-                        // Save
-                        this.saveGameState();
-
-                        setTimeout(() => {
-                            alert(`✨ ¡Atrapaste a ${newPokemon.name}${isShiny ? ' (Shiny!)' : ''}! \nGuardado en tu colección.`);
-                        }, 500);
-                    }
-                },
-
-                checkExpiredBoosts() {
-                    const now = Date.now();
-                    if (this.economy.activeBoosts && this.economy.activeBoosts.length > 0) {
-                        const initialLen = this.economy.activeBoosts.length;
-                        this.economy.activeBoosts = this.economy.activeBoosts.filter(b => b.expiresAt > now);
-
-                        if (this.economy.activeBoosts.length < initialLen) {
-                            alert('⏰ Un boost ha expirado.');
-                            this.saveGameState();
-                        }
-                    }
-                },
-
-                // ============================================================
-                // MINIGAMES SYSTEM
-                // ============================================================
-                openMinigame(gameId) {
-                    if (!this.minigames[gameId].unlocked) {
-                        alert("🔒 Minijuego bloqueado. Cómpralo en la tienda.");
-                        return;
-                    }
-                    this.activeMinigame = gameId;
-                    this.showMinigamesModal = true;
-                },
-
-                playRPS(playerChoice) {
-                    const choices = ['rock', 'paper', 'scissors'];
-                    const aiChoice = choices[Math.floor(Math.random() * 3)];
-
-                    let result = 'draw';
-                    if (playerChoice === aiChoice) result = 'draw';
-                    else if (
-                        (playerChoice === 'rock' && aiChoice === 'scissors') ||
-                        (playerChoice === 'paper' && aiChoice === 'rock') ||
-                        (playerChoice === 'scissors' && aiChoice === 'paper')
-                    ) {
-                        result = 'win';
-                    } else {
-                        result = 'loss';
-                    }
-
-                    const game = this.minigames.rock_paper_scissors;
-                    game.plays = (game.plays || 0) + 1; // Fix for missing plays property in initial state if needed
-
-                    let msg = `Tú: ${playerChoice} vs AI: ${aiChoice}. `;
-                    if (result === 'win') {
-                        msg += "¡GANASTE! +50 Monedas";
-                        this.earnCoins(50, 'minigame');
-                        game.wins++;
-                    } else if (result === 'draw') {
-                        msg += "¡EMPATE! +10 Monedas";
-                        this.earnCoins(10, 'minigame');
-                    } else {
-                        msg += "¡PERDISTE!";
-                        game.losses++;
-                    }
-
-                    alert(msg);
-                    this.saveGameState();
-
-                    // Check achievement
-                    if (game.wins >= 10) this.checkAchievement('win_10_minigames');
-                },
-
-                // ============================================================
-                // COLLECTION SYSTEM
-                // ============================================================
-                openCollection() {
-                    this.showCollectionModal = true;
                 }
             },
 
@@ -2953,11 +2483,6 @@
                 if (this.pokemonState.exists) {
                     this.checkAchievement('first_hatch');
                 }
-
-                // Start Boost Timer
-                setInterval(() => {
-                    this.checkExpiredBoosts();
-                }, 10000); // Check every 10s
             }
         }).mount('#app')
     </script>
